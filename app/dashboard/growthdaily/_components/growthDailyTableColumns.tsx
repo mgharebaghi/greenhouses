@@ -66,8 +66,8 @@ export function GrowthDailyColumns(props: GrowthDailyColumnsProps): ColumnsType<
     },
     {
       title: "قطر ریشه",
-      dataIndex: "RootDiameter",
-      key: "RootDiameter",
+      dataIndex: "Rootdiameter",
+      key: "Rootdiameter",
     },
     {
       title: "تخمینی",
