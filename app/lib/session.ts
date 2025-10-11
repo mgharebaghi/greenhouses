@@ -51,6 +51,7 @@ export async function ReadSession(): Promise<Session | null> {
   });
 
   if (!session) return { status: "error", code: 404 };
+  if (!session.ExpiresAt) return { status: "error", code: 403 };
 
   if (session.ExpiresAt < new Date()) {
     await prisma.session.deleteMany({ where: { PublicID: publicId } });
@@ -61,7 +62,7 @@ export async function ReadSession(): Promise<Session | null> {
   if (!isValid) return { status: "error", code: 403 };
 
   const user = await prisma.users.findUnique({
-    where: { UserID: session.UserId },
+    where: { UserID: session.UserId || 0 },
     select: { UserID: true, Username: true },
   });
 
