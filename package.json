@@ -8,20 +8,39 @@
     "start": "next start",
     "lint": "eslint"
   },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
   "dependencies": {
+    "@ant-design/icons": "^5.6.1",
+    "@ant-design/v5-patch-for-react-19": "^1.0.3",
+    "@auth/prisma-adapter": "^2.10.0",
+    "@prisma/client": "^6.16.2",
+    "antd": "^5.27.4",
+    "bcryptjs": "^3.0.2",
+    "crypto": "^1.0.1",
+    "dayjs": "^1.11.18",
+    "dayjs-jalali": "^0.0.2",
+    "jalaliday": "^3.1.1",
+    "next": "15.5.4",
     "react": "19.1.0",
+    "react-date-object": "^2.1.9",
     "react-dom": "19.1.0",
-    "next": "15.5.4"
+    "react-multi-date-picker": "^4.5.2"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4",
     "eslint": "^9",
     "eslint-config-next": "15.5.4",
-    "@eslint/eslintrc": "^3"
+    "prisma": "^6.16.2",
+    "tailwindcss": "^4",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.2"
   }
 }

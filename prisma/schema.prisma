@@ -1,0 +1,167 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider          = "sqlserver"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+model Greenhouses {
+  GreenhouseID     Int             @id(map: "PK_Greenhouses") @default(autoincrement())
+  OwnerID          Int?
+  GreenhouseName   String?         @db.NVarChar(150)
+  GreenhouseType   String?         @db.NVarChar(150)
+  AreaSqM          Decimal?        @db.Decimal(10, 2)
+  ConstructionDate DateTime?       @db.Date
+  CreatedAt        DateTime?
+  Address          String?         @db.NVarChar(250)
+  IsActive         Boolean?
+  Notes            String?         @db.NVarChar(500)
+  Owner_Observer   Owner_Observer? @relation(fields: [OwnerID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Greenhouses_Owner_Observer")
+  Zones            Zones[]
+}
+
+model PlantGrowthStages {
+  StageID             Int                   @id(map: "PK_PlantGrowthStages") @default(autoincrement())
+  VarietyID           Int?
+  StageOrder          Int?
+  StageName           String?               @db.NVarChar(100)
+  EntryCriteria       String?               @db.NVarChar(100)
+  StartDay            Int?
+  ExitCriteria        String?               @db.NVarChar(100)
+  EndDay              Int?
+  Description         String?               @db.NVarChar(500)
+  PlantVarieties      PlantVarities?        @relation(fields: [VarietyID], references: [VarietyID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Stages_Varieties")
+  PlantingGrowthDaily PlantingGrowthDaily[]
+}
+
+model Plantings {
+  PlantingID          BigInt                @id(map: "PK_Plantings") @default(autoincrement())
+  GreenhouseID        Int?
+  ZoneID              Int?
+  VarietyID           Int?
+  PlantDate           DateTime?             @db.Date
+  SourceBatch         String?               @db.NVarChar(200)
+  NumPlants           Int?
+  PlantsPerM2         Decimal?              @db.Decimal(9, 3)
+  ExpectedHarvestDate DateTime?             @db.Date
+  ActualHarvestDate   DateTime?             @db.Date
+  SeedingMethod       String?               @db.NVarChar(100)
+  TransplantDate      DateTime?             @db.Date
+  PlantCountMeasured  Int?
+  Notes               String?               @db.NVarChar(500)
+  PlantingGrowthDaily PlantingGrowthDaily[]
+  PlantVarieties      PlantVarities?        @relation(fields: [VarietyID], references: [VarietyID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Plantings_Varieties")
+  Zones               Zones?                @relation(fields: [ZoneID], references: [ZoneID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Plantings_Zones")
+}
+
+model sysdiagrams {
+  name         String @db.NVarChar(128)
+  principal_id Int
+  diagram_id   Int    @id(map: "PK__sysdiagr__C2B05B616C7FF742") @default(autoincrement())
+  version      Int?
+  definition   Bytes?
+
+  @@unique([principal_id, name], map: "UK_principal_name")
+}
+
+model Users {
+  UserID       Int       @id(map: "PK_Users") @default(autoincrement())
+  Username     String    @unique @db.NVarChar(100)
+  PasswordHash String    @db.NVarChar(256)
+  FullName     String?   @db.NVarChar(150)
+  Email        String?   @unique @db.NVarChar(200)
+  Phone        String?   @db.NVarChar(50)
+  RoleID       Int?
+  IsActive     Boolean?
+  CreatedAt    DateTime?
+  LastLoginAt  DateTime?
+  Sessions     Session[]
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Session {
+  ID         String    @id(map: "PK_Session") @default(cuid()) @db.NVarChar(100)
+  PublicID   String    @unique(map: "UQ_Session_PublicID") @db.NVarChar(100)
+  SecretHash String
+  UserId     Int?
+  CreatedAt  DateTime?
+  ExpiresAt  DateTime?
+  LastUsedAt DateTime?
+  User       Users?    @relation(fields: [UserId], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Session_Users")
+}
+
+model Zones {
+  ZoneID            Int          @id(map: "PK_Zones") @default(autoincrement())
+  GreenhouseID      Int?
+  Name              String?      @db.NVarChar(100)
+  AreaSqM           Decimal?     @db.Decimal(9, 2)
+  MicroclimateNotes String?      @db.NVarChar(500)
+  Plantings         Plantings[]
+  Greenhouses       Greenhouses? @relation(fields: [GreenhouseID], references: [GreenhouseID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Zones_Greenhouses")
+}
+
+model Owner_Observer {
+  ID                  Int                   @id(map: "PK_Owner_Observer") @default(autoincrement())
+  FirstName           String?               @db.NVarChar(150)
+  LastName            String?               @db.NVarChar(150)
+  PhoneNumber         String?               @db.NVarChar(150)
+  Profesion           String?               @db.NVarChar(150)
+  Greenhouses         Greenhouses[]
+  PlantingGrowthDaily PlantingGrowthDaily[]
+}
+
+model PlantingGrowthDaily {
+  PlantGrowthDailyID BigInt             @id(map: "PK_PlantingGrowthDaily") @default(autoincrement())
+  ObserverID         Int?
+  PlantingID         BigInt?
+  StageID            Int?
+  RecordDate         DateTime?          @db.Date
+  HeightCm           Decimal?           @db.Decimal(9, 3)
+  LeafCount          Int?
+  FlowerCount        Int?
+  FruitCount         Int?
+  RootLength         Int?
+  Rootdiameter       Int?
+  IsEstimated        Boolean?
+  HealthScore        Decimal?           @db.Decimal(5, 2)
+  PestObserved       Boolean?
+  Notes              String?            @db.NVarChar(500)
+  Owner_Observer     Owner_Observer?    @relation(fields: [ObserverID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PlantingGrowthDaily_Owner_Observer")
+  PlantGrowthStages  PlantGrowthStages? @relation(fields: [StageID], references: [StageID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PlantingGrowthDaily_PlantGrowthStages")
+  Plantings          Plantings?         @relation(fields: [PlantingID], references: [PlantingID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PlantingGrowthDaily_Plantings")
+}
+
+model Plants {
+  PlantID        Int             @id(map: "PK_Plants") @default(autoincrement())
+  CommonName     String?         @db.NVarChar(150)
+  ScientificName String?         @db.NVarChar(250)
+  Family         String?         @db.NVarChar(150)
+  Notes          String?         @db.NVarChar(500)
+  PlantVarities  PlantVarities[]
+}
+
+model PlantVarities {
+  VarietyID           Int                 @id(map: "PK_PlantVarities") @default(autoincrement())
+  PlantID             Int?
+  VarietyName         String?             @db.NVarChar(200)
+  SeedCompany         String?             @db.NVarChar(200)
+  DaysToGermination   Int?
+  DaysToSprout        Int?
+  DaysToSeedling      Int?
+  DaysToMaturity      Int?
+  TypicalYieldKgPerM2 Decimal?            @db.Decimal(10, 3)
+  IdealTempMin        Decimal?            @db.Decimal(6, 2)
+  IdealTempMax        Decimal?            @db.Decimal(6, 2)
+  IdealHumidityMin    Decimal?            @db.Decimal(6, 2)
+  IdealHumidityMax    Decimal?            @db.Decimal(6, 2)
+  LightRequirement    String?             @db.NVarChar(100)
+  GrowthCycleDays     Int?
+  Notes               String?             @db.NVarChar(500)
+  PlantGrowthStages   PlantGrowthStages[]
+  Plantings           Plantings[]
+  Plants              Plants?             @relation(fields: [PlantID], references: [PlantID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PlantVarities_Plants")
+}
