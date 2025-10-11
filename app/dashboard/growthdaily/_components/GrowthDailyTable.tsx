@@ -85,6 +85,10 @@ export default function GrowthDailyTable(props: GrowthDailyTableProps) {
       setPlantingOptions([]);
     } else {
       setGreenHousId(value);
+      setZoneId(null);
+      setPlantingId(null);
+      setZoneOptions([]);
+      setPlantingOptions([]);
     }
   };
 
@@ -95,6 +99,8 @@ export default function GrowthDailyTable(props: GrowthDailyTableProps) {
       setPlantingOptions([]);
     } else {
       setZoneId(value);
+      setPlantingId(null);
+      setPlantingOptions([]);
     }
   };
 
