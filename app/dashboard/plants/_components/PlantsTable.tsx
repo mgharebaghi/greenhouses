@@ -1,21 +1,28 @@
 "use client";
 import { Plants } from "@/app/generated/prisma";
-import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import { Table } from "antd";
+import Table from "@/app/dashboard/_components/UI/Table";
 import { useState } from "react";
 import PlantsEditModal, { PlantsEditModalProps } from "@/app/dashboard/plants/_components/PlantsEditModal";
 import PlantsDeleteModal, { PlantsDeleteModalProps } from "./PlantsDeleteModal";
+import InsertionRow from "../../_components/UI/InsertionRow";
+import { downloadCSVFromAntd } from "../../_components/tools/CSVoutput";
+import TableActions from "../../_components/UI/TableActions";
+import DeleteModal, { DeleteModalProps } from "../../_components/UI/DeleteModal";
+import { deletePlant, getPlants } from "@/app/lib/services/plants";
 
 type PlantsTableProps = {
   data: Plants[];
   loading?: boolean;
   setMainData?: (data: Plants[]) => void;
   setMainLoading?: (loading: boolean) => void;
+  setInsertModalOpen?: (open: boolean) => void;
 };
 
 export default function PlantsTable(props: PlantsTableProps) {
   const [openEditModal, setOpenEditModal] = useState<PlantsEditModalProps | null>(null);
-  const [openDeleteModal, setOpenDeleteModal] = useState<PlantsDeleteModalProps | null>(null);
+  const [openDeleteModal, setOpenDeleteModal] = useState<DeleteModalProps | null>(null);
+  const [deleteModalMsg, setDeleteModalMsg] = useState("");
+  const [deleteModalLoading, setDeleteModalLoading] = useState(false);
   const columns = [
     {
       title: "نام رایج",
@@ -37,14 +44,24 @@ export default function PlantsTable(props: PlantsTableProps) {
       dataIndex: "actions",
       key: "actions",
       render: (_: any, record: Plants) => (
-        <div className="flex gap-4">
-          <button className="text-blue-500 hover:underline cursor-pointer" onClick={() => onEdit(record)}>
-            <EditOutlined />
-          </button>
-          <button className="text-red-500 hover:underline cursor-pointer" onClick={() => onDelete(record)}>
-            <DeleteOutlined />
-          </button>
-        </div>
+        <TableActions
+          onEdit={() => onEdit(record)}
+          onDelete={() => {
+            setOpenDeleteModal({
+              open: true,
+              onClose() {
+                setOpenDeleteModal(null);
+              },
+              deleteLoading: deleteModalLoading,
+              id: record.PlantID,
+              name: record.CommonName || undefined,
+              onDelete() {
+                handleDelete(record.PlantID);
+              },
+              msg: deleteModalMsg,
+            });
+          }}
+        />
       ),
     },
   ];
@@ -56,16 +73,35 @@ export default function PlantsTable(props: PlantsTableProps) {
     });
   };
 
-  const onDelete = (record: Plants) => {
-    setOpenDeleteModal({
-      isOpen: true,
-      plant: record
-    });
-  }
+  const handleDelete = async (id: number) => {
+    setDeleteModalLoading(true);
+    const res = await deletePlant(id);
+    if (res) {
+      setDeleteModalLoading(false);
+      setOpenDeleteModal(null);
+      props.setMainLoading?.(true);
+      const updateData = await getPlants();
+      props.setMainData?.(updateData);
+      props.setMainLoading?.(false);
+    }
+  };
 
   return (
     <>
-      <Table columns={columns} dataSource={props.data} loading={props.loading} rowKey="PlantID" />
+      <InsertionRow
+        text="اطلاعات پایه گیاهی"
+        insertOnclick={() => props.setInsertModalOpen?.(true)}
+        csvOnclick={() =>
+          downloadCSVFromAntd(props.data, columns, "plants.csv", {
+            forceExcelSeparatorLine: false,
+            excludeKeys: ["actions"],
+          })
+        }
+        data={props.data}
+      />
+
+      <Table columns={columns} dataSource={props.data} loading={props.loading} rowKey="PlantID" pagination={false} />
+
       <PlantsEditModal
         isOpen={openEditModal?.isOpen || false}
         onClose={() => setOpenEditModal({ isOpen: false })}
@@ -73,12 +109,15 @@ export default function PlantsTable(props: PlantsTableProps) {
         setMainData={props.setMainData}
         setMainLoading={props.setMainLoading}
       />
-      <PlantsDeleteModal
-        isOpen={openDeleteModal?.isOpen || false}
-        onClose={() => setOpenDeleteModal({ isOpen: false })}
-        plant={openDeleteModal?.plant}
-        setMainData={props.setMainData}
-        setMainLoading={props.setMainLoading}
+
+      <DeleteModal 
+        open={openDeleteModal?.open || false}
+        onClose={openDeleteModal?.onClose || (() => setOpenDeleteModal(null))}
+        deleteLoading={deleteModalLoading}
+        id={openDeleteModal?.id}
+        name={openDeleteModal?.name}
+        onDelete={openDeleteModal?.onDelete}
+        msg={deleteModalMsg}
       />
     </>
   );

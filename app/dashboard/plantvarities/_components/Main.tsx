@@ -12,19 +12,16 @@ export default function PlantsVaritiesDashboard({ initialData }: { initialData: 
 
   const [isInsertModalOpen, setIsInsertModalOpen] = useState(false);
 
-  const openInsertModal = () => {
-    setIsInsertModalOpen(true);
-  };
-
   return (
     <div className="p-4 w-full h-full">
-      <div className="w-full py-4">
-        <Button type="primary" onClick={openInsertModal}>
-          افزودن گونه گیاهی
-        </Button>
-      </div>
       <div className="w-full">
-        <PlantVaritiesTable data={data} loading={loading} setMainData={setData} setMainLoading={setLoading} />
+        <PlantVaritiesTable
+          data={data}
+          loading={loading}
+          setMainData={setData}
+          setMainLoading={setLoading}
+          setIsInsertModalOpen={setIsInsertModalOpen}
+        />
       </div>
 
       <PlantVaritiesInsertModal

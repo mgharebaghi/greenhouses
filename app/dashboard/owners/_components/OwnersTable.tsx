@@ -1,15 +1,28 @@
 import { Owner_Observer } from "@/app/generated/prisma";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import { Table } from "antd";
+// import { Table } from "antd";
+import InsertionRow from "../../_components/UI/InsertionRow";
+import { downloadCSVFromAntd } from "../../_components/tools/CSVoutput";
+import DeleteModal, { DeleteModalProps } from "../../_components/UI/DeleteModal";
+import { useState } from "react";
+import { deleteOwner, getAllOwners, OwnerResponse } from "@/app/lib/services/owners";
+import Table from "@/app/dashboard/_components/UI/Table";
+import TableActions from "../../_components/UI/TableActions";
 
 type OwnersProps = {
   data: Owner_Observer[];
   loading: boolean;
   onEdit: (owner: Owner_Observer) => void;
-  onDelete: (ownerId: Owner_Observer) => void;
+  setInsertModal: (open: boolean) => void;
+  setLoading: (loading: boolean) => void;
+  setData: (data: Owner_Observer[]) => void;
 };
 
 export default function OwnersTable(props: OwnersProps) {
+  const [deleteModal, setDeleteModal] = useState<DeleteModalProps | null>(null);
+  const [deleteModalMsg, setDeleModalMsg] = useState("");
+  const [deletModalLoading, setDeleteModalLoading] = useState(false);
+
   const columns = [
     {
       title: "نام",
@@ -35,26 +48,86 @@ export default function OwnersTable(props: OwnersProps) {
       title: "عملیات",
       key: "actions",
       render: (_: any, record: Owner_Observer) => (
-        <div className="flex space-x-10 space-x-reverse">
-          <div onClick={() => props.onEdit(record)} className="text-blue-600 cursor-pointer">
-            <EditOutlined style={{ fontSize: 20 }} />
-          </div>
-          <div onClick={() => props.onDelete(record)} className="text-red-600 cursor-pointer">
-            <DeleteOutlined style={{ fontSize: 20 }} />
-          </div>
-        </div>
+        <TableActions
+          onEdit={() => {
+            props.onEdit(record);
+          }}
+          onDelete={() => {
+            setDeleteModal({
+              open: true,
+              onClose() {
+                setDeleteModal(null);
+              },
+              deleteLoading: deletModalLoading,
+              id: record.ID,
+              name: record.FirstName + " " + record.LastName,
+              onDelete() {
+                handleDelete(record.ID);
+              },
+              msg: deleteModalMsg,
+            });
+          }}
+        />
       ),
     },
   ];
 
+  const handleDelete = async (id: number) => {
+    setDeleModalMsg("");
+    setDeleteModalLoading(true);
+    if (id) {
+      const response: OwnerResponse = await deleteOwner(id);
+      if (response.status === "ok") {
+        setDeleteModalLoading(false);
+        setDeleteModal(null);
+      } else {
+        setDeleteModalLoading(false);
+        setDeleModalMsg(response.message);
+        // props.setIsOpen && props.setIsOpen();
+        return;
+      }
+    }
+
+    props.setLoading(true);
+    const newData: Owner_Observer[] = await getAllOwners();
+    props.setData(newData);
+    props.setLoading(false);
+  };
+
   return (
-    <Table
-      className="w-full"
-      columns={columns}
-      dataSource={props.data}
-      rowKey="ID"
-      pagination={false}
-      loading={props.loading}
-    />
+    <div className="w-full">
+      <InsertionRow
+        text="اطلاعات اشخاص"
+        insertOnclick={() => {
+          props.setInsertModal(true);
+        }}
+        csvOnclick={() =>
+          downloadCSVFromAntd(props.data, columns, "owners-list", {
+            forceExcelSeparatorLine: false,
+            excludeKeys: ["actions"],
+          })
+        }
+        data={props.data}
+      />
+      <Table
+        className="w-full"
+        columns={columns}
+        dataSource={props.data}
+        rowKey="ID"
+        pagination={false}
+        loading={props.loading}
+      />
+
+      <DeleteModal
+        open={deleteModal?.open || false}
+        onClose={() => setDeleteModal(null)}
+        deleteLoading={deletModalLoading}
+        id={deleteModal?.id}
+        msg={deleteModalMsg}
+        name={deleteModal?.name}
+        onDelete={deleteModal?.onDelete}
+        setMsg={setDeleModalMsg}
+      />
+    </div>
   );
 }

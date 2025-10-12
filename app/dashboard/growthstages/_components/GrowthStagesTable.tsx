@@ -1,10 +1,14 @@
 import type { PlantGrowthStages } from "@/app/generated/prisma";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import { Button, Table } from "antd";
+import { Button } from "antd";
+import Table from "@/app/dashboard/_components/UI/Table";
 import { useState } from "react";
 import StagesInsUpModal, { GrowthStagesInsUpModalProps } from "./StagesInsUpModal";
 import { deleteGrowthStage, getGrowthStages } from "@/app/lib/services/growthstages";
-import DeleteModal, { DeleteModalProps } from "@/app/dashboard/_components/tools/DeleteModal";
+import DeleteModal, { DeleteModalProps } from "@/app/dashboard/_components/UI/DeleteModal";
+import InsertionRow from "../../_components/UI/InsertionRow";
+import { downloadCSVFromAntd } from "../../_components/tools/CSVoutput";
+import TableActions from "../../_components/UI/TableActions";
 
 type GrowthStagesTableProps = {
   loading?: boolean;
@@ -19,7 +23,11 @@ export default function GrowthStagesTable(props: GrowthStagesTableProps) {
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   const columns = [
-    { title: "گونه گیاهی", dataIndex: ["PlantVarieties", "VarietyName"], key: "varietyName" },
+    {
+      title: "گونه گیاهی",
+      key: "varietyName",
+      render: (_: any, record: any) => record.PlantVarieties?.VarietyName,
+    },
     { title: "مرحله رشد", dataIndex: "StageOrder", key: "stageOrder" },
     { title: "عنوان مرحله", dataIndex: "StageName", key: "stageName" },
     { title: "علایم ورود به این مرحله", dataIndex: "EntryCriteria", key: "entryCriteria" },
@@ -30,36 +38,27 @@ export default function GrowthStagesTable(props: GrowthStagesTableProps) {
       title: "",
       key: "actions",
       render: (_: any, record: PlantGrowthStages) => (
-        <div className="flex gap-2">
-          <Button
-            type="link"
-            icon={<EditOutlined />}
-            onClick={() =>
-              setEditModal({
-                isOpen: true,
-                editData: record,
-                isEditMode: true,
-                setMainData: props.setMainData,
-                setMainLoading: props.setMainLoading,
-                StageID: record.StageID,
-              })
-            }
-          />
-          <Button
-            type="link"
-            icon={<DeleteOutlined />}
-            danger
-            onClick={() => {
-              setDeleteModal({
-                open: true,
-                onClose: () => setDeleteModal(null),
-                id: record.StageID,
-                name: record.StageName || "",
-                onDelete: () => handleDelete(record.StageID),
-              });
-            }}
-          />
-        </div>
+        <TableActions
+          onEdit={() =>
+            setEditModal({
+              isOpen: true,
+              editData: record,
+              isEditMode: true,
+              setMainData: props.setMainData,
+              setMainLoading: props.setMainLoading,
+              StageID: record.StageID,
+            })
+          }
+          onDelete={() => {
+            setDeleteModal({
+              open: true,
+              onClose: () => setDeleteModal(null),
+              id: record.StageID,
+              name: "مرحله " + record.StageName || "",
+              onDelete: () => handleDelete(record.StageID),
+            });
+          }}
+        />
       ),
     },
   ];
@@ -78,13 +77,33 @@ export default function GrowthStagesTable(props: GrowthStagesTableProps) {
   };
 
   return (
-    <>
+    <div className="w-full">
+      <InsertionRow
+        text=" مرحله رشد گیاه"
+        insertOnclick={() =>
+          setEditModal({
+            isOpen: true,
+            isEditMode: false,
+            setMainData: props.setMainData,
+            setMainLoading: props.setMainLoading,
+          })
+        }
+        csvOnclick={() => {
+          downloadCSVFromAntd<PlantGrowthStages>(props.data || [], columns, "growth-stages", {
+            forceExcelSeparatorLine: false,
+            excludeKeys: ["actions"],
+          });
+        }}
+        data={props.data}
+      />
+
       <Table
         columns={columns}
-        dataSource={props.data}
+        dataSource={props.data || []}
         loading={props.loading}
         rowKey="StageID"
-        scroll={{ x: "max-content" }}
+        scroll={{ x: 300 }}
+        pagination={false}
       />
 
       <StagesInsUpModal
@@ -105,6 +124,6 @@ export default function GrowthStagesTable(props: GrowthStagesTableProps) {
         onDelete={() => handleDelete(deleteModal?.id!)}
         deleteLoading={deleteLoading}
       />
-    </>
+    </div>
   );
 }

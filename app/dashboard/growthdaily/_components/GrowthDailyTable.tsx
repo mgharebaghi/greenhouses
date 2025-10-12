@@ -1,14 +1,17 @@
 import type { PlantingGrowthDaily } from "@/app/generated/prisma";
-import { PlusOutlined } from "@ant-design/icons";
-import { Button, Col, Row, Select, Table } from "antd";
+import { Col, Row, Select } from "antd";
+import Table from "@/app/dashboard/_components/UI/Table";
 
 import { useEffect, useState } from "react";
 import GrowthDailyInsUpModal, { GrowthDailyInsUpModalProps } from "./GrowthDailyInsUpModal";
-import { GrowthDailyColumns } from "./growthDailyTableColumns";
+import { GrowthDailyColumns, growthDailyFormatters } from "./growthDailyTableColumns";
 import { getAllData, getDataByGreenHousId, getDataByPlantingId, getDataByZoneId } from "../data/queries";
 import { fetchGreenhouseOptions, fetchPlantingOptions, fetchZoneOptions } from "../data/optionsData";
-import DeleteModal, { DeleteModalProps } from "../../_components/tools/DeleteModal";
+import DeleteModal, { DeleteModalProps } from "../../_components/UI/DeleteModal";
 import { deleteGrowthDaily } from "@/app/lib/services/growthdaily/delete";
+import { downloadCSVFromAntd } from "../../_components/tools/CSVoutput";
+import InsertionRow from "../../_components/UI/InsertionRow";
+import { getPlantingById } from "@/app/lib/services/planting";
 
 export type GrowthDailyTableProps = {
   initialData: PlantingGrowthDaily[];
@@ -39,6 +42,7 @@ export default function GrowthDailyTable(props: GrowthDailyTableProps) {
   const [plantingOptions, setPlantingOptions] = useState<selectOptions[]>([]);
   const [plantingLoading, setPlantingLoading] = useState(false);
   const [plantingId, setPlantingId] = useState<number | null>(null);
+  const [varietyID, setVarietyID] = useState<number | null>(null);
 
   //   use effects*******************
   useEffect(() => {
@@ -59,8 +63,17 @@ export default function GrowthDailyTable(props: GrowthDailyTableProps) {
 
     if (plantingId && zoneId && greenHousId) {
       getDataByPlantingId(plantingId, setTableLoading, setDataSource);
+      plantingDataById(plantingId);
     }
   }, [plantingId, zoneId, greenHousId]);
+
+  const plantingDataById = async (id: number) => {
+    const res: any | null = await getPlantingById(id);
+    if (res) {
+      console.log("res", res.VarietyID);
+      setVarietyID(res.VarietyID ?? null);
+    }
+  };
 
   useEffect(() => {
     fetchGreenhouseOptions(
@@ -104,7 +117,8 @@ export default function GrowthDailyTable(props: GrowthDailyTableProps) {
     }
   };
 
-  const handleEdit = (record: PlantingGrowthDaily) => {
+  const handleEdit = async (record: PlantingGrowthDaily) => {
+    await plantingDataById(Number(record.PlantingID));
     setGrowthInsUpModal({
       open: true,
       onClose: () => setGrowthInsUpModal(null),
@@ -113,6 +127,7 @@ export default function GrowthDailyTable(props: GrowthDailyTableProps) {
       plantingId: Number(record.PlantingID),
       setMainData: setDataSource,
       setMainLoading: setTableLoading,
+      varietyID: varietyID,
     });
   };
 
@@ -139,23 +154,7 @@ export default function GrowthDailyTable(props: GrowthDailyTableProps) {
   };
 
   return (
-    <>
-      <div className="w-full py-2 space-x-4">
-        <Button
-          type="primary"
-          onClick={() => {
-            if (plantingId) {
-              setGrowthInsUpModal({ open: true, plantingId: plantingId });
-            } else {
-              setInsUpModalMessage("لطفا ابتدا یک شناسه کاشت را انتخاب کنید.");
-            }
-          }}
-        >
-          افزودن پایش روزانه <PlusOutlined />
-        </Button>
-        <span className="text-red-500">{insUpModalMessage}</span>
-      </div>
-
+    <div className="w-full">
       <Row gutter={[16, 16]} align="middle" className="mb-4">
         <Col xs={24} sm={24} md={8} lg={8}>
           <Select
@@ -201,12 +200,41 @@ export default function GrowthDailyTable(props: GrowthDailyTableProps) {
         </Col>
       </Row>
 
+      <InsertionRow
+        text="پایش روزانه"
+        data={dataSource}
+        btnDisabled={!plantingId}
+        insertOnclick={() =>
+          setGrowthInsUpModal({
+            open: true,
+            onClose: () => setGrowthInsUpModal(null),
+            isEdititng: false,
+            setMainData: setDataSource,
+            setMainLoading: setTableLoading,
+          })
+        }
+        csvOnclick={() =>
+          downloadCSVFromAntd<PlantingGrowthDaily>(
+            dataSource,
+            GrowthDailyColumns({ handleEdit, handleDelete }),
+            `Growth-daily`,
+            {
+              formatters: growthDailyFormatters,
+              forceExcelSeparatorLine: false,
+              excludeKeys: ["actions"],
+            }
+          )
+        }
+        msg={insUpModalMessage}
+      />
+
       <Table
         columns={GrowthDailyColumns({ handleEdit, handleDelete })}
         dataSource={dataSource}
         rowKey="PlantGrowthDailyID"
-        scroll={{ x: "max-content" }}
+        scroll={{ x: 300 }}
         loading={tableLoading}
+        pagination={false}
       />
 
       <GrowthDailyInsUpModal
@@ -217,6 +245,7 @@ export default function GrowthDailyTable(props: GrowthDailyTableProps) {
         plantingId={growthInsUpModal?.plantingId || plantingId}
         setMainData={growthInsUpModal?.setMainData || setDataSource}
         setMainLoading={growthInsUpModal?.setMainLoading || setTableLoading}
+        varietyID={varietyID}
       />
 
       <DeleteModal
@@ -227,6 +256,6 @@ export default function GrowthDailyTable(props: GrowthDailyTableProps) {
         onDelete={deleteModal?.onDelete}
         deleteLoading={deleteModal?.deleteLoading}
       />
-    </>
+    </div>
   );
 }

@@ -1,4 +1,5 @@
-import { Button, Col, Divider, Form, Input, InputNumber, Modal, Row, Select, Spin, Table } from "antd";
+import { Modal, Form, Input, Select, Divider } from "antd";
+import Table from "@/app/dashboard/_components/UI/Table";
 import { ModalMsg } from "./Main";
 import { Greenhouses, Owner_Observer, Zones } from "@/app/generated/prisma";
 import { useEffect, useState } from "react";
@@ -6,9 +7,18 @@ import { allGreenHouses, updateGreenHouse } from "@/app/lib/services/greenhouse"
 import { SelectOptions } from "./GreenHouseInsrtModal";
 import { getAllOwners } from "@/app/lib/services/owners";
 import { ColumnType } from "antd/es/table";
-import { createZone, deleteZone, deleteZones, updateZone } from "@/app/lib/services/zones";
+import { createZone, deleteZone, updateZone } from "@/app/lib/services/zones";
 import { getgreenHouseZones } from "@/app/lib/services/zones/read";
-import { get } from "http";
+import {
+  CloseOutlined,
+  EditOutlined,
+  CheckCircleOutlined,
+  ExclamationCircleOutlined,
+  PlusOutlined,
+  SaveOutlined,
+  DeleteOutlined,
+} from "@ant-design/icons";
+import GreenhouseButton from "@/app/components/UI/GreenhouseButton";
 
 type ZoneType = {
   ZoneID: number;
@@ -34,8 +44,8 @@ export default function GreenHouseEditModal(props: EditModalProps) {
   const [modalMsg, setModalMsg] = useState<ModalMsg | null>(null);
   const [owners, setOwners] = useState<SelectOptions[]>([]);
   const [ownersLoading, setOwnersLoading] = useState(false);
-
   const [form] = Form.useForm();
+  const [zoneForm] = Form.useForm();
 
   const [pagination, setPagination] = useState({ current: 1, pageSize: 5 });
   const [zonesModalOpen, setZonesModalOpen] = useState(false);
@@ -46,28 +56,33 @@ export default function GreenHouseEditModal(props: EditModalProps) {
   const [zoneArea, setZoneArea] = useState(0);
 
   const fields = [
-    { name: "GreenhouseName", label: "نام گلخانه", required: true, type: "text" },
-    { name: "OwnerID", label: "نام مالک", required: true, type: "select" },
-    { name: "Address", label: "آدرس", required: true, type: "text" },
+    { name: "GreenhouseName", label: "نام گلخانه", required: true, icon: "🏡" },
+    { name: "OwnerID", label: "نام مالک", required: true, type: "select", icon: "👤" },
+    { name: "Address", label: "آدرس", required: true, icon: "📍" },
   ];
 
   const zoneFields = [
-    { name: "Name", label: "نام سالن", placeholder: "نام سالن", required: true, type: "text" },
-    { name: "AreaSqM", label: "مساحت (متر مربع)", placeholder: "مساحت سالن", required: true, type: "number" },
+    { name: "Name", label: "نام سالن", placeholder: "نام سالن را وارد کنید", required: true, icon: "🚪" },
+    {
+      name: "AreaSqM",
+      label: "مساحت (متر مربع)",
+      placeholder: "مساحت سالن",
+      required: true,
+      type: "number",
+      icon: "📐",
+    },
   ];
 
-  const zonesColumns: ColumnType<ZoneType>[] = [
+  const zonesColumns: any[] = [
     {
       title: "نام سالن",
       dataIndex: "Name",
       key: "Name",
       render: (_: any, record: ZoneType) =>
         onEditZone?.ZoneID === record.ZoneID ? (
-          <Form.Item rules={[{ required: true, message: "لطفا نام سالن را وارد کنید" }]}>
-            <Input value={zoneName} onChange={(e) => setZoneName(e.target.value)} />
-          </Form.Item>
+          <Input value={zoneName} onChange={(e) => setZoneName(e.target.value)} size="large" className="rounded-lg" />
         ) : (
-          <div>{record.Name}</div>
+          <span className="font-medium text-slate-700">{record.Name}</span>
         ),
     },
     {
@@ -76,11 +91,15 @@ export default function GreenHouseEditModal(props: EditModalProps) {
       key: "AreaSqM",
       render: (_: any, record: ZoneType) =>
         onEditZone?.ZoneID === record.ZoneID ? (
-          <Form.Item rules={[{ required: true, message: "لطفا مساحت سالن را وارد کنید" }]}>
-            <InputNumber value={zoneArea} onChange={(value) => setZoneArea(value || 0)} />
-          </Form.Item>
+          <Input
+            type="number"
+            value={zoneArea}
+            onChange={(e) => setZoneArea(Number(e.target.value))}
+            size="large"
+            className="rounded-lg"
+          />
         ) : (
-          <div>{record.AreaSqM}</div>
+          <span className="font-medium text-slate-700">{record.AreaSqM}</span>
         ),
     },
     {
@@ -89,39 +108,41 @@ export default function GreenHouseEditModal(props: EditModalProps) {
       key: "actions",
       render: (_: any, record: ZoneType) =>
         onEditZone?.ZoneID === record.ZoneID ? (
-          <>
-            <Button
-              type="link"
+          <div className="flex gap-2">
+            <GreenhouseButton
+              text="ذخیره"
+              variant="primary"
+              icon={<SaveOutlined />}
               onClick={async () => {
-                const newZone = {
-                  ZoneID: record.ZoneID,
-                  Name: zoneName,
-                  AreaSqM: zoneArea,
-                };
+                const newZone = { ZoneID: record.ZoneID, Name: zoneName, AreaSqM: zoneArea };
                 await editZone(newZone);
               }}
-            >
-              ذخیره
-            </Button>
-            <Button type="link" onClick={() => setOnEditZone(null)}>
-              لغو
-            </Button>
-          </>
+              className="h-8 px-3 text-xs"
+            />
+            <GreenhouseButton
+              text="لغو"
+              variant="secondary"
+              onClick={() => setOnEditZone(null)}
+              className="h-8 px-3 text-xs"
+            />
+          </div>
         ) : (
-          <>
-            <Button
-              type="link"
+          <div className="flex gap-2">
+            <GreenhouseButton
+              text="ویرایش"
+              variant="outline"
+              icon={<EditOutlined />}
               onClick={() => {
                 setZoneName(record.Name || "");
                 setZoneArea(record.AreaSqM || 0);
                 setOnEditZone({ ZoneID: record.ZoneID, onEdit: true });
               }}
-            >
-              ویرایش
-            </Button>
-            <Button
-              type="link"
-              danger
+              className="h-8 px-3 text-xs"
+            />
+            <GreenhouseButton
+              text="حذف"
+              variant="outline"
+              icon={<DeleteOutlined />}
               onClick={async () => {
                 setZonesLoading(true);
                 await deleteZone(record.ZoneID);
@@ -133,10 +154,10 @@ export default function GreenHouseEditModal(props: EditModalProps) {
                   setZonesLoading(false);
                 }
               }}
-            >
-              حذف
-            </Button>
-          </>
+              style={{ color: "#dc2626", borderColor: "#fca5a5" }}
+              className="h-8 px-3 text-xs hover:bg-red-50"
+            />
+          </div>
         ),
     },
   ];
@@ -193,167 +214,335 @@ export default function GreenHouseEditModal(props: EditModalProps) {
     setLoading(true);
     setModalMsg(null);
     await updateGreenHouse({ id: props.data?.GreenhouseID || 0, data: values });
-    setLoading(false);
-    props.onClose?.();
 
+    setModalMsg({ status: "ok", message: "اطلاعات گلخانه با موفقیت ویرایش شد" });
     props.setMainLoading?.(true);
     const newData = await allGreenHouses();
     props.setMainData?.(newData);
     props.setMainLoading?.(false);
+    setLoading(false);
+
+    setTimeout(() => {
+      props.onClose?.();
+      setModalMsg(null);
+    }, 1500);
   };
 
   const submitZone = async (value: Zones) => {
     if (!props.data?.GreenhouseID) return;
-    if (zonesData.length === 0) {
-      setLoading(true);
-    }
     setZonesLoading(true);
-    setZonesModalOpen(false);
     const newZone: Zones = { ...value, GreenhouseID: props.data.GreenhouseID };
     await createZone(newZone);
     const newZonesData: any = await getgreenHouseZones(props.data?.GreenhouseID || 0);
     const newMainData = await allGreenHouses();
     props.setMainData?.(newMainData);
     if (newZonesData) {
-      setLoading(false);
       newZonesData.reverse();
       setZonesData(newZonesData);
       setZonesLoading(false);
       setZonesModalOpen(false);
+      zoneForm.resetFields();
     }
   };
 
+  const handleClose = () => {
+    props.onClose?.();
+    setModalMsg(null);
+    setOnEditZone(null);
+  };
+
   return (
-    <Modal
-      title={
-        <>
-          <div className="text-lg font-semibold">بروزرسانی گلخانه</div>
-          <Divider />
-        </>
-      }
-      open={props.isOpen}
-      onCancel={props.onClose}
-      footer={null}
-      className="min-w-[50%]"
-    >
-      {props.data !== undefined ? (
-        <>
-          <Form form={form} layout="vertical" className="w-full" onFinish={submitGreenHouse}>
-            <Row gutter={[16, 16]}>
-              {fields.map((field) => (
-                <Col key={field.name} xs={24} sm={24} md={12} lg={8}>
-                  <Form.Item
-                    name={field.name}
-                    label={field.label}
-                    rules={[{ required: field.required, message: `لطفا ${field.label} را وارد کنید` }]}
-                  >
-                    {field.name === "OwnerID" ? (
-                      <Select showSearch options={owners} optionFilterProp="label" loading={ownersLoading} allowClear />
-                    ) : (
-                      <Input type={field.type} />
-                    )}
-                  </Form.Item>
-                </Col>
-              ))}
-            </Row>
-            <Row>
-              <Col span={24}>
-                <Form.Item name="Notes" label="توضیحات:">
+    <>
+      <Modal
+        open={props.isOpen}
+        onCancel={handleClose}
+        footer={null}
+        closeIcon={null}
+        centered
+        width={680}
+        className="!p-0"
+        styles={{
+          content: {
+            padding: 0,
+            borderRadius: "1.25rem",
+            overflow: "hidden",
+            boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+            minWidth: "320px",
+            minHeight: "480px",
+          },
+        }}
+      >
+        {/* Header */}
+        <div className="relative px-6 py-6 bg-gradient-to-br from-amber-50 via-orange-50/80 to-white border-b border-amber-100">
+          <button
+            onClick={handleClose}
+            className="absolute top-5 left-5 h-9 w-9 rounded-xl bg-white hover:bg-amber-50 border border-amber-200 hover:border-amber-300 transition-all flex items-center justify-center text-amber-600 hover:text-amber-700 shadow-sm hover:shadow"
+            aria-label="بستن"
+          >
+            <CloseOutlined className="text-sm" />
+          </button>
+
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-amber-500 via-amber-600 to-orange-600 shadow-lg flex items-center justify-center text-white">
+                <EditOutlined className="text-2xl" />
+              </div>
+              <div className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-orange-400 border-2 border-white"></div>
+            </div>
+            <div>
+              <h3 className="font-bold text-2xl text-amber-900">ویرایش اطلاعات گلخانه</h3>
+              <p className="text-sm text-amber-600/80 mt-1 flex items-center gap-1.5">
+                <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                اطلاعات گلخانه و سالن‌ها را ویرایش کنید
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Body */}
+        <div className="px-6 py-6 bg-gradient-to-br from-white to-slate-50/30 max-h-[70vh] overflow-y-auto">
+          {props.data !== undefined ? (
+            <>
+              <Form form={form} layout="vertical" onFinish={submitGreenHouse} requiredMark={false}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  {fields.map((field, index) => (
+                    <Form.Item
+                      key={field.name}
+                      label={
+                        <span className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                          <span className="text-base">{field.icon}</span>
+                          {field.label}
+                          {field.required && <span className="text-rose-500 text-xs">*</span>}
+                        </span>
+                      }
+                      name={field.name}
+                      rules={[{ required: field.required, message: `لطفاً ${field.label} را وارد کنید` }]}
+                      className={`mb-0 ${index === 0 ? "sm:col-span-2" : ""}`}
+                    >
+                      {field.type === "select" ? (
+                        <Select
+                          showSearch
+                          options={owners}
+                          optionFilterProp="label"
+                          loading={ownersLoading}
+                          allowClear
+                          size="large"
+                          className="rounded-xl"
+                          disabled={loading}
+                        />
+                      ) : (
+                        <Input
+                          onChange={() => setModalMsg(null)}
+                          disabled={loading}
+                          size="large"
+                          className="rounded-xl border-2 border-slate-200 hover:border-amber-300 focus:border-amber-400 transition-all shadow-sm hover:shadow"
+                          style={{ height: "46px", fontSize: "14px" }}
+                        />
+                      )}
+                    </Form.Item>
+                  ))}
+                </div>
+
+                <Form.Item
+                  label={
+                    <span className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                      <span>📝</span>توضیحات
+                    </span>
+                  }
+                  name="Notes"
+                  className="mt-5"
+                >
                   <Input.TextArea
-                    style={{ resize: "none", minHeight: "150px" }}
-                    value={props.data.Notes || ""}
-                    rows={4}
+                    disabled={loading}
+                    rows={3}
+                    className="rounded-xl border-2 border-slate-200 hover:border-amber-300 focus:border-amber-400 transition-all"
+                    style={{ resize: "none" }}
                   />
                 </Form.Item>
-              </Col>
-            </Row>
-            <Row gutter={[16, 16]} justify="space-between" align="middle">
-              <Col span={12}>
-                <Button type="primary" htmlType="submit">
-                  ثبت تغییرات
-                </Button>
-              </Col>
-              <Col span={4.5}>
-                <Button type="default" onClick={() => setZonesModalOpen(true)}>
-                  افزودن سالن جدید
-                </Button>
-              </Col>
-              <Col span={24}>
-                {loading && (
-                  <div className="w-full flex justify-center">
-                    <Spin size="default" />
+
+                {modalMsg && (
+                  <div
+                    className={`mt-4 p-4 rounded-xl border-2 flex items-start gap-3 animate-in fade-in slide-in-from-top-3 duration-300 shadow-sm ${
+                      modalMsg.status === "ok"
+                        ? "bg-gradient-to-br from-emerald-50 to-emerald-100/50 border-emerald-300 text-emerald-900"
+                        : "bg-gradient-to-br from-rose-50 to-rose-100/50 border-rose-300 text-rose-900"
+                    }`}
+                  >
+                    <div
+                      className={`mt-0.5 p-1.5 rounded-lg ${
+                        modalMsg.status === "ok" ? "bg-emerald-200/50" : "bg-rose-200/50"
+                      }`}
+                    >
+                      {modalMsg.status === "ok" ? (
+                        <CheckCircleOutlined className="text-lg text-emerald-700" />
+                      ) : (
+                        <ExclamationCircleOutlined className="text-lg text-rose-700" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold mb-0.5">{modalMsg.status === "ok" ? "موفقیت‌آمیز" : "خطا"}</p>
+                      <p className="text-sm leading-relaxed opacity-90">{modalMsg.message}</p>
+                    </div>
                   </div>
                 )}
-                {modalMsg?.status === "ok" ? (
-                  <div className="w-full text-center text-sm text-gray-500">{modalMsg.message}</div>
-                ) : (
-                  <div className="w-full text-center text-sm text-red-500">{modalMsg?.message}</div>
-                )}
-              </Col>
-            </Row>
-          </Form>
-          <div>
-            {zonesData.length > 0 && (
-              <>
-                <Divider orientation="left">سالن ها</Divider>
-                <Table
-                  columns={zonesColumns}
-                  dataSource={zonesData}
-                  rowKey="ZoneID"
-                  loading={zonesLoading}
-                  scroll={{ y: 180 }}
-                  pagination={{
-                    current: pagination.current,
-                    pageSize: pagination.pageSize,
-                    total: zonesData.length,
-                    pageSizeOptions: [5, 10, 20, 50],
-                    onChange: (page, pageSize) => setPagination({ current: page, pageSize }),
-                    showTotal: (total, range) => `${range[0]}–${range[1]} از ${total}`,
-                  }}
-                />
-              </>
-            )}
-          </div>
-        </>
-      ) : (
-        <div>در حال بارگذاری...</div>
-      )}
-      <Modal title="افزودن سالن جدید" open={zonesModalOpen} footer={null} onCancel={() => setZonesModalOpen(false)}>
-        <Form layout="vertical" className="w-full" onFinish={submitZone}>
-          <Row gutter={[16, 16]}>
-            {zoneFields.map((field) => (
-              <Col key={field.name} xs={24} sm={24} md={12} lg={12}>
-                <Form.Item
-                  name={field.name}
-                  label={field.label}
-                  rules={[{ required: field.required, message: `لطفا ${field.label} را وارد کنید` }]}
-                >
-                  <Input type={field.type} placeholder={field.placeholder} />
-                </Form.Item>
-              </Col>
-            ))}
-          </Row>
-          <Row>
-            <Col span={24}>
-              <Form.Item>
-                <Input.TextArea
-                  name="MicroclimateNotes"
-                  style={{ resize: "none", minHeight: "150px" }}
-                  placeholder="توضیحات سالن"
-                  rows={4}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row>
-            <Col>
-              <Button type="primary" htmlType="submit">
-                افزودن سالن
-              </Button>
-            </Col>
-          </Row>
-        </Form>
+
+                <div className="flex justify-end gap-3 mt-6 pt-4  border-slate-200">
+                  <GreenhouseButton
+                    text="افزودن سالن"
+                    variant="secondary"
+                    icon={<PlusOutlined />}
+                    onClick={() => setZonesModalOpen(true)}
+                    disabled={loading}
+                    className="min-w-[140px] h-11"
+                  />
+                  <GreenhouseButton
+                    text={loading ? "در حال ویرایش..." : "ویرایش اطلاعات"}
+                    variant="primary"
+                    type="submit"
+                    loading={loading}
+                    className="min-w-[140px] h-11 shadow-lg hover:shadow-xl"
+                  />
+                </div>
+              </Form>
+
+              {/* Zones Table */}
+              {zonesData.length > 0 && (
+                <>
+                  <Divider className="my-6">
+                    <span className="text-slate-600 font-semibold">سالن‌های گلخانه</span>
+                  </Divider>
+                  <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+                    <Table
+                      columns={zonesColumns}
+                      dataSource={zonesData}
+                      rowKey="ZoneID"
+                      loading={zonesLoading}
+                      scroll={{ y: 240 }}
+                      pagination={{
+                        current: pagination.current,
+                        pageSize: pagination.pageSize,
+                        total: zonesData.length,
+                        onChange: (page, pageSize) => setPagination({ current: page, pageSize }),
+                        showTotal: (total, range) => `${range[0]}–${range[1]} از ${total}`,
+                      }}
+                    />
+                  </div>
+                </>
+              )}
+            </>
+          ) : (
+            <div className="flex items-center justify-center py-12">
+              <div className="text-slate-600">در حال بارگذاری...</div>
+            </div>
+          )}
+        </div>
       </Modal>
-    </Modal>
+
+      {/* Add Zone Modal */}
+      <Modal
+        open={zonesModalOpen}
+        onCancel={() => {
+          setZonesModalOpen(false);
+          zoneForm.resetFields();
+        }}
+        footer={null}
+        closeIcon={null}
+        centered
+        width={520}
+        styles={{
+          content: { padding: 0, borderRadius: "1rem", overflow: "hidden" },
+        }}
+      >
+        <div className="relative px-6 py-5 bg-gradient-to-br from-emerald-50/80 via-lime-50/60 to-white border-b border-emerald-100">
+          <button
+            onClick={() => {
+              setZonesModalOpen(false);
+              zoneForm.resetFields();
+            }}
+            className="absolute top-4 left-4 h-8 w-8 rounded-lg bg-white/80 hover:bg-white border border-emerald-100 hover:border-emerald-200 transition-all flex items-center justify-center text-emerald-600 hover:text-emerald-700"
+          >
+            <CloseOutlined className="text-sm" />
+          </button>
+          <div className="flex items-center gap-3">
+            <div className="h-12 w-12 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-md flex items-center justify-center text-white">
+              <PlusOutlined className="text-2xl" />
+            </div>
+            <div>
+              <h3 className="font-bold text-xl text-emerald-900">افزودن سالن جدید</h3>
+              <p className="text-sm text-emerald-700/70 mt-0.5">اطلاعات سالن را وارد کنید</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="px-6 py-6 bg-white">
+          <Form form={zoneForm} layout="vertical" onFinish={submitZone} requiredMark={false}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              {zoneFields.map((field) => (
+                <Form.Item
+                  key={field.name}
+                  label={
+                    <span className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                      <span className="text-base">{field.icon}</span>
+                      {field.label}
+                      {field.required && <span className="text-rose-500 text-xs">*</span>}
+                    </span>
+                  }
+                  name={field.name}
+                  rules={[{ required: field.required, message: `لطفاً ${field.label} را وارد کنید` }]}
+                  className="mb-0"
+                >
+                  <Input
+                    type={field.type || "text"}
+                    placeholder={field.placeholder}
+                    disabled={zonesLoading}
+                    size="large"
+                    className="rounded-xl border-2 border-slate-200 hover:border-emerald-300 focus:border-emerald-400 transition-all shadow-sm hover:shadow"
+                    style={{ height: "46px", fontSize: "14px" }}
+                  />
+                </Form.Item>
+              ))}
+            </div>
+
+            <Form.Item
+              label={
+                <span className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                  <span>📝</span>توضیحات سالن
+                </span>
+              }
+              name="MicroclimateNotes"
+              className="mt-5"
+            >
+              <Input.TextArea
+                placeholder="توضیحات سالن"
+                disabled={zonesLoading}
+                rows={3}
+                className="rounded-xl border-2 border-slate-200 hover:border-emerald-300 focus:border-emerald-400 transition-all"
+                style={{ resize: "none" }}
+              />
+            </Form.Item>
+
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 mt-6 pt-4 border-t border-slate-100">
+              <GreenhouseButton
+                text="انصراف"
+                variant="secondary"
+                onClick={() => {
+                  setZonesModalOpen(false);
+                  zoneForm.resetFields();
+                }}
+                disabled={zonesLoading}
+                className="w-full sm:w-auto min-w-[120px]"
+              />
+              <GreenhouseButton
+                text={zonesLoading ? "در حال افزودن..." : "افزودن سالن"}
+                variant="primary"
+                type="submit"
+                loading={zonesLoading}
+                className="w-full sm:w-auto min-w-[120px] shadow-lg hover:shadow-xl"
+              />
+            </div>
+          </Form>
+        </div>
+      </Modal>
+    </>
   );
 }

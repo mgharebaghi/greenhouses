@@ -4,6 +4,7 @@ import { Button } from "antd";
 import { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import jalaliday from "jalaliday";
+import TableActions from "../../_components/UI/TableActions";
 dayjs.extend(jalaliday);
 
 type GrowthDailyColumnsProps = {
@@ -11,27 +12,33 @@ type GrowthDailyColumnsProps = {
   handleDelete: (record: PlantingGrowthDaily) => void;
 };
 
-export function GrowthDailyColumns(props: GrowthDailyColumnsProps): ColumnsType<PlantingGrowthDaily> {
-  const columns = [
-    {
-      title: "مشاهده کننده",
-      dataIndex: ["Owner_Observer", "FullName"],
-      key: "Owner_Observer",
-    },
+type Column = {
+  title: string;
+  key: string;
+  dataIndex?: string; // فقط string در جدول تو
+  render?: (value: any, record: any, index: number) => React.ReactNode;
+  sortable?: boolean;
+  className?: string;
+};
+
+export function GrowthDailyColumns(props: GrowthDailyColumnsProps): Column[] {
+  const columns: Column[] = [
     {
       title: "شناسه کاشت",
-      dataIndex: ["PlantingID"],
+      dataIndex: "PlantingID",
       key: "Plantings",
     },
     {
       title: "نام گونه گیاهی",
-      dataIndex: ["Plantings", "PlantVarieties", "VarietyName"],
+      // dataIndex: ["Plantings", "PlantVarieties", "VarietyName"],
       key: "PlantVarieties",
+      render: (_: any, record: any) => record?.Plantings?.PlantVarieties?.VarietyName || "-",
     },
     {
       title: "مرحله رشد",
-      dataIndex: ["PlantGrowthStages", "StageName"],
+      // dataIndex: ["PlantGrowthStages", "StageName"],
       key: "PlantGrowthStages",
+      render: (_: any, record: any) => record?.PlantGrowthStages?.StageName || "-",
     },
     {
       title: "تاریخ ثبت",
@@ -87,21 +94,28 @@ export function GrowthDailyColumns(props: GrowthDailyColumnsProps): ColumnsType<
       render: (pestObserved: boolean) => (pestObserved ? "بله" : "خیر"),
     },
     {
+      title: "مشاهده کننده",
+      // dataIndex: ["Owner_Observer", "FullName"],
+      key: "Owner_Observer",
+      render: (_: any, record: any) => record.Owner_Observer?.FullName || "-",
+    },
+    {
       title: "",
       dataIndex: "actions",
       key: "actions",
       render: (_: any, record: any) => (
-        <div className="flex space-x-2">
-          <Button type="link" onClick={props.handleEdit.bind(_, record)}>
-            <EditOutlined />
-          </Button>
-          <Button type="link" style={{ color: "red" }} onClick={props.handleDelete.bind(_, record)}>
-            <DeleteOutlined />
-          </Button>
-        </div>
+        <TableActions onEdit={props.handleEdit.bind(_, record)} onDelete={props.handleDelete.bind(_, record)} />
       ),
     },
   ];
 
   return columns;
 }
+
+export const growthDailyFormatters = {
+  // با key ستون یا dataIndex هر دو کار می‌کند:
+  RecordDate: (_row: any, v: any) => (v ? dayjs(v).calendar("jalali").locale("fa").format("YYYY/MM/DD") : "-"),
+
+  IsEstimated: (_row: any, v: boolean) => (v ? "بله" : "خیر"),
+  PestObserved: (_row: any, v: boolean) => (v ? "بله" : "خیر"),
+};

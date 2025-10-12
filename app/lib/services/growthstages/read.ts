@@ -8,3 +8,11 @@ export async function getGrowthStages() {
     include: { PlantVarieties: { select: { VarietyID: true, VarietyName: true } } },
   });
 }
+
+export async function getGrowthStagesByVariety(varietyID: number) {
+  return await prisma.plantGrowthStages.findMany({
+    where: { VarietyID: varietyID },
+    orderBy: { StageOrder: "asc" },
+    // include: { PlantVarieties: { select: { VarietyID: true, VarietyName: true } } },
+  });
+}

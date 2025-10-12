@@ -1,19 +1,35 @@
 import { Greenhouses as GreenHouse } from "@/app/generated/prisma/client";
-import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import Table, { ColumnsType } from "antd/es/table";
+import { downloadCSVFromAntd } from "../../_components/tools/CSVoutput";
+import { useState } from "react";
+import GreenHouseInsertModal from "./GreenHouseInsrtModal";
+import InsertionRow from "../../_components/UI/InsertionRow";
+import Table from "@/app/dashboard/_components/UI/Table";
+import TableActions from "../../_components/UI/TableActions";
+import DeleteModal, { DeleteModalProps } from "../../_components/UI/DeleteModal";
+import { allGreenHouses, deleteGreenHouse } from "@/app/lib/services/greenhouse";
 
 export default function GreenHousesTable({
   data,
   loading,
   handleEdit,
-  handleDelete,
+  setMainLoading,
+  setMainData,
 }: {
   data: GreenHouse[];
   loading: boolean;
   handleEdit: (record: GreenHouse) => void;
-  handleDelete: (record: GreenHouse) => void;
+  setMainLoading: (loading: boolean) => void;
+  setMainData: (data: GreenHouse[]) => void;
 }) {
-  const columns: ColumnsType<GreenHouse> = [
+  const [deleteModal, setDeleteModal] = useState<DeleteModalProps | null>(null);
+  const [deleteModalMsg, setDeleModalMsg] = useState("");
+  const [deletModalLoading, setDeleteModalLoading] = useState(false);
+  const [insertModal, setInsertModal] = useState(false);
+  const openInsertModal = () => {
+    setInsertModal(true);
+  };
+
+  const columns = [
     {
       title: "نام گلخانه",
       dataIndex: "GreenhouseName",
@@ -46,16 +62,80 @@ export default function GreenHousesTable({
       title: "",
       key: "action",
       render: (_: any, record: GreenHouse) => (
-        <div className="flex space-x-10 space-x-reverse">
-          <div onClick={() => handleEdit(record)} className="text-blue-600 cursor-pointer">
-            <EditOutlined style={{ fontSize: 20 }} />
-          </div>
-          <div onClick={() => handleDelete(record)} className="text-red-600 cursor-pointer">
-            <DeleteOutlined style={{ fontSize: 20 }} />
-          </div>
-        </div>
+        <TableActions
+          onEdit={() => handleEdit(record)}
+          onDelete={() =>
+            setDeleteModal({
+              open: true,
+              onClose() {
+                setDeleteModal(null);
+              },
+              deleteLoading: deletModalLoading,
+              id: record.GreenhouseID,
+              name: record.GreenhouseName || "",
+              onDelete() {
+                handleDelete(record.GreenhouseID);
+              },
+              msg: deleteModalMsg,
+            })
+          }
+        />
       ),
     },
   ];
-  return <Table columns={columns} dataSource={data} loading={loading} rowKey="GreenhouseID" />;
+
+  const getters = {
+    Owner: (r: any) => `${r.Owner_Observer?.FirstName ?? ""} ${r.Owner_Observer?.LastName ?? ""}`.trim(),
+    Zones: (r: any) => r.Zones?.length ?? 0,
+  } as const;
+
+  const handleDelete = async (id: number) => {
+    setDeleteModalLoading(true);
+    const res: any = await deleteGreenHouse(id);
+    setDeleteModalLoading(false);
+    if (res.status === "error") {
+      setDeleModalMsg(res.message || "خطایی رخ داده است.");
+      return;
+    }
+    setDeleteModal(null);
+    setMainLoading(true);
+    const newData = await allGreenHouses();
+    setMainData(newData);
+    setMainLoading(false);
+  };
+
+  return (
+    <div className="w-full">
+      <InsertionRow
+        text="گلخانه"
+        insertOnclick={openInsertModal}
+        csvOnclick={() => {
+          downloadCSVFromAntd<GreenHouse>(data, columns, "greenhouses.csv", {
+            getters,
+            forceExcelSeparatorLine: false,
+            excludeKeys: ["action"],
+          });
+        }}
+        data={data}
+      />
+      <Table columns={columns} dataSource={data} loading={loading} rowKey="GreenhouseID" pagination={false} />
+      <GreenHouseInsertModal
+        modalOpen={insertModal}
+        setModalOpen={setInsertModal}
+        setMainLoading={setMainLoading}
+        setMainData={setMainData}
+      />
+
+      <DeleteModal
+        open={deleteModal?.open || false}
+        onClose={() => setDeleteModal(null)}
+        onDelete={deleteModal?.onDelete}
+        name={deleteModal?.name}
+        id={deleteModal?.id}
+        msg={deleteModalMsg}
+        deleteLoading={deletModalLoading}
+        setMsg={setDeleModalMsg}
+      />
+    </div>
+  );
 }

@@ -1,15 +1,19 @@
-import { Button, Table } from "antd";
+import Table from "@/app/dashboard/_components/UI/Table";
 import { PlantVarietyDTO } from "../page";
-import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import PlantVaritiesEditModal from "./PlantVaritiesEditModal";
 import { useState } from "react";
-import PlantVaritiesDeleteModal from "./PlantVaritiesDeletModal";
+import InsertionRow from "../../_components/UI/InsertionRow";
+import { downloadCSVFromAntd } from "../../_components/tools/CSVoutput";
+import TableActions from "../../_components/UI/TableActions";
+import DeleteModal, { DeleteModalProps } from "../../_components/UI/DeleteModal";
+import { deletePlantVariety, getPlantVarieties } from "@/app/lib/services/varities";
 
 type PlantVarietiesTableProps = {
   data: PlantVarietyDTO[];
   loading?: boolean;
   setMainData?: (data: PlantVarietyDTO[]) => void;
   setMainLoading?: (loading: boolean) => void;
+  setIsInsertModalOpen: (open: boolean) => void;
 };
 
 type editModalProps = {
@@ -20,9 +24,17 @@ type editModalProps = {
   setMainData?: (data: PlantVarietyDTO[]) => void;
 };
 
-export default function PlantVaritiesTable({ data, loading, setMainData, setMainLoading }: PlantVarietiesTableProps) {
+export default function PlantVaritiesTable({
+  data,
+  loading,
+  setMainData,
+  setMainLoading,
+  setIsInsertModalOpen,
+}: PlantVarietiesTableProps) {
   const [editModalOpen, setEditModalOpen] = useState<editModalProps | null>(null);
-  const [deleteModalOpen, setDeleteModalOpen] = useState<editModalProps | null>(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState<DeleteModalProps | null>(null);
+  const [deleteModalLoading, setDeleteModalLoading] = useState(false);
+  const [deleteModalMsg, setDeleteModalMsg] = useState("");
 
   const columns = [
     {
@@ -32,8 +44,9 @@ export default function PlantVaritiesTable({ data, loading, setMainData, setMain
     },
     {
       title: "نام گیاه",
-      dataIndex: ["Plants", "CommonName"],
+      dataIndex: "CommonName",
       key: "CommonName",
+      render: (_: any, record: PlantVarietyDTO) => record.Plants?.CommonName,
     },
     {
       title: "شرکت بذر",
@@ -100,27 +113,62 @@ export default function PlantVaritiesTable({ data, loading, setMainData, setMain
       dataIndex: "actions",
       key: "actions",
       render: (_: any, record: PlantVarietyDTO) => (
-        <div className="flex gap-2">
-          <Button type="link" onClick={() => setEditModalOpen({ isOpen: true, record })}>
-            <EditOutlined />
-          </Button>
-          <Button type="link" danger onClick={() => setDeleteModalOpen({ isOpen: true, record })}>
-            <DeleteOutlined />
-          </Button>
-        </div>
+        <TableActions
+          onEdit={() => setEditModalOpen({ isOpen: true, record })}
+          onDelete={() =>
+            setDeleteModalOpen({
+              open: true,
+              onClose: () => setDeleteModalOpen(null),
+              id: record.VarietyID,
+              name: record.VarietyName || "",
+              deleteLoading: deleteModalLoading,
+              onDelete: () => handleDelete(record),
+              msg: deleteModalMsg,
+            })
+          }
+        />
       ),
     },
   ];
 
+  const handleDelete = async (record: PlantVarietyDTO) => {
+    setDeleteModalLoading(true);
+    setDeleteModalMsg("");
+    const res = await deletePlantVariety(record.VarietyID!);
+    if (res) {
+      setDeleteModalLoading(false);
+      setDeleteModalOpen(null);
+      setMainLoading?.(true);
+      const newData: any = await getPlantVarieties();
+      setMainData?.(newData);
+      setMainLoading?.(false);
+    } else {
+      setDeleteModalLoading(false);
+      setDeleteModalMsg("خطایی رخ داده است. لطفا دوباره تلاش کنید.");
+    }
+  };
+
   return (
     <>
+      <InsertionRow
+        text="افزودن گونه گیاهی"
+        insertOnclick={() => setIsInsertModalOpen(true)}
+        csvOnclick={() =>
+          downloadCSVFromAntd(data, columns, "plantvarieties.csv", {
+            forceExcelSeparatorLine: false,
+            excludeKeys: ["actions"],
+          })
+        }
+        data={data}
+      />
+
       <Table
         columns={columns}
         dataSource={data}
         rowKey="VarietyID"
-        pagination={{ pageSize: 10 }}
-        scroll={{ x: "max-content" }}
         loading={loading}
+        pagination={false}
+        scroll={{ x: 2000 }}
       />
 
       <PlantVaritiesEditModal
@@ -131,12 +179,14 @@ export default function PlantVaritiesTable({ data, loading, setMainData, setMain
         setMainData={setMainData}
       />
 
-      <PlantVaritiesDeleteModal
-        isOpen={deleteModalOpen?.isOpen || false}
+      <DeleteModal
+        open={deleteModalOpen?.open || false}
         onClose={() => setDeleteModalOpen(null)}
-        record={deleteModalOpen?.record}
-        setMainLoading={setMainLoading}
-        setMainData={setMainData}
+        id={deleteModalOpen?.id}
+        name={deleteModalOpen?.name}
+        deleteLoading={deleteModalLoading}
+        onDelete={deleteModalOpen?.onDelete}
+        msg={deleteModalMsg}
       />
     </>
   );

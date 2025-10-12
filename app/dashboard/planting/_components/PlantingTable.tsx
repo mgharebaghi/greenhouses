@@ -1,12 +1,16 @@
 import type { Plantings } from "@/app/generated/prisma";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import { Button, Table } from "antd";
+import { Button } from "antd";
+import Table from "@/app/dashboard/_components/UI/Table";
 import PlantingInsUpModal, { PlantingInsUpModalProps } from "./PlantingInsUpModal";
 import { useState } from "react";
-import DeleteModal, { DeleteModalProps } from "../../_components/tools/DeleteModal";
+import DeleteModal, { DeleteModalProps } from "../../_components/UI/DeleteModal";
 import { deletePlanting, getAllPlantings } from "@/app/lib/services/planting";
 import dayjs from "dayjs";
 import jalaliday from "jalaliday";
+import { downloadCSVFromAntd } from "../../_components/tools/CSVoutput";
+import InsertionRow from "../../_components/UI/InsertionRow";
+import TableActions from "../../_components/UI/TableActions";
 
 dayjs.extend(jalaliday);
 
@@ -18,7 +22,7 @@ type PlantingTableProps = {
 };
 
 export default function PlantingTable({ data, loading, setMainData, setMainLoading }: PlantingTableProps) {
-  const [editModal, setEditModal] = useState<PlantingInsUpModalProps | null>(null);
+  const [insUpModal, setInsUpModal] = useState<PlantingInsUpModalProps | null>(null);
   const [onDeleteModal, setOnDeleteModal] = useState<DeleteModalProps | null>(null);
   const [onDeleteLoading, setOnDeleteLoading] = useState<boolean>(false);
 
@@ -30,18 +34,20 @@ export default function PlantingTable({ data, loading, setMainData, setMainLoadi
     },
     {
       title: "نام گلخانه",
-      dataIndex: ["Zones", "Greenhouses", "GreenhouseName"],
+      dataIndex: "GreenhouseName",
       key: "greenhouseName",
     },
     {
       title: "سالن",
-      dataIndex: ["Zones", "Name"],
+      // dataIndex: ["Zones", "Name"],
       key: "zoneID",
+      render: (_: any, record: any) => record.Zones?.Name,
     },
     {
       title: "گونه گیاهی",
-      dataIndex: ["PlantVarieties", "VarietyName"],
+      // dataIndex: ["PlantVarieties", "VarietyName"],
       key: "varietyName",
+      render: (_: any, record: any) => record.PlantVarieties?.VarietyName,
     },
     {
       title: "تاریخ کاشت",
@@ -105,26 +111,20 @@ export default function PlantingTable({ data, loading, setMainData, setMainLoadi
       dataIndex: "actions",
       key: "actions",
       render: (_: any, record: Plantings) => (
-        <div className="flex items-center gap-2">
-          <Button
-            type="link"
-            onClick={() =>
-              setEditModal({
-                open: true,
-                isInEditing: true,
-                initialData: record,
-                setMainData,
-                setMainLoading,
-                plantingId: Number(record.PlantingID),
-              })
-            }
-          >
-            <EditOutlined />
-          </Button>
-          <Button type="link" danger onClick={() => handleDelete(record)}>
-            <DeleteOutlined />
-          </Button>
-        </div>
+        <TableActions
+          onEdit={() =>
+            setInsUpModal({
+              open: true,
+              isInEditing: true,
+              initialData: record,
+              setMainData,
+              setMainLoading,
+              plantingId: Number(record.PlantingID),
+              ZoneID: Number(record.ZoneID),
+            })
+          }
+          onDelete={() => handleDelete(record)}
+        />
       ),
     },
   ];
@@ -132,7 +132,7 @@ export default function PlantingTable({ data, loading, setMainData, setMainLoadi
   const handleDelete = (record: Plantings) => {
     setOnDeleteModal({
       open: true,
-      name: record.PlantingID + "",
+      name: "شناسه کاشت با شماره  " + record.PlantingID,
       onClose: () => setOnDeleteModal(null),
       onDelete: onDelete,
       id: Number(record.PlantingID),
@@ -153,18 +153,56 @@ export default function PlantingTable({ data, loading, setMainData, setMainLoadi
     }
   };
 
+  const formatter = {
+    PlantDate: (_: any, v: any) => (v ? dayjs(v).calendar("jalali").locale("fa").format("YYYY/MM/DD") : "-"),
+    ExpectedHarvestDate: (_: any, v: any) => (v ? dayjs(v).calendar("jalali").locale("fa").format("YYYY/MM/DD") : "-"),
+    ActualHarvestDate: (_: any, v: any) => (v ? dayjs(v).calendar("jalali").locale("fa").format("YYYY/MM/DD") : "-"),
+    TransplantDate: (_: any, v: any) => (v ? dayjs(v).calendar("jalali").locale("fa").format("YYYY/MM/DD") : "-"),
+  };
+
   return (
     <>
-      <Table columns={columns} dataSource={data} loading={loading} rowKey="PlantingID" scroll={{ x: "max-content" }} />
+      <InsertionRow
+        text="اطلاعات کاشت"
+        data={data}
+        insertOnclick={() =>
+          setInsUpModal({
+            open: true,
+            setMainData,
+            setMainLoading,
+            isInEditing: false,
+            plantingId: 0,
+            ZoneID: 0,
+            initialData: undefined,
+            onClose: () => setInsUpModal(null),
+          })
+        }
+        csvOnclick={() =>
+          downloadCSVFromAntd(data, columns, "plantings", {
+            formatters: formatter,
+            forceExcelSeparatorLine: false,
+            excludeKeys: ["actions"],
+          })
+        }
+      />
+
+      <Table
+        columns={columns}
+        dataSource={data}
+        loading={loading}
+        rowKey="PlantingID"
+        scroll={{ x: 300 }}
+        pagination={false}
+      />
 
       <PlantingInsUpModal
-        open={editModal?.open || false}
+        open={insUpModal?.open || false}
         setMainData={setMainData}
         setMainLoading={setMainLoading}
-        onClose={() => setEditModal(null)}
-        isInEditing={!!editModal?.isInEditing}
-        initialData={editModal?.initialData}
-        plantingId={Number(editModal?.initialData?.PlantingID)}
+        onClose={() => setInsUpModal(null)}
+        isInEditing={insUpModal?.isInEditing || false}
+        initialData={insUpModal?.initialData}
+        plantingId={Number(insUpModal?.initialData?.PlantingID)}
       />
 
       <DeleteModal
