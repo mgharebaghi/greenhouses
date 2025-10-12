@@ -53,7 +53,7 @@ export default function Dashboard() {
   }, [typedText, currentPhraseIndex, isDeleting, isPaused]);
 
   return (
-    <div className="h-screen w-full overflow-hidden relative bg-gradient-to-br from-emerald-50 via-lime-50 to-white">
+    <div className="h-full w-full overflow-hidden relative bg-gradient-to-br from-emerald-50 via-lime-50 to-white">
       {/* Animated Background Patterns */}
       <div className="absolute inset-0 opacity-30">
         <div className="absolute top-0 left-0 w-96 h-96 bg-emerald-200 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
