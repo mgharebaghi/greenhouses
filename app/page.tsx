@@ -5,7 +5,7 @@ export default async function Home() {
   await requireAuth("/");
 
   return (
-    <div className="min-h-screen bg-slate-100 flex items-center justify-center">
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <Login />
     </div>
   );
