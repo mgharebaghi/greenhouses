@@ -55,7 +55,49 @@ export default function DashboardShell({ children }: { children: React.ReactNode
         </div>
       </header>
 
-      <Content className="flex-1 min-h-screen bg-slate-200">{children}</Content>
+      <Content className="flex-1 min-h-screen relative bg-gradient-to-br from-emerald-50 via-lime-50 to-white overflow-hidden">
+        {/* Animated Background Patterns */}
+        <div className="absolute inset-0 opacity-30 pointer-events-none">
+          <div className="absolute top-0 left-0 w-96 h-96 bg-emerald-200 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
+          <div className="absolute top-0 right-0 w-96 h-96 bg-lime-200 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
+          <div className="absolute bottom-0 left-1/2 w-96 h-96 bg-emerald-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
+        </div>
+
+        {/* Grid Pattern Overlay */}
+        <div
+          className="absolute inset-0 opacity-[0.03] pointer-events-none"
+          style={{
+            backgroundImage: `radial-gradient(circle at 2px 2px, rgb(16 185 129) 1px, transparent 0)`,
+            backgroundSize: "40px 40px",
+          }}
+        ></div>
+
+        <div className="relative z-10">{children}</div>
+
+        <style jsx>{`
+          @keyframes blob {
+            0%,
+            100% {
+              transform: translate(0, 0) scale(1);
+            }
+            33% {
+              transform: translate(30px, -50px) scale(1.1);
+            }
+            66% {
+              transform: translate(-20px, 20px) scale(0.9);
+            }
+          }
+          .animate-blob {
+            animation: blob 7s infinite;
+          }
+          .animation-delay-2000 {
+            animation-delay: 2s;
+          }
+          .animation-delay-4000 {
+            animation-delay: 4s;
+          }
+        `}</style>
+      </Content>
 
       <DashboardMenu open={openDrawer} onClose={() => setOpenDrawer(false)} />
     </Layout>
