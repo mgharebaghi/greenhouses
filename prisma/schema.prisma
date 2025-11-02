@@ -95,13 +95,15 @@ model Session {
 }
 
 model Zones {
-  ZoneID            Int          @id(map: "PK_Zones") @default(autoincrement())
+  ZoneID            Int               @id(map: "PK_Zones") @default(autoincrement())
   GreenhouseID      Int?
-  Name              String?      @db.NVarChar(100)
-  AreaSqM           Decimal?     @db.Decimal(9, 2)
-  MicroclimateNotes String?      @db.NVarChar(500)
+  Name              String?           @db.NVarChar(100)
+  AreaSqM           Decimal?          @db.Decimal(9, 2)
+  MicroclimateNotes String?           @db.NVarChar(500)
+  ClimateDaily      ClimateDaily[]
+  IrrigationEvent   IrrigationEvent[]
   Plantings         Plantings[]
-  Greenhouses       Greenhouses? @relation(fields: [GreenhouseID], references: [GreenhouseID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Zones_Greenhouses")
+  Greenhouses       Greenhouses?      @relation(fields: [GreenhouseID], references: [GreenhouseID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Zones_Greenhouses")
 }
 
 model Owner_Observer {
@@ -110,6 +112,7 @@ model Owner_Observer {
   LastName            String?               @db.NVarChar(150)
   PhoneNumber         String?               @db.NVarChar(150)
   Profesion           String?               @db.NVarChar(150)
+  ClimateDaily        ClimateDaily[]
   Greenhouses         Greenhouses[]
   PlantingGrowthDaily PlantingGrowthDaily[]
 }
@@ -164,4 +167,70 @@ model PlantVarities {
   PlantGrowthStages   PlantGrowthStages[]
   Plantings           Plantings[]
   Plants              Plants?             @relation(fields: [PlantID], references: [PlantID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PlantVarities_Plants")
+}
+
+model ClimateDaily {
+  ClimateDailyID     Int             @id(map: "PK_ClimateDaily") @default(autoincrement())
+  ZoneID             Int?
+  ObserverID         Int?
+  RecordDate         DateTime?       @db.Date
+  RecordTime         DateTime?       @db.Time
+  ExternalTemp       Decimal?        @db.Decimal(6, 2)
+  ExternalHumidity   Decimal?        @db.Decimal(6, 2)
+  ExternalPressure   Decimal?        @db.Decimal(8, 2)
+  ExternalRainfallMM Decimal?        @db.Decimal(8, 2)
+  InternalTemp       Decimal?        @db.Decimal(6, 2)
+  InternalHumidity   Decimal?        @db.Decimal(6, 2)
+  CO2ppm             Decimal?        @db.Decimal(8, 2)
+  ExternalPAR        Decimal?        @db.Decimal(10, 2)
+  ExternalDLI        Decimal?        @db.Decimal(8, 2)
+  InternalPAR        Decimal?        @db.Decimal(8, 2)
+  InternalDLI        Decimal?        @db.Decimal(8, 2)
+  WindSpeed          Decimal?        @db.Decimal(5, 2)
+  WindDirection      Int?
+  VentOpenPct        Decimal?        @db.Decimal(5, 2)
+  VentErrorCount     Int?
+  VPD                Decimal?        @db.Decimal(4, 2)
+  Notes              String?         @db.NVarChar(50)
+  Owner_Observer     Owner_Observer? @relation(fields: [ObserverID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_ClimateDaily_Owner_Observer")
+  Zones              Zones?          @relation(fields: [ZoneID], references: [ZoneID], onDelete: NoAction, onUpdate: NoAction, map: "FK_ClimateDaily_Zones")
+}
+
+model IrrigationEvent {
+  EventID              Int                 @id(map: "PK_IrrigationEvent")
+  ZoneID               Int?
+  StartTime            DateTime?           @db.DateTime
+  EndTime              DateTime?           @db.DateTime
+  VolumeLiter          Decimal?            @db.Decimal(12, 3)
+  ECIn                 Decimal?            @db.Decimal(5, 2)
+  ECOut                Decimal?            @db.Decimal(5, 2)
+  pHIn                 Decimal?            @db.Decimal(4, 2)
+  pHOut                Decimal?            @db.Decimal(4, 2)
+  DrainPct             Decimal?            @db.Decimal(5, 2)
+  CyclesCount          Int?
+  TotalDurationSeconds Int?
+  TriggerType          String?             @db.NVarChar(100)
+  AvgFlowRate          Decimal?            @db.Decimal(6, 2)
+  Zones                Zones?              @relation(fields: [ZoneID], references: [ZoneID], onDelete: NoAction, onUpdate: NoAction, map: "FK_IrrigationEvent_Zones")
+  IrrigationRecords    IrrigationRecords[]
+}
+
+model IrrigationRecords {
+  RecordID           Int              @id(map: "PK_IrrigationRecords")
+  EventID            Int?
+  CycleNumber        Int?
+  StartTime          DateTime?
+  EndTime            DateTime?
+  DurationSeconds    String?          @db.NVarChar(50)
+  VolumeLiters       Decimal?         @db.Decimal(12, 3)
+  Method             String?          @db.NVarChar(50)
+  SourceWater        String?          @db.NVarChar(50)
+  ECIn               Decimal?         @db.Decimal(5, 2)
+  ECOut              Decimal?         @db.Decimal(5, 2)
+  pHIn               Decimal?         @db.Decimal(4, 2)
+  pHOut              Decimal?         @db.Decimal(4, 2)
+  FlowRate_L_per_min Decimal?         @db.Decimal(8, 3)
+  QualityFlag        String?          @db.NVarChar(50)
+  notes              String?          @db.NVarChar(50)
+  IrrigationEvent    IrrigationEvent? @relation(fields: [EventID], references: [EventID], onDelete: NoAction, onUpdate: NoAction, map: "FK_IrrigationRecords_IrrigationEvent")
 }

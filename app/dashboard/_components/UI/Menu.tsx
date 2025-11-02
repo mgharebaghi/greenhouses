@@ -12,6 +12,7 @@ import {
   LineChartOutlined,
   EnvironmentOutlined,
   LogoutOutlined,
+  CloudOutlined,
 } from "@ant-design/icons";
 import { useRouter, usePathname } from "next/navigation";
 import GreenhouseButton from "@/app/components/UI/GreenhouseButton";
@@ -91,6 +92,15 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
       bgColor: "bg-violet-50",
       hoverColor: "group-hover:bg-violet-100",
       page: "/dashboard/growthdaily",
+      active: true,
+    },
+    {
+      icon: <CloudOutlined />,
+      title: "ثبت اطلاعات اقلیمی",
+      color: "text-sky-700",
+      bgColor: "bg-sky-50",
+      hoverColor: "group-hover:bg-sky-100",
+      page: "/dashboard/climatedaily",
       active: true,
     },
   ];

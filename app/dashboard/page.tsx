@@ -55,99 +55,163 @@ export default function Dashboard() {
   return (
     <div className="h-full w-full overflow-hidden relative bg-gradient-to-br from-emerald-50 via-lime-50 to-white">
       {/* Animated Background Patterns */}
-      <div className="absolute inset-0 opacity-30">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-emerald-200 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
-        <div className="absolute top-0 right-0 w-96 h-96 bg-lime-200 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
-        <div className="absolute bottom-0 left-1/2 w-96 h-96 bg-emerald-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
+      <div className="absolute inset-0 opacity-20 sm:opacity-30">
+        <div className="absolute top-0 left-0 w-40 h-40 sm:w-64 sm:h-64 lg:w-80 lg:h-80 bg-emerald-200 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
+        <div className="absolute top-0 right-0 w-40 h-40 sm:w-64 sm:h-64 lg:w-80 lg:h-80 bg-lime-200 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-40 h-40 sm:w-64 sm:h-64 lg:w-80 lg:h-80 bg-emerald-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
       </div>
 
       {/* Grid Pattern Overlay */}
       <div
-        className="absolute inset-0 opacity-[0.03]"
+        className="absolute inset-0 opacity-[0.02] sm:opacity-[0.03]"
         style={{
           backgroundImage: `radial-gradient(circle at 2px 2px, rgb(16 185 129) 1px, transparent 0)`,
-          backgroundSize: "40px 40px",
+          backgroundSize: "30px 30px",
         }}
       ></div>
 
-      {/* Floating Icons */}
+      {/* Decorative Elements - Corners */}
+      <div className="absolute top-4 left-4 sm:top-6 sm:left-6 lg:top-8 lg:left-8 opacity-10">
+        <div className="w-16 h-16 sm:w-20 sm:h-20 border-t-4 border-l-4 border-emerald-500 rounded-tl-3xl"></div>
+      </div>
+      <div className="absolute top-4 right-4 sm:top-6 sm:right-6 lg:top-8 lg:right-8 opacity-10">
+        <div className="w-16 h-16 sm:w-20 sm:h-20 border-t-4 border-r-4 border-lime-500 rounded-tr-3xl"></div>
+      </div>
+      <div className="absolute bottom-4 left-4 sm:bottom-6 sm:left-6 lg:bottom-8 lg:left-8 opacity-10">
+        <div className="w-16 h-16 sm:w-20 sm:h-20 border-b-4 border-l-4 border-emerald-500 rounded-bl-3xl"></div>
+      </div>
+      <div className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 lg:bottom-8 lg:right-8 opacity-10">
+        <div className="w-16 h-16 sm:w-20 sm:h-20 border-b-4 border-r-4 border-lime-500 rounded-br-3xl"></div>
+      </div>
+
+      {/* Floating Icons - More vibrant and diverse */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-32 left-[10%] text-5xl animate-float opacity-30">🌱</div>
-        <div className="absolute top-48 right-[15%] text-4xl animate-float-delayed opacity-25">🌿</div>
-        <div className="absolute bottom-40 left-[20%] text-6xl animate-float-slow opacity-30">🏡</div>
-        <div className="absolute top-[60%] right-[25%] text-4xl animate-float opacity-30">🌾</div>
-        <div className="absolute bottom-32 right-[30%] text-5xl animate-float-delayed opacity-25">💧</div>
+        {/* Large decorative icons - desktop only */}
+        <div className="hidden lg:block">
+          <div className="absolute top-[15%] left-[8%] text-3xl animate-float opacity-20">🌱</div>
+          <div className="absolute top-[20%] right-[12%] text-2xl animate-float-delayed opacity-20">🌿</div>
+          <div className="absolute bottom-[15%] left-[15%] text-3xl animate-float-slow opacity-20">🏡</div>
+          <div className="absolute top-[55%] right-[10%] text-2xl animate-float opacity-20">🌾</div>
+          <div className="absolute bottom-[20%] right-[20%] text-3xl animate-float-delayed opacity-20">💧</div>
+          <div className="absolute top-[35%] left-[5%] text-2xl animate-float-slow opacity-15">�</div>
+          <div className="absolute top-[45%] right-[8%] text-2xl animate-float opacity-15">🍃</div>
+          <div className="absolute bottom-[35%] left-[25%] text-2xl animate-float-delayed opacity-15">�</div>
+          <div className="absolute top-[65%] left-[12%] text-xl animate-float-slow opacity-15">�</div>
+          <div className="absolute bottom-[25%] right-[15%] text-xl animate-float opacity-15">☀️</div>
+        </div>
+
+        {/* Medium icons - tablet and up */}
+        <div className="hidden md:block lg:hidden">
+          <div className="absolute top-[18%] left-[10%] text-2xl animate-float opacity-20">🌱</div>
+          <div className="absolute top-[25%] right-[15%] text-xl animate-float-delayed opacity-20">�</div>
+          <div className="absolute bottom-[20%] left-[18%] text-2xl animate-float-slow opacity-20">💧</div>
+          <div className="absolute top-[60%] right-[12%] text-xl animate-float opacity-20">🌾</div>
+          <div className="absolute bottom-[30%] right-[22%] text-xl animate-float-delayed opacity-15">🍃</div>
+        </div>
+
+        {/* Small icons - mobile */}
+        <div className="md:hidden">
+          <div className="absolute top-[12%] left-[5%] text-xl animate-float opacity-15">🌱</div>
+          <div className="absolute top-[15%] right-[8%] text-lg animate-float-delayed opacity-15">🌿</div>
+          <div className="absolute bottom-[12%] left-[10%] text-xl animate-float-slow opacity-15">💧</div>
+          <div className="absolute bottom-[18%] right-[12%] text-lg animate-float opacity-15">☀️</div>
+        </div>
       </div>
 
       {/* Main Content */}
-      <div className="relative h-screen w-full flex items-center justify-center px-6 z-10">
-        <div className="text-center space-y-6 max-w-5xl w-full animate-fade-in-up">
+      <div className="relative h-full w-full flex items-center justify-center px-3 sm:px-4 lg:px-6 z-10">
+        <div className="text-center w-full max-w-6xl animate-fade-in-up">
           {/* Icon */}
-          <div className="flex justify-center mb-4">
+          <div className="flex justify-center mb-2 sm:mb-3">
             <div className="relative">
-              <div className="absolute inset-0 bg-emerald-400/30 rounded-full blur-2xl animate-pulse"></div>
-              <div className="relative h-20 w-20 bg-gradient-to-br from-emerald-400 to-lime-500 rounded-3xl flex items-center justify-center shadow-2xl rotate-12 hover:rotate-0 transition-transform duration-500">
-                <span className="text-4xl -rotate-12 hover:rotate-0 transition-transform duration-500">🌱</span>
+              <div className="absolute inset-0 bg-emerald-400/30 rounded-full blur-xl animate-pulse"></div>
+              <div className="relative h-12 w-12 sm:h-14 sm:w-14 lg:h-16 lg:w-16 bg-gradient-to-br from-emerald-400 to-lime-500 rounded-2xl flex items-center justify-center shadow-2xl rotate-12 hover:rotate-0 transition-transform duration-500">
+                <span className="text-xl sm:text-2xl lg:text-3xl -rotate-12 hover:rotate-0 transition-transform duration-500">
+                  🌱
+                </span>
               </div>
             </div>
           </div>
 
           {/* Title */}
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-emerald-900 leading-tight drop-shadow-sm">
-            <span className="inline-block animate-slide-in-left">سامانه</span>
-            <br />
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black text-emerald-900 leading-tight drop-shadow-sm mb-2 sm:mb-3">
+            <span className="inline-block animate-slide-in-left">سامانه</span>{" "}
             <span className="inline-block animate-slide-in-right bg-gradient-to-r from-emerald-600 via-emerald-500 to-lime-600 bg-clip-text text-transparent">
               گلخانه هوشمند
             </span>
           </h1>
 
           {/* Subtitle with Typing Animation */}
-          <div className="h-16 flex items-center justify-center">
-            <p className="text-base md:text-lg text-emerald-700 font-semibold max-w-2xl mx-auto drop-shadow-sm">
+          <div className="h-12 sm:h-14 lg:h-16 flex items-center justify-center px-2 mb-3 sm:mb-4">
+            <p className="text-xs sm:text-sm md:text-base lg:text-lg text-emerald-700 font-semibold max-w-2xl mx-auto drop-shadow-sm">
               {typedText}
-              <span className="inline-block w-0.5 h-5 bg-emerald-600 mr-1 animate-blink"></span>
+              <span className="inline-block w-0.5 h-3 sm:h-4 bg-emerald-600 mr-1 animate-blink align-middle"></span>
             </p>
           </div>
 
           {/* Features */}
-          <div className="flex flex-wrap justify-center gap-3 mt-6 animate-fade-in-more-delayed">
-            <div className="px-4 py-2 bg-white/80 backdrop-blur-md border-2 border-emerald-200 rounded-full text-emerald-700 font-bold hover:bg-emerald-50 hover:border-emerald-300 hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-default text-sm">
-              📊 پایش لحظه‌ای
+          <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2 lg:gap-2.5 mb-4 sm:mb-5 lg:mb-6 px-2 animate-fade-in-more-delayed">
+            <div className="px-2.5 sm:px-3 lg:px-4 py-1 sm:py-1.5 bg-white/80 backdrop-blur-md border-2 border-emerald-200 rounded-full text-emerald-700 font-bold hover:bg-emerald-50 hover:border-emerald-300 hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-default text-[10px] sm:text-xs lg:text-sm group">
+              <span className="inline-block group-hover:scale-110 transition-transform">📊</span> پایش لحظه‌ای
             </div>
-            <div className="px-4 py-2 bg-white/80 backdrop-blur-md border-2 border-emerald-200 rounded-full text-emerald-700 font-bold hover:bg-emerald-50 hover:border-emerald-300 hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-default text-sm">
-              🌡️ کنترل هوشمند
+            <div className="px-2.5 sm:px-3 lg:px-4 py-1 sm:py-1.5 bg-white/80 backdrop-blur-md border-2 border-emerald-200 rounded-full text-emerald-700 font-bold hover:bg-emerald-50 hover:border-emerald-300 hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-default text-[10px] sm:text-xs lg:text-sm group">
+              <span className="inline-block group-hover:scale-110 transition-transform">🌡️</span> کنترل هوشمند
             </div>
-            <div className="px-4 py-2 bg-white/80 backdrop-blur-md border-2 border-emerald-200 rounded-full text-emerald-700 font-bold hover:bg-emerald-50 hover:border-emerald-300 hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-default text-sm">
-              📈 گزارش‌گیری دقیق
+            <div className="px-2.5 sm:px-3 lg:px-4 py-1 sm:py-1.5 bg-white/80 backdrop-blur-md border-2 border-emerald-200 rounded-full text-emerald-700 font-bold hover:bg-emerald-50 hover:border-emerald-300 hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-default text-[10px] sm:text-xs lg:text-sm group">
+              <span className="inline-block group-hover:scale-110 transition-transform">📈</span> گزارش‌گیری دقیق
+            </div>
+            <div className="px-2.5 sm:px-3 lg:px-4 py-1 sm:py-1.5 bg-white/80 backdrop-blur-md border-2 border-emerald-200 rounded-full text-emerald-700 font-bold hover:bg-emerald-50 hover:border-emerald-300 hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-default text-[10px] sm:text-xs lg:text-sm group">
+              <span className="inline-block group-hover:scale-110 transition-transform">💡</span> هوش مصنوعی
             </div>
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8 max-w-3xl mx-auto animate-fade-in-more-delayed">
-            <div className="bg-white/60 backdrop-blur-md border-2 border-emerald-200/50 rounded-2xl p-4 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
-              <div className="text-3xl mb-1">🌿</div>
-              <div className="text-xl font-bold text-emerald-700 mb-1">+۹۵٪</div>
-              <div className="text-xs text-emerald-600 font-medium">بهره‌وری بالاتر</div>
+          <div className="grid grid-cols-3 gap-2 sm:gap-3 lg:gap-4 max-w-4xl mx-auto px-2 animate-fade-in-more-delayed">
+            <div className="relative bg-white/70 backdrop-blur-md border-2 border-emerald-200/60 rounded-xl lg:rounded-2xl p-3 sm:p-4 lg:p-5 shadow-lg hover:shadow-2xl hover:scale-105 hover:border-emerald-300 transition-all duration-300 group overflow-hidden">
+              <div className="absolute -top-4 -right-4 text-5xl sm:text-6xl lg:text-7xl opacity-10 group-hover:opacity-20 transition-opacity">
+                🌿
+              </div>
+              <div className="relative z-10">
+                <div className="text-xl sm:text-2xl lg:text-3xl mb-1 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300">
+                  🌿
+                </div>
+                <div className="text-base sm:text-lg lg:text-xl xl:text-2xl font-bold text-emerald-700">+۹۵٪</div>
+                <div className="text-[10px] sm:text-xs lg:text-sm text-emerald-600 font-medium mt-0.5">بهره‌وری</div>
+              </div>
             </div>
-            <div className="bg-white/60 backdrop-blur-md border-2 border-lime-200/50 rounded-2xl p-4 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
-              <div className="text-3xl mb-1">💧</div>
-              <div className="text-xl font-bold text-lime-700 mb-1">-۶۰٪</div>
-              <div className="text-xs text-lime-600 font-medium">مصرف آب کمتر</div>
+            <div className="relative bg-white/70 backdrop-blur-md border-2 border-lime-200/60 rounded-xl lg:rounded-2xl p-3 sm:p-4 lg:p-5 shadow-lg hover:shadow-2xl hover:scale-105 hover:border-lime-300 transition-all duration-300 group overflow-hidden">
+              <div className="absolute -top-4 -right-4 text-5xl sm:text-6xl lg:text-7xl opacity-10 group-hover:opacity-20 transition-opacity">
+                💧
+              </div>
+              <div className="relative z-10">
+                <div className="text-xl sm:text-2xl lg:text-3xl mb-1 group-hover:scale-110 group-hover:-rotate-12 transition-all duration-300">
+                  💧
+                </div>
+                <div className="text-base sm:text-lg lg:text-xl xl:text-2xl font-bold text-lime-700">-۶۰٪</div>
+                <div className="text-[10px] sm:text-xs lg:text-sm text-lime-600 font-medium mt-0.5">مصرف آب</div>
+              </div>
             </div>
-            <div className="bg-white/60 backdrop-blur-md border-2 border-emerald-200/50 rounded-2xl p-4 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
-              <div className="text-3xl mb-1">📊</div>
-              <div className="text-xl font-bold text-emerald-700 mb-1">۲۴/۷</div>
-              <div className="text-xs text-emerald-600 font-medium">پایش مستمر</div>
+            <div className="relative bg-white/70 backdrop-blur-md border-2 border-emerald-200/60 rounded-xl lg:rounded-2xl p-3 sm:p-4 lg:p-5 shadow-lg hover:shadow-2xl hover:scale-105 hover:border-emerald-300 transition-all duration-300 group overflow-hidden">
+              <div className="absolute -top-4 -right-4 text-5xl sm:text-6xl lg:text-7xl opacity-10 group-hover:opacity-20 transition-opacity">
+                📊
+              </div>
+              <div className="relative z-10">
+                <div className="text-xl sm:text-2xl lg:text-3xl mb-1 group-hover:scale-110 transition-all duration-300">
+                  📊
+                </div>
+                <div className="text-base sm:text-lg lg:text-xl xl:text-2xl font-bold text-emerald-700">۲۴/۷</div>
+                <div className="text-[10px] sm:text-xs lg:text-sm text-emerald-600 font-medium mt-0.5">پایش مستمر</div>
+              </div>
             </div>
           </div>
 
-          {/* Scroll Indicator */}
-          <div className="mt-8 animate-bounce">
-            <div className="flex flex-col items-center gap-2 text-emerald-600">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
-              </svg>
-            </div>
+          {/* Bottom decorative line */}
+          <div className="flex items-center justify-center gap-2 mt-5 sm:mt-6 lg:mt-8 opacity-30">
+            <div className="h-0.5 w-12 sm:w-16 lg:w-20 bg-gradient-to-r from-transparent to-emerald-400"></div>
+            <div className="h-1.5 w-1.5 rounded-full bg-emerald-400"></div>
+            <div className="h-0.5 w-16 sm:w-24 lg:w-32 bg-emerald-400"></div>
+            <div className="h-1.5 w-1.5 rounded-full bg-lime-400"></div>
+            <div className="h-0.5 w-12 sm:w-16 lg:w-20 bg-gradient-to-l from-transparent to-lime-400"></div>
           </div>
         </div>
       </div>

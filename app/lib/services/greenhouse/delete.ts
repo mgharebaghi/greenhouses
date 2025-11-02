@@ -2,7 +2,6 @@
 
 import { prisma } from "@/app/lib/singletone";
 import { deleteZones } from "../zones/delete";
-import { message } from "antd";
 
 export type GreenHouseDeleteResponse = {
   status: "ok" | "error";
