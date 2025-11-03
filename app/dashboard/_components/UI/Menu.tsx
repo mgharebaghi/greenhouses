@@ -13,6 +13,7 @@ import {
   EnvironmentOutlined,
   LogoutOutlined,
   CloudOutlined,
+  ApiOutlined,
 } from "@ant-design/icons";
 import { useRouter, usePathname } from "next/navigation";
 import GreenhouseButton from "@/app/components/UI/GreenhouseButton";
@@ -101,6 +102,15 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
       bgColor: "bg-sky-50",
       hoverColor: "group-hover:bg-sky-100",
       page: "/dashboard/climatedaily",
+      active: true,
+    },
+    {
+      icon: <ApiOutlined />,
+      title: "آبیاری",
+      color: "text-blue-700",
+      bgColor: "bg-blue-50",
+      hoverColor: "group-hover:bg-blue-100",
+      page: "/dashboard/irrigation",
       active: true,
     },
   ];

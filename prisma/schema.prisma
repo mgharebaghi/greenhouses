@@ -197,7 +197,7 @@ model ClimateDaily {
 }
 
 model IrrigationEvent {
-  EventID              Int                 @id(map: "PK_IrrigationEvent")
+  EventID              Int                 @id(map: "PK_IrrigationEvent") @default(autoincrement())
   ZoneID               Int?
   StartTime            DateTime?           @db.DateTime
   EndTime              DateTime?           @db.DateTime
@@ -216,7 +216,7 @@ model IrrigationEvent {
 }
 
 model IrrigationRecords {
-  RecordID           Int              @id(map: "PK_IrrigationRecords")
+  RecordID           Int              @id(map: "PK_IrrigationRecords") @default(autoincrement())
   EventID            Int?
   CycleNumber        Int?
   StartTime          DateTime?
