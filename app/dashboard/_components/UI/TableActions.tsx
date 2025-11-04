@@ -8,6 +8,7 @@ interface TableActionsProps {
   deleteTitle?: string;
   disabledEdit?: boolean;
   disabledDelete?: boolean;
+  qrcode?: () => void;
 }
 
 export default function TableActions({
@@ -17,6 +18,7 @@ export default function TableActions({
   deleteTitle = "حذف",
   disabledEdit = false,
   disabledDelete = false,
+  qrcode,
 }: TableActionsProps) {
   return (
     <div className="flex gap-3 items-center">
@@ -48,6 +50,7 @@ export default function TableActions({
       >
         <DeleteOutlined className="text-red-500 text-base group-hover:scale-110 transition-transform" />
       </button>
+      {qrcode && <GreenhouseButton onClick={qrcode} text="کد QR" />}
     </div>
   );
 }

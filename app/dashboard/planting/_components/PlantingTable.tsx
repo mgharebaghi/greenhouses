@@ -124,10 +124,17 @@ export default function PlantingTable({ data, loading, setMainData, setMainLoadi
             })
           }
           onDelete={() => handleDelete(record)}
+          qrcode={() => generateQR(Number(record.PlantingID))}
         />
       ),
     },
   ];
+
+  const generateQR = (plantingId: number) => {
+    const url = `https://mygreenhouses.ir/planting/${plantingId}`;
+    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(url)}&size=300x300`;
+    window.open(qrCodeUrl, "_blank");
+  };
 
   const handleDelete = (record: Plantings) => {
     setOnDeleteModal({
