@@ -59,6 +59,10 @@ export async function getPlantingByZoneId(zoneId: number) {
 export async function getPlantingById(plantingId: number) {
   const data = await prisma.plantings.findUnique({
     where: { PlantingID: plantingId },
+    include: {
+      Zones: { select: { ZoneID: true, Name: true } },
+      PlantVarieties: { select: { VarietyID: true, VarietyName: true } },
+    },
   });
 
   if (!data) return null;

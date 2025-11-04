@@ -1,6 +1,5 @@
+"use client";
 import type { Plantings } from "@/app/generated/prisma";
-import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import { Button } from "antd";
 import Table from "@/app/dashboard/_components/UI/Table";
 import PlantingInsUpModal, { PlantingInsUpModalProps } from "./PlantingInsUpModal";
 import { useState } from "react";
@@ -11,6 +10,7 @@ import jalaliday from "jalaliday";
 import { downloadCSVFromAntd } from "../../_components/tools/CSVoutput";
 import InsertionRow from "../../_components/UI/InsertionRow";
 import TableActions from "../../_components/UI/TableActions";
+import QRCodeModal from "../../_components/UI/QRCodeModal";
 
 dayjs.extend(jalaliday);
 
@@ -25,6 +25,11 @@ export default function PlantingTable({ data, loading, setMainData, setMainLoadi
   const [insUpModal, setInsUpModal] = useState<PlantingInsUpModalProps | null>(null);
   const [onDeleteModal, setOnDeleteModal] = useState<DeleteModalProps | null>(null);
   const [onDeleteLoading, setOnDeleteLoading] = useState<boolean>(false);
+  const [qrModal, setQrModal] = useState<{ visible: boolean; url: string; plantingId: number }>({
+    visible: false,
+    url: "",
+    plantingId: 0,
+  });
 
   const columns = [
     {
@@ -132,8 +137,11 @@ export default function PlantingTable({ data, loading, setMainData, setMainLoadi
 
   const generateQR = (plantingId: number) => {
     const url = `https://mygreenhouses.ir/planting/${plantingId}`;
-    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(url)}&size=300x300`;
-    window.open(qrCodeUrl, "_blank");
+    setQrModal({
+      visible: true,
+      url,
+      plantingId,
+    });
   };
 
   const handleDelete = (record: Plantings) => {
@@ -218,6 +226,13 @@ export default function PlantingTable({ data, loading, setMainData, setMainLoadi
         onClose={() => setOnDeleteModal(null)}
         onDelete={() => onDeleteModal?.onDelete?.(Number(onDeleteModal?.id))}
         deleteLoading={onDeleteLoading}
+      />
+
+      <QRCodeModal
+        visible={qrModal.visible}
+        url={qrModal.url}
+        title={`QR Code - کاشت شماره ${qrModal.plantingId}`}
+        onClose={() => setQrModal({ visible: false, url: "", plantingId: 0 })}
       />
     </>
   );

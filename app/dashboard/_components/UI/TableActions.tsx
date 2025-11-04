@@ -1,5 +1,4 @@
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import GreenhouseButton from "@/app/components/UI/GreenhouseButton";
+import { EditOutlined, DeleteOutlined, QrcodeOutlined } from "@ant-design/icons";
 
 interface TableActionsProps {
   onEdit: () => void;
@@ -22,6 +21,21 @@ export default function TableActions({
 }: TableActionsProps) {
   return (
     <div className="flex gap-3 items-center">
+      {qrcode && (
+        <button
+          onClick={qrcode}
+          title="کد QR"
+          aria-label="کد QR"
+          className={`h-8 w-8 flex items-center justify-center rounded-full border border-blue-100 bg-blue-50/60 shadow-sm transition-all
+            hover:bg-blue-100 hover:border-blue-300 hover:shadow-md
+            focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-200
+            disabled:opacity-50 disabled:cursor-not-allowed
+            group`}
+          type="button"
+        >
+          <QrcodeOutlined className="text-blue-500 text-base group-hover:scale-110 transition-transform" />
+        </button>
+      )}
       <button
         onClick={onEdit}
         title={editTitle}
@@ -50,7 +64,6 @@ export default function TableActions({
       >
         <DeleteOutlined className="text-red-500 text-base group-hover:scale-110 transition-transform" />
       </button>
-      {qrcode && <GreenhouseButton onClick={qrcode} text="کد QR" />}
     </div>
   );
 }
