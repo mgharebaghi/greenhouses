@@ -53,6 +53,7 @@ export default function PlantingScan() {
       <div
         className="h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex items-center justify-center"
         dir="rtl"
+        style={{ fontFamily: "IransansR" }}
       >
         <div className="text-center">
           <div className="relative">
@@ -70,6 +71,7 @@ export default function PlantingScan() {
       <div
         className="h-screen bg-gradient-to-br from-rose-50 via-red-50 to-orange-50 flex items-center justify-center"
         dir="rtl"
+        style={{ fontFamily: "IransansR" }}
       >
         <div className="bg-white rounded-3xl shadow-2xl p-12 max-w-md border-2 border-red-200">
           <div className="text-7xl mb-6">⚠️</div>
@@ -84,6 +86,7 @@ export default function PlantingScan() {
     <div
       className="min-h-screen lg:h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 p-3 sm:p-4 lg:p-6 overflow-y-auto lg:overflow-hidden"
       dir="rtl"
+      style={{ fontFamily: "IransansR" }}
     >
       <div className="h-full max-w-[1600px] mx-auto flex flex-col gap-3 sm:gap-4">
         {/* Header Bar */}
