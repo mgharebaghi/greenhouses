@@ -39,23 +39,23 @@ model PlantGrowthStages {
 }
 
 model Plantings {
-  PlantingID          BigInt                @id(map: "PK_Plantings") @default(autoincrement())
+  PlantingID          BigInt            @id(map: "PK_Plantings") @default(autoincrement())
   GreenhouseID        Int?
   ZoneID              Int?
   VarietyID           Int?
-  PlantDate           DateTime?             @db.Date
-  SourceBatch         String?               @db.NVarChar(200)
+  PlantDate           DateTime?         @db.Date
+  SourceBatch         String?           @db.NVarChar(200)
   NumPlants           Int?
-  PlantsPerM2         Decimal?              @db.Decimal(9, 3)
-  ExpectedHarvestDate DateTime?             @db.Date
-  ActualHarvestDate   DateTime?             @db.Date
-  SeedingMethod       String?               @db.NVarChar(100)
-  TransplantDate      DateTime?             @db.Date
+  PlantsPerM2         Decimal?          @db.Decimal(9, 3)
+  ExpectedHarvestDate DateTime?         @db.Date
+  ActualHarvestDate   DateTime?         @db.Date
+  SeedingMethod       String?           @db.NVarChar(100)
+  TransplantDate      DateTime?         @db.Date
   PlantCountMeasured  Int?
-  Notes               String?               @db.NVarChar(500)
-  PlantingGrowthDaily PlantingGrowthDaily[]
-  PlantVarieties      PlantVarities?        @relation(fields: [VarietyID], references: [VarietyID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Plantings_Varieties")
-  Zones               Zones?                @relation(fields: [ZoneID], references: [ZoneID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Plantings_Zones")
+  Notes               String?           @db.NVarChar(500)
+  PlantVarieties      PlantVarities?    @relation(fields: [VarietyID], references: [VarietyID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Plantings_Varieties")
+  Zones               Zones?            @relation(fields: [ZoneID], references: [ZoneID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Plantings_Zones")
+  PlantingSamples     PlantingSamples[]
 }
 
 model sysdiagrams {
@@ -120,7 +120,7 @@ model Owner_Observer {
 model PlantingGrowthDaily {
   PlantGrowthDailyID BigInt             @id(map: "PK_PlantingGrowthDaily") @default(autoincrement())
   ObserverID         Int?
-  PlantingID         BigInt?
+  SampleID           BigInt?
   StageID            Int?
   RecordDate         DateTime?          @db.Date
   HeightCm           Decimal?           @db.Decimal(9, 3)
@@ -135,7 +135,7 @@ model PlantingGrowthDaily {
   Notes              String?            @db.NVarChar(500)
   Owner_Observer     Owner_Observer?    @relation(fields: [ObserverID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PlantingGrowthDaily_Owner_Observer")
   PlantGrowthStages  PlantGrowthStages? @relation(fields: [StageID], references: [StageID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PlantingGrowthDaily_PlantGrowthStages")
-  Plantings          Plantings?         @relation(fields: [PlantingID], references: [PlantingID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PlantingGrowthDaily_Plantings")
+  PlantingSamples    PlantingSamples?   @relation(fields: [SampleID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PlantingGrowthDaily_PlantingSamples")
 }
 
 model Plants {
@@ -233,4 +233,12 @@ model IrrigationRecords {
   QualityFlag        String?          @db.NVarChar(50)
   notes              String?          @db.NVarChar(50)
   IrrigationEvent    IrrigationEvent? @relation(fields: [EventID], references: [EventID], onDelete: NoAction, onUpdate: NoAction, map: "FK_IrrigationRecords_IrrigationEvent")
+}
+
+model PlantingSamples {
+  ID                  BigInt                @id(map: "PK_PlantingSamples") @default(autoincrement())
+  SerialID            String?               @db.NVarChar(50)
+  PlantingID          BigInt?
+  PlantingGrowthDaily PlantingGrowthDaily[]
+  Plantings           Plantings?            @relation(fields: [PlantingID], references: [PlantingID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PlantingSamples_Plantings")
 }

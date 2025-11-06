@@ -3,6 +3,7 @@ import { Col, Row, Select } from "antd";
 import Table from "@/app/dashboard/_components/UI/Table";
 import { useEffect, useState } from "react";
 import ClimateDailyInsUpModal, { ClimateDailyInsUpModalProps } from "./ClimateDailyInsUpModal";
+import ClimateDailyDetailModal from "./ClimateDailyDetailModal";
 import { ClimateDailyColumns, climateDailyFormatters } from "./climateDailyTableColumns";
 import { getAllData, getDataByGreenhouseId, getDataByZoneId } from "../data/queries";
 import { fetchGreenhouseOptions, fetchZoneOptions } from "../data/optionsData";
@@ -22,6 +23,10 @@ type SelectOptions = {
 
 export default function ClimateDailyTable(props: ClimateDailyTableProps) {
   const [deleteModal, setDeleteModal] = useState<DeleteModalProps | null>(null);
+  const [detailModal, setDetailModal] = useState<{ open: boolean; data: any | null }>({
+    open: false,
+    data: null,
+  });
   const [climateInsUpModal, setClimateInsUpModal] = useState<ClimateDailyInsUpModalProps | null>(null);
   const [insUpModalMessage, setInsUpModalMessage] = useState("");
   const [dataSource, setDataSource] = useState<ClimateDaily[]>(props.initialData);
@@ -87,6 +92,10 @@ export default function ClimateDailyTable(props: ClimateDailyTableProps) {
       setMainData: setDataSource,
       setMainLoading: setTableLoading,
     });
+  };
+
+  const handleDetail = (record: any) => {
+    setDetailModal({ open: true, data: record });
   };
 
   const handleDelete = (record: ClimateDaily) => {
@@ -164,12 +173,12 @@ export default function ClimateDailyTable(props: ClimateDailyTableProps) {
         csvOnclick={() =>
           downloadCSVFromAntd<ClimateDaily>(
             dataSource,
-            ClimateDailyColumns({ handleEdit, handleDelete }),
+            ClimateDailyColumns({ handleEdit, handleDelete, handleDetail }),
             `Climate-daily`,
             {
               formatters: climateDailyFormatters,
               forceExcelSeparatorLine: false,
-              excludeKeys: ["actions"],
+              excludeKeys: ["actions", "details"],
             }
           )
         }
@@ -177,7 +186,7 @@ export default function ClimateDailyTable(props: ClimateDailyTableProps) {
       />
 
       <Table
-        columns={ClimateDailyColumns({ handleEdit, handleDelete })}
+        columns={ClimateDailyColumns({ handleEdit, handleDelete, handleDetail })}
         dataSource={dataSource}
         rowKey="ClimateDailyID"
         scroll={{ x: 300 }}
@@ -202,6 +211,12 @@ export default function ClimateDailyTable(props: ClimateDailyTableProps) {
         id={deleteModal?.id}
         onDelete={deleteModal?.onDelete}
         deleteLoading={deleteModal?.deleteLoading}
+      />
+
+      <ClimateDailyDetailModal
+        open={detailModal.open}
+        data={detailModal.data}
+        onClose={() => setDetailModal({ open: false, data: null })}
       />
     </div>
   );

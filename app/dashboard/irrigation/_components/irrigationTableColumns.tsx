@@ -97,7 +97,7 @@ export function IrrigationColumns(props: IrrigationColumnsProps): Column[] {
       title: "میانگین جریان",
       dataIndex: "AvgFlowRate",
       key: "AvgFlowRate",
-      render: (value: number) => value?.toFixed(2) || "-",
+      render: (record: any) => record?.AvgFlowRate?.toFixed(2) || "-",
     },
     {
       title: "سیکل‌ها",

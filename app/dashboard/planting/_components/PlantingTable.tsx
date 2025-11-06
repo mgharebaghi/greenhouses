@@ -11,6 +11,10 @@ import { downloadCSVFromAntd } from "../../_components/tools/CSVoutput";
 import InsertionRow from "../../_components/UI/InsertionRow";
 import TableActions from "../../_components/UI/TableActions";
 import QRCodeModal from "../../_components/UI/QRCodeModal";
+import { DatabaseOutlined, PlusCircleOutlined, InfoCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import SamplesModal from "./SamplesModal";
+import PlantingDetailModal from "./PlantingDetailModal";
+import { Button, Tooltip } from "antd";
 
 dayjs.extend(jalaliday);
 
@@ -31,7 +35,32 @@ export default function PlantingTable({ data, loading, setMainData, setMainLoadi
     plantingId: 0,
   });
 
+  const [samplesModal, setSamplesModal] = useState<{ plantingId: number; open: boolean }>({
+    plantingId: 0,
+    open: false,
+  });
+
+  const [detailModal, setDetailModal] = useState<{ open: boolean; data: Plantings | null }>({
+    open: false,
+    data: null,
+  });
+
   const columns = [
+    {
+      title: "جزئیات",
+      key: "details",
+      width: 80,
+      align: "center" as const,
+      render: (_: any, record: Plantings) => (
+        <Tooltip title="مشاهده جزئیات">
+          <Button
+            type="text"
+            icon={<InfoCircleOutlined style={{ color: "#3b82f6", fontSize: "18px" }} />}
+            onClick={() => setDetailModal({ open: true, data: record })}
+          />
+        </Tooltip>
+      ),
+    },
     {
       title: "شناسه کاشت",
       dataIndex: "PlantingID",
@@ -63,53 +92,20 @@ export default function PlantingTable({ data, loading, setMainData, setMainLoadi
       ),
     },
     {
-      title: "بسته منبع",
-      dataIndex: "SourceBatch",
-      key: "sourceBatch",
-    },
-    {
       title: "تعداد گیاهان",
       dataIndex: "NumPlants",
       key: "numPlants",
     },
     {
-      title: "تراکمِ بوته (گیاه در هر مترمربع)",
-      dataIndex: "PlantsPerM2",
-      key: "plantsPerM2",
-    },
-    {
-      title: "تاریخِ برداشتِ مورد انتظار",
-      dataIndex: "ExpectedHarvestDate",
-      key: "expectedHarvestDate",
-      render: (date: string) => (
-        <span>{date ? dayjs(date).calendar("jalali").locale("fa").format("YYYY/MM/DD") : "-"}</span>
+      title: "ثبت نمونه های پایش",
+      key: "monitoringSamples",
+      render: (_: any, record: Plantings) => (
+        <PlusOutlined size={18} style={{ color: "#10b981", fontSize: "18px" }}
+          onClick={() => {
+            setSamplesModal({ plantingId: Number(record.PlantingID), open: true });
+          }}
+        />
       ),
-    },
-    {
-      title: "تاریخِ برداشتِ واقعی",
-      dataIndex: "ActualHarvestDate",
-      key: "actualHarvestDate",
-      render: (date: string) => (
-        <span>{date ? dayjs(date).calendar("jalali").locale("fa").format("YYYY/MM/DD") : "-"}</span>
-      ),
-    },
-    {
-      title: "روشِ کاشت",
-      dataIndex: "SeedingMethod",
-      key: "seedingMethod",
-    },
-    {
-      title: "تاریخِ نشاکاری (انتقال نشاء)",
-      dataIndex: "TransplantDate",
-      key: "transplantDate",
-      render: (date: string) => (
-        <span>{date ? dayjs(date).calendar("jalali").locale("fa").format("YYYY/MM/DD") : "-"}</span>
-      ),
-    },
-    {
-      title: "تعدادِ گیاهِ شمارش‌شده",
-      dataIndex: "PlantCountMeasured",
-      key: "plantCountMeasured",
     },
     {
       title: "",
@@ -233,6 +229,18 @@ export default function PlantingTable({ data, loading, setMainData, setMainLoadi
         url={qrModal.url}
         title={`QR Code - کاشت شماره ${qrModal.plantingId}`}
         onClose={() => setQrModal({ visible: false, url: "", plantingId: 0 })}
+      />
+
+      <SamplesModal
+        open={samplesModal.open}
+        plantingId={samplesModal.plantingId}
+        onClose={() => setSamplesModal({ ...samplesModal, open: false })}
+      />
+
+      <PlantingDetailModal
+        open={detailModal.open}
+        data={detailModal.data}
+        onClose={() => setDetailModal({ open: false, data: null })}
       />
     </>
   );

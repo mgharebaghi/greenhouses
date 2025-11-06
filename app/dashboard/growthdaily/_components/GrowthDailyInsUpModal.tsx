@@ -17,6 +17,7 @@ import {
   ExclamationCircleOutlined,
 } from "@ant-design/icons";
 import GreenhouseButton from "@/app/components/UI/GreenhouseButton";
+import { getSamples } from "@/app/lib/services/plantingsamples";
 
 export type GrowthDailyInsUpModalProps = {
   open: boolean;
@@ -42,8 +43,12 @@ export default function GrowthDailyInsUpModal(props: GrowthDailyInsUpModalProps)
 
   const [ownersOptions, setOwnersOptions] = useState<ItemOptions[]>([]);
   const [ownersLoading, setOwnersLoading] = useState(false);
+
   const [stagesLoading, setStagesLoading] = useState(false);
   const [stagesOptions, setStagesOptions] = useState<ItemOptions[]>([]);
+
+  const [plantingSamplesLoading, setPlantingSamplesLoading] = useState(false);
+  const [plantingSamplesOptions, setPlantingSamplesOptions] = useState<ItemOptions[]>([]);
 
   const [isEstimatedChecked, setIsEstimatedChecked] = useState(false);
   const [pestObservedChecked, setPestObservedChecked] = useState(false);
@@ -75,6 +80,25 @@ export default function GrowthDailyInsUpModal(props: GrowthDailyInsUpModalProps)
     }
   };
 
+  const getPlantingSamples = async () => {
+    if (!props.plantingId) {
+      setPlantingSamplesOptions([]);
+      return;
+    }
+    setPlantingSamplesLoading(true);
+    const res = await getSamples(props.plantingId);
+    if (res) {
+      setPlantingSamplesLoading(false);
+      const options = res.map((sample) => ({
+        label: sample.SerialID,
+        value: Number(sample.ID),
+      }));
+      setPlantingSamplesOptions(options);
+    } else {
+      setPlantingSamplesLoading(false);
+    }
+  };
+
   useEffect(() => {
     getStagesOptions();
   }, [props.varietyID]);
@@ -82,6 +106,10 @@ export default function GrowthDailyInsUpModal(props: GrowthDailyInsUpModalProps)
   useEffect(() => {
     getOwnersOptions();
   }, []);
+
+  useEffect(() => {
+    getPlantingSamples();
+  }, [props.plantingId]);
 
   useEffect(() => {
     if (!props.open) return;
@@ -112,6 +140,16 @@ export default function GrowthDailyInsUpModal(props: GrowthDailyInsUpModalProps)
       required: true,
       loading: ownersLoading,
       icon: "👤",
+    },
+    {
+      name: "SampleID",
+      label: "نمونه کاشت",
+      placeholder: "نمونه کاشت را انتخاب کنید",
+      type: "select",
+      options: plantingSamplesOptions,
+      required: true,
+      loading: plantingSamplesLoading,
+      icon: "🆔",
     },
     {
       name: "StageID",
@@ -151,7 +189,6 @@ export default function GrowthDailyInsUpModal(props: GrowthDailyInsUpModalProps)
       required: true,
       icon: "⭕",
     },
-    { name: "IsEstimated", label: "آیا اطلاعات تخمینی است؟", type: "checkbox", required: false, icon: "❓" },
     {
       name: "HealthScore",
       label: "امتیاز سلامت (1-10)",
@@ -160,6 +197,7 @@ export default function GrowthDailyInsUpModal(props: GrowthDailyInsUpModalProps)
       required: true,
       icon: "💚",
     },
+    { name: "IsEstimated", label: "آیا اطلاعات تخمینی است؟", type: "checkbox", required: false, icon: "❓" },
     { name: "PestObserved", label: "آفت مشاهده شد؟", type: "checkbox", required: false, icon: "🐛" },
   ];
 
@@ -168,7 +206,6 @@ export default function GrowthDailyInsUpModal(props: GrowthDailyInsUpModalProps)
     setSubmitMessage(null);
     const completedValues: any = {
       ...values,
-      PlantingID: Number(props.plantingId),
       IsEstimated: isEstimatedChecked,
       PestObserved: pestObservedChecked,
       RecordDate: values.RecordDate

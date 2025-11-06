@@ -1,12 +1,15 @@
 import Table from "@/app/dashboard/_components/UI/Table";
 import { PlantVarietyDTO } from "../page";
 import PlantVaritiesEditModal from "./PlantVaritiesEditModal";
+import PlantVarietyDetailModal from "./PlantVarietyDetailModal";
 import { useState } from "react";
 import InsertionRow from "../../_components/UI/InsertionRow";
 import { downloadCSVFromAntd } from "../../_components/tools/CSVoutput";
 import TableActions from "../../_components/UI/TableActions";
 import DeleteModal, { DeleteModalProps } from "../../_components/UI/DeleteModal";
 import { deletePlantVariety, getPlantVarieties } from "@/app/lib/services/varities";
+import { Button, Tooltip } from "antd";
+import { InfoCircleOutlined } from "@ant-design/icons";
 
 type PlantVarietiesTableProps = {
   data: PlantVarietyDTO[];
@@ -35,8 +38,27 @@ export default function PlantVaritiesTable({
   const [deleteModalOpen, setDeleteModalOpen] = useState<DeleteModalProps | null>(null);
   const [deleteModalLoading, setDeleteModalLoading] = useState(false);
   const [deleteModalMsg, setDeleteModalMsg] = useState("");
+  const [detailModal, setDetailModal] = useState<{ open: boolean; data: PlantVarietyDTO | null }>({
+    open: false,
+    data: null,
+  });
 
   const columns = [
+    {
+      title: "جزئیات",
+      key: "details",
+      width: 80,
+      align: "center" as const,
+      render: (_: any, record: PlantVarietyDTO) => (
+        <Tooltip title="مشاهده جزئیات">
+          <Button
+            type="text"
+            icon={<InfoCircleOutlined style={{ color: "#3b82f6", fontSize: "18px" }} />}
+            onClick={() => setDetailModal({ open: true, data: record })}
+          />
+        </Tooltip>
+      ),
+    },
     {
       title: "نام گونه",
       dataIndex: "VarietyName",
@@ -54,62 +76,17 @@ export default function PlantVaritiesTable({
       key: "SeedCompany",
     },
     {
-      title: "روز تا جوانه زنی",
-      dataIndex: "DaysToGermination",
-      key: "DaysToGermination",
-    },
-    {
-      title: "روز تا رویش",
-      dataIndex: "DaysToSprout",
-      key: "DaysToSprout",
-    },
-    {
-      title: "روز تا نشاء",
-      dataIndex: "DaysToSeedling",
-      key: "DaysToSeedling",
-    },
-    {
       title: "روز تا بلوغ",
       dataIndex: "DaysToMaturity",
       key: "DaysToMaturity",
     },
     {
-      title: "عملکرد معمول کیلوگرم بر متر مربع",
+      title: "عملکرد (کیلوگرم/متر مربع)",
       dataIndex: "TypicalYieldKgPerM2",
       key: "TypicalYieldKgPerM2",
     },
     {
-      title: "حداقل دمای ایده آل ",
-      dataIndex: "IdealTempMin",
-      key: "IdealTempMin",
-    },
-    {
-      title: "حداکثر دمای ایده آل",
-      dataIndex: "IdealTempMax",
-      key: "IdealTempMax",
-    },
-    {
-      title: "حداقل رطوبت ایده آل",
-      dataIndex: "IdealHumidityMin",
-      key: "IdealHumidityMin",
-    },
-    {
-      title: "حداکثر رطوبت ایده آل",
-      dataIndex: "IdealHumidityMax",
-      key: "IdealHumidityMax",
-    },
-    {
-      title: "نیاز نوری",
-      dataIndex: "LightRequirement",
-      key: "LightRequirement",
-    },
-    {
-      title: "چرخه رشد (روز)",
-      dataIndex: "GrowthCycleDays",
-      key: "GrowthCycleDays",
-    },
-    {
-      title: "",
+      title: "عملیات",
       dataIndex: "actions",
       key: "actions",
       render: (_: any, record: PlantVarietyDTO) => (
@@ -168,7 +145,7 @@ export default function PlantVaritiesTable({
         rowKey="VarietyID"
         loading={loading}
         pagination={false}
-        scroll={{ x: 2000 }}
+        scroll={{ x: 1000 }}
       />
 
       <PlantVaritiesEditModal
@@ -187,6 +164,12 @@ export default function PlantVaritiesTable({
         deleteLoading={deleteModalLoading}
         onDelete={deleteModalOpen?.onDelete}
         msg={deleteModalMsg}
+      />
+
+      <PlantVarietyDetailModal
+        open={detailModal.open}
+        data={detailModal.data}
+        onClose={() => setDetailModal({ open: false, data: null })}
       />
     </>
   );

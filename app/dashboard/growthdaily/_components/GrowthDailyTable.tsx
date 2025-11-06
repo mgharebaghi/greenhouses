@@ -4,6 +4,7 @@ import Table from "@/app/dashboard/_components/UI/Table";
 
 import { useEffect, useState } from "react";
 import GrowthDailyInsUpModal, { GrowthDailyInsUpModalProps } from "./GrowthDailyInsUpModal";
+import GrowthDailyDetailModal from "./GrowthDailyDetailModal";
 import { GrowthDailyColumns, growthDailyFormatters } from "./growthDailyTableColumns";
 import { getAllData, getDataByGreenHousId, getDataByPlantingId, getDataByZoneId } from "../data/queries";
 import { fetchGreenhouseOptions, fetchPlantingOptions, fetchZoneOptions } from "../data/optionsData";
@@ -25,6 +26,10 @@ type selectOptions = {
 
 export default function GrowthDailyTable(props: GrowthDailyTableProps) {
   const [deleteModal, setDeleteModal] = useState<DeleteModalProps | null>(null);
+  const [detailModal, setDetailModal] = useState<{ open: boolean; data: any | null }>({
+    open: false,
+    data: null,
+  });
 
   const [growthInsUpModal, setGrowthInsUpModal] = useState<GrowthDailyInsUpModalProps | null>(null);
   const [insUpModalMessage, setInsUpModalMessage] = useState("");
@@ -117,18 +122,22 @@ export default function GrowthDailyTable(props: GrowthDailyTableProps) {
     }
   };
 
-  const handleEdit = async (record: PlantingGrowthDaily) => {
-    await plantingDataById(Number(record.PlantingID));
+  const handleEdit = async (record: any) => {
+    await plantingDataById(Number(record.PlantingSamples.PlantingID));
     setGrowthInsUpModal({
       open: true,
       onClose: () => setGrowthInsUpModal(null),
       isEdititng: true,
       initialData: record,
-      plantingId: Number(record.PlantingID),
+      plantingId: Number(record.PlantingSamples.PlantingID),
       setMainData: setDataSource,
       setMainLoading: setTableLoading,
       varietyID: varietyID,
     });
+  };
+
+  const handleDetail = (record: any) => {
+    setDetailModal({ open: true, data: record });
   };
 
   const handleDelete = (record: PlantingGrowthDaily) => {
@@ -216,12 +225,12 @@ export default function GrowthDailyTable(props: GrowthDailyTableProps) {
         csvOnclick={() =>
           downloadCSVFromAntd<PlantingGrowthDaily>(
             dataSource,
-            GrowthDailyColumns({ handleEdit, handleDelete }),
+            GrowthDailyColumns({ handleEdit, handleDelete, handleDetail }),
             `Growth-daily`,
             {
               formatters: growthDailyFormatters,
               forceExcelSeparatorLine: false,
-              excludeKeys: ["actions"],
+              excludeKeys: ["actions", "details"],
             }
           )
         }
@@ -229,7 +238,7 @@ export default function GrowthDailyTable(props: GrowthDailyTableProps) {
       />
 
       <Table
-        columns={GrowthDailyColumns({ handleEdit, handleDelete })}
+        columns={GrowthDailyColumns({ handleEdit, handleDelete, handleDetail })}
         dataSource={dataSource}
         rowKey="PlantGrowthDailyID"
         scroll={{ x: 300 }}
@@ -255,6 +264,12 @@ export default function GrowthDailyTable(props: GrowthDailyTableProps) {
         id={deleteModal?.id}
         onDelete={deleteModal?.onDelete}
         deleteLoading={deleteModal?.deleteLoading}
+      />
+
+      <GrowthDailyDetailModal
+        open={detailModal.open}
+        data={detailModal.data}
+        onClose={() => setDetailModal({ open: false, data: null })}
       />
     </div>
   );

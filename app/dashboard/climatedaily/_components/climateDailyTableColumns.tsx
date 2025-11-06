@@ -1,4 +1,6 @@
 import { ClimateDaily } from "@/app/generated/prisma";
+import { InfoCircleOutlined } from "@ant-design/icons";
+import { Button, Tooltip } from "antd";
 import dayjs from "dayjs";
 import jalaliday from "jalaliday";
 import TableActions from "../../_components/UI/TableActions";
@@ -7,6 +9,7 @@ dayjs.extend(jalaliday);
 type ClimateDailyColumnsProps = {
   handleEdit: (record: ClimateDaily) => void;
   handleDelete: (record: ClimateDaily) => void;
+  handleDetail?: (record: any) => void;
 };
 
 type Column = {
@@ -20,6 +23,19 @@ type Column = {
 
 export function ClimateDailyColumns(props: ClimateDailyColumnsProps): Column[] {
   const columns: Column[] = [
+    {
+      title: "جزئیات",
+      key: "details",
+      render: (_: any, record: any) => (
+        <Tooltip title="مشاهده جزئیات">
+          <Button
+            type="text"
+            icon={<InfoCircleOutlined style={{ color: "#3b82f6", fontSize: "18px" }} />}
+            onClick={() => props.handleDetail?.(record)}
+          />
+        </Tooltip>
+      ),
+    },
     {
       title: "گلخانه",
       key: "Greenhouses",
@@ -43,30 +59,6 @@ export function ClimateDailyColumns(props: ClimateDailyColumnsProps): Column[] {
       render: (time: string) => time || "-",
     },
     {
-      title: "دمای خارجی (°C)",
-      dataIndex: "ExternalTemp",
-      key: "ExternalTemp",
-      render: (value: number) => value?.toFixed(2) || "-",
-    },
-    {
-      title: "رطوبت خارجی (%)",
-      dataIndex: "ExternalHumidity",
-      key: "ExternalHumidity",
-      render: (value: number) => value?.toFixed(2) || "-",
-    },
-    {
-      title: "فشار هوا (hPa)",
-      dataIndex: "ExternalPressure",
-      key: "ExternalPressure",
-      render: (value: number) => value?.toFixed(2) || "-",
-    },
-    {
-      title: "بارش (mm)",
-      dataIndex: "ExternalRainfallMM",
-      key: "ExternalRainfallMM",
-      render: (value: number) => value?.toFixed(2) || "-",
-    },
-    {
       title: "دمای داخلی (°C)",
       dataIndex: "InternalTemp",
       key: "InternalTemp",
@@ -79,72 +71,7 @@ export function ClimateDailyColumns(props: ClimateDailyColumnsProps): Column[] {
       render: (value: number) => value?.toFixed(2) || "-",
     },
     {
-      title: "CO2 (ppm)",
-      dataIndex: "CO2ppm",
-      key: "CO2ppm",
-      render: (value: number) => value?.toFixed(2) || "-",
-    },
-    {
-      title: "PAR خارجی",
-      dataIndex: "ExternalPAR",
-      key: "ExternalPAR",
-      render: (value: number) => value?.toFixed(2) || "-",
-    },
-    {
-      title: "DLI خارجی",
-      dataIndex: "ExternalDLI",
-      key: "ExternalDLI",
-      render: (value: number) => value?.toFixed(2) || "-",
-    },
-    {
-      title: "PAR داخلی",
-      dataIndex: "InternalPAR",
-      key: "InternalPAR",
-      render: (value: number) => value?.toFixed(2) || "-",
-    },
-    {
-      title: "DLI داخلی",
-      dataIndex: "InternalDLI",
-      key: "InternalDLI",
-      render: (value: number) => value?.toFixed(2) || "-",
-    },
-    {
-      title: "سرعت باد (m/s)",
-      dataIndex: "WindSpeed",
-      key: "WindSpeed",
-      render: (value: number) => value?.toFixed(2) || "-",
-    },
-    {
-      title: "جهت باد (°)",
-      dataIndex: "WindDirection",
-      key: "WindDirection",
-      render: (value: number) => value || "-",
-    },
-    {
-      title: "باز شدن هواکش (%)",
-      dataIndex: "VentOpenPct",
-      key: "VentOpenPct",
-      render: (value: number) => value?.toFixed(2) || "-",
-    },
-    {
-      title: "خطاهای هواکش",
-      dataIndex: "VentErrorCount",
-      key: "VentErrorCount",
-      render: (value: number) => value || "-",
-    },
-    {
-      title: "VPD (kPa)",
-      dataIndex: "VPD",
-      key: "VPD",
-      render: (value: number) => value?.toFixed(2) || "-",
-    },
-    {
-      title: "مشاهده کننده",
-      key: "Owner_Observer",
-      render: (_: any, record: any) => record.Owner_Observer?.FullName || "-",
-    },
-    {
-      title: "",
+      title: "عملیات",
       dataIndex: "actions",
       key: "actions",
       render: (_: any, record: any) => (

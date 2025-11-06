@@ -11,6 +11,8 @@ export default function GlobalFaDigits() {
     const convertNode = (n: Node) => {
       const p = n.parentElement;
       if (!p || skipTags.has(p.tagName)) return;
+      // Skip any subtree explicitly marked to keep Latin digits
+      if (p.closest("[data-latin-digits]")) return;
       const txt = n.nodeValue ?? "";
       const converted = toFaDigits(txt);
       if (converted !== txt) n.nodeValue = converted;
