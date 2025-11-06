@@ -89,7 +89,7 @@ export default function GrowthDailyInsUpModal(props: GrowthDailyInsUpModalProps)
     const res = await getSamples(props.plantingId);
     if (res) {
       setPlantingSamplesLoading(false);
-      const options = res.map((sample) => ({
+      const options = res.map((sample: any) => ({
         label: sample.SerialID,
         value: Number(sample.ID),
       }));
