@@ -2,20 +2,12 @@
 
 import { Divider, Drawer } from "antd";
 import {
-  DashboardOutlined,
-  TeamOutlined,
   HomeOutlined,
-  BugOutlined,
-  ExperimentOutlined,
-  RiseOutlined,
-  DatabaseOutlined,
-  LineChartOutlined,
   EnvironmentOutlined,
   LogoutOutlined,
   CloudOutlined,
   ApiOutlined,
   DownOutlined,
-  UpOutlined,
   FolderOutlined,
   BarChartOutlined,
 } from "@ant-design/icons";
@@ -78,11 +70,15 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
     route.push(page);
   };
 
+  // Accordion behavior: only one submenu open at a time
   const toggleMenu = (title: string) => {
-    setExpandedMenus((prev) => ({
-      ...prev,
-      [title]: !prev[title],
-    }));
+    setExpandedMenus((prev) => {
+      const isCurrentlyOpen = !!prev[title];
+      // If clicked menu already open -> close all
+      if (isCurrentlyOpen) return {};
+      // Otherwise open only this one
+      return { [title]: true };
+    });
   };
 
   const isSubmenuItemActive = (submenu?: { title: string; page: string }[]) => {
