@@ -1,6 +1,6 @@
 import Table from "@/app/dashboard/_components/UI/Table";
 import { PlantVarietyDTO } from "../page";
-import PlantVaritiesEditModal from "./PlantVaritiesEditModal";
+import VarietiesInsUpModal from "./VarietiesInsUpModal";
 import PlantVarietyDetailModal from "./PlantVarietyDetailModal";
 import { useState } from "react";
 import InsertionRow from "../../_components/UI/InsertionRow";
@@ -21,10 +21,7 @@ type PlantVarietiesTableProps = {
 
 type editModalProps = {
   isOpen: boolean;
-  onClose?: () => void;
   record?: PlantVarietyDTO;
-  setMainLoading?: (loading: boolean) => void;
-  setMainData?: (data: PlantVarietyDTO[]) => void;
 };
 
 export default function PlantVaritiesTable({
@@ -71,17 +68,17 @@ export default function PlantVaritiesTable({
       render: (_: any, record: PlantVarietyDTO) => record.Plants?.CommonName,
     },
     {
-      title: "شرکت بذر",
+      title: "شرکت توزیع کننده بذر",
       dataIndex: "SeedCompany",
       key: "SeedCompany",
     },
     {
-      title: "روز تا بلوغ",
+      title: "تعداد روز تا بلوغ",
       dataIndex: "DaysToMaturity",
       key: "DaysToMaturity",
     },
     {
-      title: "عملکرد (کیلوگرم/متر مربع)",
+      title: "محصول (کیلوگرم/متر مربع)",
       dataIndex: "TypicalYieldKgPerM2",
       key: "TypicalYieldKgPerM2",
     },
@@ -148,12 +145,13 @@ export default function PlantVaritiesTable({
         scroll={{ x: 1000 }}
       />
 
-      <PlantVaritiesEditModal
+      <VarietiesInsUpModal
         isOpen={editModalOpen?.isOpen || false}
         onClose={() => setEditModalOpen(null)}
-        record={editModalOpen?.record}
+        isEditMode
+        editData={editModalOpen?.record as any}
         setMainLoading={setMainLoading}
-        setMainData={setMainData}
+        setMainData={setMainData as any}
       />
 
       <DeleteModal

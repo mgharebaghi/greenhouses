@@ -28,7 +28,7 @@ export default function PlantVarietyDetailModal({ open, onClose, data }: PlantVa
         items={[
           { label: "نام گونه", value: data.VarietyName },
           { label: "نام گیاه", value: data.Plants?.CommonName },
-          { label: "شرکت بذر", value: data.SeedCompany },
+          { label: "شرکت توزیع کننده بذر", value: data.SeedCompany },
         ]}
       />
 
@@ -38,10 +38,10 @@ export default function PlantVarietyDetailModal({ open, onClose, data }: PlantVa
         icon={<span className="text-xl">⏱️</span>}
         color="#3b82f6"
         items={[
-          { label: "روز تا جوانه زنی", value: data.DaysToGermination ? `${data.DaysToGermination} روز` : "—" },
-          { label: "روز تا رویش", value: data.DaysToSprout ? `${data.DaysToSprout} روز` : "—" },
-          { label: "روز تا نشاء", value: data.DaysToSeedling ? `${data.DaysToSeedling} روز` : "—" },
-          { label: "روز تا بلوغ", value: data.DaysToMaturity ? `${data.DaysToMaturity} روز` : "—" },
+          { label: "تعداد روز تا جوانه زنی", value: data.DaysToGermination ? `${data.DaysToGermination} روز` : "—" },
+          { label: "تعداد روز تا رویش", value: data.DaysToSprout ? `${data.DaysToSprout} روز` : "—" },
+          { label: "تعداد روز تا نشاء", value: data.DaysToSeedling ? `${data.DaysToSeedling} روز` : "—" },
+          { label: "تعداد روز تا بلوغ", value: data.DaysToMaturity ? `${data.DaysToMaturity} روز` : "—" },
           { label: "چرخه رشد", value: data.GrowthCycleDays ? `${data.GrowthCycleDays} روز` : "—" },
         ]}
       />

@@ -31,9 +31,9 @@ export default function GrowthStagesTable(props: GrowthStagesTableProps) {
     { title: "مرحله رشد", dataIndex: "StageOrder", key: "stageOrder" },
     { title: "عنوان مرحله", dataIndex: "StageName", key: "stageName" },
     { title: "علایم ورود به این مرحله", dataIndex: "EntryCriteria", key: "entryCriteria" },
-    { title: "روز مورد انتظار برای ورود به این مرحله", dataIndex: "StartDay", key: "startDay" },
+    { title: "تعداد روز مورد انتظار برای ورود به این مرحله", dataIndex: "StartDay", key: "startDay" },
     { title: "علائم خروج از این مرحله", dataIndex: "ExitCriteria", key: "exitCriteria" },
-    { title: "روز مورد انتظار برای خروج از این مرحله", dataIndex: "EndDay", key: "endDay" },
+    { title: "تعداد روز مورد انتظار برای خروج از این مرحله", dataIndex: "EndDay", key: "endDay" },
     {
       title: "",
       key: "actions",

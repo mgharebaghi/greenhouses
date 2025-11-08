@@ -113,7 +113,7 @@ export default function StagesInsUpModal(props: GrowthStagesInsUpModalProps) {
     },
     {
       name: "StartDay",
-      label: "روز ورود به این مرحله",
+      label: "تعداد روز ورود به این مرحله",
       placeholder: "تعداد روز",
       type: "number",
       required: true,
@@ -129,7 +129,7 @@ export default function StagesInsUpModal(props: GrowthStagesInsUpModalProps) {
     },
     {
       name: "EndDay",
-      label: "روز خروج از این مرحله",
+      label: "تعداد روز خروج از این مرحله",
       placeholder: "تعداد روز",
       type: "number",
       required: true,

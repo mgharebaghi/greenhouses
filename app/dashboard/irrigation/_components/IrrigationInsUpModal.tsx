@@ -109,7 +109,7 @@ export default function IrrigationInsUpModal(props: IrrigationInsUpModalProps) {
     },
     {
       name: "DrainPct",
-      label: "درصد زهکشی",
+      label: "پس آب",
       placeholder: "درصد",
       type: "number",
       required: false,

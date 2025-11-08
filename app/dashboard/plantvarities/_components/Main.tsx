@@ -4,7 +4,7 @@ import { Button } from "antd";
 import { PlantVarietyDTO } from "../page";
 import { useState } from "react";
 import PlantVaritiesTable from "./PlantsVaritiesTable";
-import PlantVaritiesInsertModal from "./PlantVaritiesInsertModal";
+import VarietiesInsUpModal from "./VarietiesInsUpModal";
 
 export default function PlantsVaritiesDashboard({ initialData }: { initialData: PlantVarietyDTO[] }) {
   const [data, setData] = useState<PlantVarietyDTO[]>(initialData);
@@ -24,11 +24,12 @@ export default function PlantsVaritiesDashboard({ initialData }: { initialData: 
         />
       </div>
 
-      <PlantVaritiesInsertModal
+      <VarietiesInsUpModal
         isOpen={isInsertModalOpen}
         onClose={() => setIsInsertModalOpen(false)}
-        setMainLoading={setIsInsertModalOpen}
-        setMainData={setData}
+        setMainLoading={setLoading}
+        setMainData={setData as any}
+        isEditMode={false}
       />
     </div>
   );

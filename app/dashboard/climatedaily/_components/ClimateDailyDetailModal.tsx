@@ -103,8 +103,8 @@ export default function ClimateDailyDetailModal({ open, data, onClose }: Climate
         items={[
           { label: "سرعت باد", value: `${formatNumber(data.WindSpeed)} m/s` },
           { label: "جهت باد", value: data.WindDirection ? `${data.WindDirection}°` : "-" },
-          { label: "باز شدن هواکش", value: `${formatNumber(data.VentOpenPct)} %` },
-          { label: "خطاهای هواکش", value: data.VentErrorCount || "-" },
+          { label: "باز شدن دریچه", value: `${formatNumber(data.VentOpenPct)} %` },
+          { label: "خطاهای دریچه", value: data.VentErrorCount || "-" },
         ]}
       />
 

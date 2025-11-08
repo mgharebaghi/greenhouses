@@ -76,7 +76,7 @@ export function IrrigationColumns(props: IrrigationColumnsProps): Column[] {
       render: (value: number) => value?.toFixed(2) || "-",
     },
     {
-      title: "درصد زهکشی",
+      title: "پس آب",
       dataIndex: "DrainPct",
       key: "DrainPct",
       render: (value: number) => value?.toFixed(2) || "-",

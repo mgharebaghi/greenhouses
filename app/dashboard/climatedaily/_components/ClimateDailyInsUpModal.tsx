@@ -116,7 +116,7 @@ export default function ClimateDailyInsUpModal(props: ClimateDailyInsUpModalProp
     },
     {
       name: "ExternalRainfallMM",
-      label: "بارش (mm)",
+      label: "میازن بارش (mm)",
       placeholder: "میزان بارش",
       type: "number",
       required: false,
@@ -196,7 +196,7 @@ export default function ClimateDailyInsUpModal(props: ClimateDailyInsUpModalProp
     },
     {
       name: "VentOpenPct",
-      label: "باز شدن هواکش (%)",
+      label: "باز شدن دریچه (%)",
       placeholder: "درصد",
       type: "number",
       required: false,
@@ -204,7 +204,7 @@ export default function ClimateDailyInsUpModal(props: ClimateDailyInsUpModalProp
     },
     {
       name: "VentErrorCount",
-      label: "تعداد خطاهای هواکش",
+      label: "تعداد خطاهای دریچه",
       placeholder: "تعداد",
       type: "number",
       required: false,
