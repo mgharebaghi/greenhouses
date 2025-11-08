@@ -78,7 +78,7 @@ export default function VarietiesInsUpModal(props: VarietiesInsUpModalProps) {
       options: plantOptions,
       icon: "🌱",
     },
-    { name: "SeedCompany", label: "شرکت توزیع کننده بذر", placeholder: "نام شرکت بذر", type: "text", required: false, icon: "🏢" },
+    // { name: "SeedCompany", label: "شرکت توزیع کننده بذر", placeholder: "نام شرکت بذر", type: "text", required: false, icon: "🏢" },
     {
       name: "DaysToGermination",
       label: "تعداد روز تا جوانه زنی",

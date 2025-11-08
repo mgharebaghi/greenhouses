@@ -5,7 +5,7 @@ import PlantingTable from "./PlantingTable";
 import { useState } from "react";
 
 export default function PlantingDashboard({ initialData }: { initialData: any }) {
-  const [data, setData] = useState<Plantings[]>(initialData || []);
+  const [data, setData] = useState<any[]>(initialData || []);
   const [loading, setLoading] = useState<boolean>(false);
 
   return (

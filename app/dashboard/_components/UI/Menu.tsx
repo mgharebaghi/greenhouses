@@ -39,6 +39,7 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
       title: "اطلاعات پایه",
       submenu: [
         { title: "اطلاعات اشخاص", page: "/dashboard/owners" },
+        { title: "اطلاعات تامین کنندگان", page: "/dashboard/suppliers" },
         { title: "اطلاعات گلخانه ها", page: "/dashboard/greenhouse" },
         { title: "اطلاعات پایه گیاهی", page: "/dashboard/plants" },
         { title: "اطلاعات گونه گیاهی", page: "/dashboard/plantvarities" },

@@ -16,7 +16,7 @@ dayjs.extend(jalaliday);
 interface PlantingDetailModalProps {
   open: boolean;
   onClose: () => void;
-  data: Plantings | null;
+  data: any | null;
 }
 
 export default function PlantingDetailModal({ open, onClose, data }: PlantingDetailModalProps) {
@@ -80,7 +80,14 @@ export default function PlantingDetailModal({ open, onClose, data }: PlantingDet
         icon={<FileTextOutlined />}
         color="#8b5cf6"
         items={[
-          { label: "بسته منبع", value: data.SourceBatch },
+          {
+            label: "تامین کننده",
+            value: data.Suppliers
+              ? data.Suppliers.Legal
+                ? data.Suppliers.CompanyName
+                : data.Suppliers.FirstName + " " + data.Suppliers.LastName
+              : "—",
+          },
           { label: "روش کاشت", value: data.SeedingMethod },
         ]}
       />

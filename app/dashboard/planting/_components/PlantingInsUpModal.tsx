@@ -19,6 +19,8 @@ import {
   ExclamationCircleOutlined,
 } from "@ant-design/icons";
 import GreenhouseButton from "@/app/components/UI/GreenhouseButton";
+import { SupplierDTO } from "../../suppliers/types";
+import { getSuppliers } from "@/app/lib/services/suppliers";
 
 export type PlantingInsUpModalProps = {
   open: boolean;
@@ -59,6 +61,9 @@ export default function PlantingInsUpModal({
   const [varitiesOptions, setVaritiesOptions] = useState<selectOption[]>([]);
   const [varitiesLoading, setVaritiesLoading] = useState<boolean>(false);
 
+  const [suppliersOptions, setSuppliersOptions] = useState<selectOption[]>([]);
+  const [suppliersLoading, setSuppliersLoading] = useState<boolean>(false);
+
   const getGreenHouses = async () => {
     setGreenHouseLoading(true);
     const res: Greenhouses[] = await allGreenHouses();
@@ -92,10 +97,24 @@ export default function PlantingInsUpModal({
     setVaritiesLoading(false);
   };
 
+  const getSupliers = async () => {
+    setSuppliersLoading(true);
+    const res: SupplierDTO[] = await getSuppliers();
+    if (res) {
+      const options = res.map((s) => ({
+        label: s.Legal ? s.CompanyName : s.FirstName + " " + s.LastName,
+        value: s.ID,
+      }));
+      setSuppliersOptions(options);
+    }
+    setSuppliersLoading(false);
+  };
+
   useEffect(() => {
     if (!open) return;
     getGreenHouses();
     getVarities();
+    getSupliers();
     setSubmitMessage(null);
     if (form && isInEditing && initialData) {
       form.setFieldsValue({
@@ -149,7 +168,16 @@ export default function PlantingInsUpModal({
       icon: "🌱",
     },
     { name: "PlantDate", label: "تاریخ کاشت", placeholder: "انتخاب تاریخ", type: "date", required: true, icon: "📅" },
-    { name: "SourceBatch", label: "شماره بچ", placeholder: "شماره بچ", type: "text", required: true, icon: "🏷️" },
+    {
+      name: "SupplierID",
+      label: "تامین کننده",
+      placeholder: "تامین کننده را انتخاب کنید",
+      type: "select",
+      required: true,
+      icon: "🏷️",
+      options: suppliersOptions,
+      loading: suppliersLoading,
+    },
     { name: "NumPlants", label: "تعداد گیاهان", placeholder: "تعداد", type: "number", required: true, icon: "🌿" },
     {
       name: "PlantsPerM2",

@@ -44,7 +44,7 @@ model Plantings {
   ZoneID              Int?
   VarietyID           Int?
   PlantDate           DateTime?         @db.Date
-  SourceBatch         String?           @db.NVarChar(200)
+  SupplierID          Int?
   NumPlants           Int?
   PlantsPerM2         Decimal?          @db.Decimal(9, 3)
   ExpectedHarvestDate DateTime?         @db.Date
@@ -53,6 +53,7 @@ model Plantings {
   TransplantDate      DateTime?         @db.Date
   PlantCountMeasured  Int?
   Notes               String?           @db.NVarChar(500)
+  Suppliers           Suppliers?        @relation(fields: [SupplierID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Plantings_Suppliers")
   PlantVarieties      PlantVarities?    @relation(fields: [VarietyID], references: [VarietyID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Plantings_Varieties")
   Zones               Zones?            @relation(fields: [ZoneID], references: [ZoneID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Plantings_Zones")
   PlantingSamples     PlantingSamples[]
@@ -241,4 +242,16 @@ model PlantingSamples {
   PlantingID          BigInt?
   PlantingGrowthDaily PlantingGrowthDaily[]
   Plantings           Plantings?            @relation(fields: [PlantingID], references: [PlantingID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PlantingSamples_Plantings")
+}
+
+model Suppliers {
+  ID             Int         @id(map: "PK_Suppliers") @default(autoincrement())
+  Legal          Boolean?
+  CompanyName    String?     @db.NVarChar(150)
+  CompanyAddress String?     @db.NVarChar(150)
+  FirstName      String?     @db.NVarChar(150)
+  LastName       String?     @db.NVarChar(150)
+  ContactEmail   String?     @db.NVarChar(150)
+  ContactTel     String?     @db.NVarChar(50)
+  Plantings      Plantings[]
 }

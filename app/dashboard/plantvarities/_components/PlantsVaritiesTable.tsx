@@ -67,11 +67,11 @@ export default function PlantVaritiesTable({
       key: "CommonName",
       render: (_: any, record: PlantVarietyDTO) => record.Plants?.CommonName,
     },
-    {
-      title: "شرکت توزیع کننده بذر",
-      dataIndex: "SeedCompany",
-      key: "SeedCompany",
-    },
+    // {
+    //   title: "شرکت توزیع کننده بذر",
+    //   dataIndex: "SeedCompany",
+    //   key: "SeedCompany",
+    // },
     {
       title: "تعداد روز تا بلوغ",
       dataIndex: "DaysToMaturity",

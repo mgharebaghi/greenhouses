@@ -7,6 +7,7 @@ export async function getAllPlantings() {
     include: {
       Zones: { select: { ZoneID: true, Name: true } },
       PlantVarieties: { select: { VarietyID: true, VarietyName: true } },
+      Suppliers: { select: { ID: true, Legal: true, CompanyName: true, FirstName: true, LastName: true } },
     },
     orderBy: { PlantingID: "desc" },
   });
@@ -62,6 +63,7 @@ export async function getPlantingById(plantingId: number) {
     include: {
       Zones: { select: { ZoneID: true, Name: true } },
       PlantVarieties: { select: { VarietyID: true, VarietyName: true } },
+      Suppliers: { select: { ID: true, Legal: true, CompanyName: true, FirstName: true, LastName: true } },
     },
   });
 

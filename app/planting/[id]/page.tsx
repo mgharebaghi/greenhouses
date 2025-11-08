@@ -154,9 +154,15 @@ export default function PlantingScan() {
                 <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg sm:rounded-xl p-4 sm:p-5 border-2 border-green-200 hover:shadow-lg transition-shadow">
                   <div className="flex items-center gap-2 mb-2 sm:mb-3 pb-2 border-b border-green-300">
                     <span className="text-xl sm:text-2xl">📦</span>
-                    <span className="text-sm sm:text-base text-green-700">دسته منبع</span>
+                    <span className="text-sm sm:text-base text-green-700">تامین کننده</span>
                   </div>
-                  <div className="text-gray-900 text-lg sm:text-xl">{planting.SourceBatch || "ندارد"}</div>
+                  <div className="text-gray-900 text-lg sm:text-xl">
+                    {planting.Suppliers
+                      ? planting.Suppliers.Legal
+                        ? planting.Suppliers.CompanyName
+                        : planting.Suppliers.FirstName + " " + planting.Suppliers.LastName
+                      : "ندارد"}
+                  </div>
                 </div>
 
                 <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-lg sm:rounded-xl p-4 sm:p-5 border-2 border-emerald-200 hover:shadow-lg transition-shadow">
