@@ -2,12 +2,13 @@ import { Owner_Observer } from "@/app/generated/prisma";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 // import { Table } from "antd";
 import InsertionRow from "../../_components/UI/InsertionRow";
-import { downloadCSVFromAntd } from "../../_components/tools/CSVoutput";
 import DeleteModal, { DeleteModalProps } from "../../_components/UI/DeleteModal";
 import { useState } from "react";
 import { deleteOwner, getAllOwners, OwnerResponse } from "@/app/lib/services/owners";
 import Table from "@/app/dashboard/_components/UI/Table";
 import TableActions from "../../_components/UI/TableActions";
+import { generateCsv, download, mkConfig } from "export-to-csv";
+import { ownersCSVData, headers } from "../data/csvFileData";
 
 type OwnersProps = {
   data: Owner_Observer[];
@@ -101,12 +102,12 @@ export default function OwnersTable(props: OwnersProps) {
         insertOnclick={() => {
           props.setInsertModal(true);
         }}
-        csvOnclick={() =>
-          downloadCSVFromAntd(props.data, columns, "owners-list", {
-            forceExcelSeparatorLine: false,
-            excludeKeys: ["actions"],
-          })
-        }
+        csvOnclick={async () => {
+          const csvData = await ownersCSVData(props.data as any);
+          const options = mkConfig({ useKeysAsHeaders: false, columnHeaders: headers, filename: "owners" });
+          const csv = generateCsv(options)(csvData);
+          download(options)(csv);
+        }}
         data={props.data}
       />
       <Table

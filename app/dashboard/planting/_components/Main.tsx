@@ -1,6 +1,5 @@
 "use client";
 
-import type { Plantings } from "@/app/generated/prisma";
 import PlantingTable from "./PlantingTable";
 import { useState } from "react";
 

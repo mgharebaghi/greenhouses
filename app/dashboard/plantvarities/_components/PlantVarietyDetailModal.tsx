@@ -27,7 +27,9 @@ export default function PlantVarietyDetailModal({ open, onClose, data }: PlantVa
         color="#10b981"
         items={[
           { label: "نام گونه", value: data.VarietyName },
-          { label: "نام گیاه", value: data.Plants?.CommonName },
+          { label: "نام رایج", value: data.Plants?.CommonName },
+          { label: "نام علمی", value: data.Plants?.ScientificName },
+          { label: "خانواده", value: data.Plants?.Family },
           // { label: "شرکت توزیع کننده بذر", value: data.SeedCompany },
         ]}
       />

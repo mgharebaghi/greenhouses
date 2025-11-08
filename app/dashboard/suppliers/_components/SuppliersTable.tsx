@@ -2,10 +2,11 @@ import Table from "@/app/dashboard/_components/UI/Table";
 import InsertionRow from "@/app/dashboard/_components/UI/InsertionRow";
 import TableActions from "@/app/dashboard/_components/UI/TableActions";
 import DeleteModal, { DeleteModalProps } from "@/app/dashboard/_components/UI/DeleteModal";
-import { downloadCSVFromAntd } from "@/app/dashboard/_components/tools/CSVoutput";
 import { useState } from "react";
 import type { SupplierDTO } from "../types";
 import { deleteSupplier, getSuppliers, SupplierResponse } from "@/app/lib/services/suppliers";
+import { generateCsv, download, mkConfig } from "export-to-csv";
+import { suppliersCSVData, headers } from "../data/csvFileData";
 
 interface SuppliersTableProps {
   data: SupplierDTO[];
@@ -80,12 +81,12 @@ export default function SuppliersTable({
       <InsertionRow
         text="اطلاعات تامین کنندگان"
         insertOnclick={() => setInsertModal(true)}
-        csvOnclick={() =>
-          downloadCSVFromAntd(data, columns, "suppliers-list", {
-            forceExcelSeparatorLine: false,
-            excludeKeys: ["actions"],
-          })
-        }
+        csvOnclick={async () => {
+          const csvData = await suppliersCSVData(data as any);
+          const options = mkConfig({ useKeysAsHeaders: false, columnHeaders: headers, filename: "suppliers" });
+          const csv = generateCsv(options)(csvData);
+          download(options)(csv);
+        }}
         data={data}
       />
 

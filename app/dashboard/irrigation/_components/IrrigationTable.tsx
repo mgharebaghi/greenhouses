@@ -9,8 +9,9 @@ import { getAllData, getDataByGreenhouseId, getDataByZoneId } from "../data/quer
 import { fetchGreenhouseOptions, fetchZoneOptions } from "../data/optionsData";
 import DeleteModal, { DeleteModalProps } from "../../_components/UI/DeleteModal";
 import { deleteIrrigationEvent } from "@/app/lib/services/irrigation";
-import { downloadCSVFromAntd } from "../../_components/tools/CSVoutput";
 import InsertionRow from "../../_components/UI/InsertionRow";
+import { generateCsv, download, mkConfig } from "export-to-csv";
+import { irrigationCSVData, headers } from "../data/csvFileData";
 
 export type IrrigationTableProps = {
   initialData: IrrigationEvent[];
@@ -176,18 +177,12 @@ export default function IrrigationTable(props: IrrigationTableProps) {
             setMainLoading: setTableLoading,
           })
         }
-        csvOnclick={() =>
-          downloadCSVFromAntd<IrrigationEvent>(
-            dataSource,
-            IrrigationColumns({ handleEdit, handleDelete, handleViewCycles }),
-            `Irrigation-events`,
-            {
-              formatters: irrigationFormatters,
-              forceExcelSeparatorLine: false,
-              excludeKeys: ["actions", "cycles"],
-            }
-          )
-        }
+        csvOnclick={async () => {
+          const csvData = await irrigationCSVData(dataSource as any);
+          const options = mkConfig({ useKeysAsHeaders: false, columnHeaders: headers, filename: "irrigation-events" });
+          const csv = generateCsv(options)(csvData);
+          download(options)(csv);
+        }}
         msg={insUpModalMessage}
       />
 

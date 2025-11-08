@@ -7,8 +7,9 @@ import StagesInsUpModal, { GrowthStagesInsUpModalProps } from "./StagesInsUpModa
 import { deleteGrowthStage, getGrowthStages } from "@/app/lib/services/growthstages";
 import DeleteModal, { DeleteModalProps } from "@/app/dashboard/_components/UI/DeleteModal";
 import InsertionRow from "../../_components/UI/InsertionRow";
-import { downloadCSVFromAntd } from "../../_components/tools/CSVoutput";
 import TableActions from "../../_components/UI/TableActions";
+import { generateCsv, download, mkConfig } from "export-to-csv";
+import { growthStagesCSVData, headers } from "../data/csvFileData";
 
 type GrowthStagesTableProps = {
   loading?: boolean;
@@ -88,11 +89,11 @@ export default function GrowthStagesTable(props: GrowthStagesTableProps) {
             setMainLoading: props.setMainLoading,
           })
         }
-        csvOnclick={() => {
-          downloadCSVFromAntd<PlantGrowthStages>(props.data || [], columns, "growth-stages", {
-            forceExcelSeparatorLine: false,
-            excludeKeys: ["actions"],
-          });
+        csvOnclick={async () => {
+          const csvData = await growthStagesCSVData(props.data as any);
+          const options = mkConfig({ useKeysAsHeaders: false, columnHeaders: headers, filename: "growth-stages" });
+          const csv = generateCsv(options)(csvData);
+          download(options)(csv);
         }}
         data={props.data}
       />

@@ -7,14 +7,15 @@ import DeleteModal, { DeleteModalProps } from "../../_components/UI/DeleteModal"
 import { deletePlanting, getAllPlantings } from "@/app/lib/services/planting";
 import dayjs from "dayjs";
 import jalaliday from "jalaliday";
-import { downloadCSVFromAntd } from "../../_components/tools/CSVoutput";
 import InsertionRow from "../../_components/UI/InsertionRow";
 import TableActions from "../../_components/UI/TableActions";
 import QRCodeModal from "../../_components/UI/QRCodeModal";
-import { DatabaseOutlined, PlusCircleOutlined, InfoCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import { InfoCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import SamplesModal from "./SamplesModal";
 import PlantingDetailModal from "./PlantingDetailModal";
 import { Button, Tooltip } from "antd";
+import { generateCsv, download, mkConfig } from "export-to-csv";
+import { plantingsCSVData, headers } from "../data/csvFileData";
 
 dayjs.extend(jalaliday);
 
@@ -100,7 +101,9 @@ export default function PlantingTable({ data, loading, setMainData, setMainLoadi
       title: "ثبت نمونه های پایش",
       key: "monitoringSamples",
       render: (_: any, record: Plantings) => (
-        <PlusOutlined size={18} style={{ color: "#10b981", fontSize: "18px" }}
+        <PlusOutlined
+          size={18}
+          style={{ color: "#10b981", fontSize: "18px" }}
           onClick={() => {
             setSamplesModal({ plantingId: Number(record.PlantingID), open: true });
           }}
@@ -164,13 +167,6 @@ export default function PlantingTable({ data, loading, setMainData, setMainLoadi
     }
   };
 
-  const formatter = {
-    PlantDate: (_: any, v: any) => (v ? dayjs(v).calendar("jalali").locale("fa").format("YYYY/MM/DD") : "-"),
-    ExpectedHarvestDate: (_: any, v: any) => (v ? dayjs(v).calendar("jalali").locale("fa").format("YYYY/MM/DD") : "-"),
-    ActualHarvestDate: (_: any, v: any) => (v ? dayjs(v).calendar("jalali").locale("fa").format("YYYY/MM/DD") : "-"),
-    TransplantDate: (_: any, v: any) => (v ? dayjs(v).calendar("jalali").locale("fa").format("YYYY/MM/DD") : "-"),
-  };
-
   return (
     <>
       <InsertionRow
@@ -188,13 +184,12 @@ export default function PlantingTable({ data, loading, setMainData, setMainLoadi
             onClose: () => setInsUpModal(null),
           })
         }
-        csvOnclick={() =>
-          downloadCSVFromAntd(data, columns, "plantings", {
-            formatters: formatter,
-            forceExcelSeparatorLine: false,
-            excludeKeys: ["actions"],
-          })
-        }
+        csvOnclick={async () => {
+          const csvData = await plantingsCSVData(data as any);
+          const options = mkConfig({ useKeysAsHeaders: false, columnHeaders: headers, filename: "plantings" });
+          const csv = generateCsv(options)(csvData);
+          download(options)(csv);
+        }}
       />
 
       <Table

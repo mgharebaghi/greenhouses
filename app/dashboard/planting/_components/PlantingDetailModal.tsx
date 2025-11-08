@@ -7,7 +7,6 @@ import {
   DatabaseOutlined,
   FileTextOutlined,
 } from "@ant-design/icons";
-import type { Plantings } from "@/app/generated/prisma";
 import dayjs from "dayjs";
 import jalaliday from "jalaliday";
 

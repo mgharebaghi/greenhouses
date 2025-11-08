@@ -4,12 +4,13 @@ import VarietiesInsUpModal from "./VarietiesInsUpModal";
 import PlantVarietyDetailModal from "./PlantVarietyDetailModal";
 import { useState } from "react";
 import InsertionRow from "../../_components/UI/InsertionRow";
-import { downloadCSVFromAntd } from "../../_components/tools/CSVoutput";
 import TableActions from "../../_components/UI/TableActions";
 import DeleteModal, { DeleteModalProps } from "../../_components/UI/DeleteModal";
 import { deletePlantVariety, getPlantVarieties } from "@/app/lib/services/varities";
 import { Button, Tooltip } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
+import { generateCsv, download, mkConfig } from "export-to-csv";
+import { plantVarietiesCSVData, headers } from "../data/csvFileData";
 
 type PlantVarietiesTableProps = {
   data: PlantVarietyDTO[];
@@ -127,12 +128,12 @@ export default function PlantVaritiesTable({
       <InsertionRow
         text="افزودن گونه گیاهی"
         insertOnclick={() => setIsInsertModalOpen(true)}
-        csvOnclick={() =>
-          downloadCSVFromAntd(data, columns, "plantvarieties.csv", {
-            forceExcelSeparatorLine: false,
-            excludeKeys: ["actions"],
-          })
-        }
+        csvOnclick={async () => {
+          const csvData = await plantVarietiesCSVData(data as any);
+          const options = mkConfig({ useKeysAsHeaders: false, columnHeaders: headers, filename: "plant-varieties" });
+          const csv = generateCsv(options)(csvData);
+          download(options)(csv);
+        }}
         data={data}
       />
 

@@ -5,10 +5,11 @@ import { useState } from "react";
 import PlantsEditModal, { PlantsEditModalProps } from "@/app/dashboard/plants/_components/PlantsEditModal";
 import PlantsDeleteModal, { PlantsDeleteModalProps } from "./PlantsDeleteModal";
 import InsertionRow from "../../_components/UI/InsertionRow";
-import { downloadCSVFromAntd } from "../../_components/tools/CSVoutput";
 import TableActions from "../../_components/UI/TableActions";
 import DeleteModal, { DeleteModalProps } from "../../_components/UI/DeleteModal";
 import { deletePlant, getPlants } from "@/app/lib/services/plants";
+import { generateCsv, download, mkConfig } from "export-to-csv";
+import { plantsCSVData, headers } from "../data/csvFileData";
 
 type PlantsTableProps = {
   data: Plants[];
@@ -91,12 +92,12 @@ export default function PlantsTable(props: PlantsTableProps) {
       <InsertionRow
         text="اطلاعات پایه گیاهی"
         insertOnclick={() => props.setInsertModalOpen?.(true)}
-        csvOnclick={() =>
-          downloadCSVFromAntd(props.data, columns, "plants.csv", {
-            forceExcelSeparatorLine: false,
-            excludeKeys: ["actions"],
-          })
-        }
+        csvOnclick={async () => {
+          const csvData = await plantsCSVData(props.data as any);
+          const options = mkConfig({ useKeysAsHeaders: false, columnHeaders: headers, filename: "plants" });
+          const csv = generateCsv(options)(csvData);
+          download(options)(csv);
+        }}
         data={props.data}
       />
 
@@ -110,7 +111,7 @@ export default function PlantsTable(props: PlantsTableProps) {
         setMainLoading={props.setMainLoading}
       />
 
-      <DeleteModal 
+      <DeleteModal
         open={openDeleteModal?.open || false}
         onClose={openDeleteModal?.onClose || (() => setOpenDeleteModal(null))}
         deleteLoading={deleteModalLoading}

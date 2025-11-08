@@ -10,9 +10,10 @@ import { getAllData, getDataByGreenHousId, getDataByPlantingId, getDataByZoneId 
 import { fetchGreenhouseOptions, fetchPlantingOptions, fetchZoneOptions } from "../data/optionsData";
 import DeleteModal, { DeleteModalProps } from "../../_components/UI/DeleteModal";
 import { deleteGrowthDaily } from "@/app/lib/services/growthdaily/delete";
-import { downloadCSVFromAntd } from "../../_components/tools/CSVoutput";
 import InsertionRow from "../../_components/UI/InsertionRow";
 import { getPlantingById } from "@/app/lib/services/planting";
+import { generateCsv, download, mkConfig } from "export-to-csv";
+import { growthDailyCSVData, headers } from "../data/csvFileData";
 
 export type GrowthDailyTableProps = {
   initialData: PlantingGrowthDaily[];
@@ -222,18 +223,12 @@ export default function GrowthDailyTable(props: GrowthDailyTableProps) {
             setMainLoading: setTableLoading,
           })
         }
-        csvOnclick={() =>
-          downloadCSVFromAntd<PlantingGrowthDaily>(
-            dataSource,
-            GrowthDailyColumns({ handleEdit, handleDelete, handleDetail }),
-            `Growth-daily`,
-            {
-              formatters: growthDailyFormatters,
-              forceExcelSeparatorLine: false,
-              excludeKeys: ["actions", "details"],
-            }
-          )
-        }
+        csvOnclick={async () => {
+          const csvData = await growthDailyCSVData(dataSource as any);
+          const options = mkConfig({ useKeysAsHeaders: false, columnHeaders: headers, filename: "growth-daily" });
+          const csv = generateCsv(options)(csvData);
+          download(options)(csv);
+        }}
         msg={insUpModalMessage}
       />
 

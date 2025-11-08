@@ -1,5 +1,4 @@
 import { Greenhouses as GreenHouse } from "@/app/generated/prisma/client";
-import { downloadCSVFromAntd } from "../../_components/tools/CSVoutput";
 import { useState } from "react";
 import GreenHouseInsertModal from "./GreenHouseInsrtModal";
 import InsertionRow from "../../_components/UI/InsertionRow";
@@ -7,6 +6,8 @@ import Table from "@/app/dashboard/_components/UI/Table";
 import TableActions from "../../_components/UI/TableActions";
 import DeleteModal, { DeleteModalProps } from "../../_components/UI/DeleteModal";
 import { allGreenHouses, deleteGreenHouse } from "@/app/lib/services/greenhouse";
+import { generateCsv, download, mkConfig } from "export-to-csv";
+import { greenhousesCSVData, headers } from "../data/csvFileData";
 
 export default function GreenHousesTable({
   data,
@@ -84,11 +85,6 @@ export default function GreenHousesTable({
     },
   ];
 
-  const getters = {
-    Owner: (r: any) => `${r.Owner_Observer?.FirstName ?? ""} ${r.Owner_Observer?.LastName ?? ""}`.trim(),
-    Zones: (r: any) => r.Zones?.length ?? 0,
-  } as const;
-
   const handleDelete = async (id: number) => {
     setDeleteModalLoading(true);
     const res: any = await deleteGreenHouse(id);
@@ -109,12 +105,11 @@ export default function GreenHousesTable({
       <InsertionRow
         text="گلخانه"
         insertOnclick={openInsertModal}
-        csvOnclick={() => {
-          downloadCSVFromAntd<GreenHouse>(data, columns, "greenhouses.csv", {
-            getters,
-            forceExcelSeparatorLine: false,
-            excludeKeys: ["action"],
-          });
+        csvOnclick={async () => {
+          const csvData = await greenhousesCSVData(data as any);
+          const options = mkConfig({ useKeysAsHeaders: false, columnHeaders: headers, filename: "greenhouses" });
+          const csv = generateCsv(options)(csvData);
+          download(options)(csv);
         }}
         data={data}
       />

@@ -9,8 +9,9 @@ import { getAllData, getDataByGreenhouseId, getDataByZoneId } from "../data/quer
 import { fetchGreenhouseOptions, fetchZoneOptions } from "../data/optionsData";
 import DeleteModal, { DeleteModalProps } from "../../_components/UI/DeleteModal";
 import { deleteClimateDaily } from "@/app/lib/services/climatedaily";
-import { downloadCSVFromAntd } from "../../_components/tools/CSVoutput";
+import { generateCsv, download, mkConfig } from "export-to-csv";
 import InsertionRow from "../../_components/UI/InsertionRow";
+import { climateDailyCSVData, headers } from "../data/csvFileData";
 
 export type ClimateDailyTableProps = {
   initialData: ClimateDaily[];
@@ -170,18 +171,12 @@ export default function ClimateDailyTable(props: ClimateDailyTableProps) {
             setMainLoading: setTableLoading,
           })
         }
-        csvOnclick={() =>
-          downloadCSVFromAntd<ClimateDaily>(
-            dataSource,
-            ClimateDailyColumns({ handleEdit, handleDelete, handleDetail }),
-            `Climate-daily`,
-            {
-              formatters: climateDailyFormatters,
-              forceExcelSeparatorLine: false,
-              excludeKeys: ["actions", "details"],
-            }
-          )
-        }
+        csvOnclick={async () => {
+          const csvData = await climateDailyCSVData(dataSource as any);
+          const options = mkConfig({ useKeysAsHeaders: false, columnHeaders: headers, filename: "climate-daily" });
+          const csv = generateCsv(options)(csvData);
+          download(options)(csv);
+        }}
         msg={insUpModalMessage}
       />
 
