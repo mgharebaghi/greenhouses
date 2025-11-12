@@ -39,7 +39,6 @@ export default function Login() {
     }
 
     if (res?.status === "ok") {
-      setLoading(false);
       route.replace("/dashboard");
     }
   };
