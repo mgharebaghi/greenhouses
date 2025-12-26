@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
-import { AppProgressBar } from 'next-nprogress-bar';
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,12 +27,6 @@ export default function RootLayout({
   return (
     <html lang="fa" suppressHydrationWarning>
       <body className={`antialiased font-IransansR`}>
-        <AppProgressBar
-          height="4px"
-          color="#10b981"
-          options={{ showSpinner: false }}
-          shallowRouting
-        />
         <Providers>{children}</Providers>
       </body>
     </html>
