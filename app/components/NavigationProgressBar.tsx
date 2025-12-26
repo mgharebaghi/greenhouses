@@ -3,7 +3,6 @@
 import { useEffect } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import NProgress from "nprogress";
-import "nprogress/nprogress.css";
 
 // Configure NProgress with aggressive settings for visibility
 NProgress.configure({
