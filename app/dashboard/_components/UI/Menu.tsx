@@ -14,7 +14,7 @@ import {
 import { useRouter, usePathname } from "next/navigation";
 import GreenhouseButton from "@/app/components/UI/GreenhouseButton";
 import { removeAuth } from "@/app/lib/auth";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 type MenuItem = {
   icon: React.ReactNode;
@@ -27,6 +27,19 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
   const route = useRouter();
   const pathname = usePathname();
   const [expandedMenus, setExpandedMenus] = useState<{ [key: string]: boolean }>({});
+  const [currentDate, setCurrentDate] = useState<string>("");
+  const [currentTime, setCurrentTime] = useState<string>("");
+
+  useEffect(() => {
+    setCurrentDate(new Date().toLocaleDateString("fa-IR"));
+    setCurrentTime(new Date().toLocaleTimeString("fa-IR", { hour: "2-digit", minute: "2-digit" }));
+
+    const timer = setInterval(() => {
+      setCurrentTime(new Date().toLocaleTimeString("fa-IR", { hour: "2-digit", minute: "2-digit" }));
+    }, 60000);
+
+    return () => clearInterval(timer);
+  }, []);
 
   const menuItems: MenuItem[] = [
     {
@@ -123,9 +136,9 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
 
           {/* Date info */}
           <div className="bg-white border border-emerald-100 rounded-lg p-3 text-center shadow-sm">
-            <div className="text-emerald-900 text-lg font-semibold">{new Date().toLocaleDateString("fa-IR")}</div>
-            <div className="text-emerald-700/80 text-sm">
-              {new Date().toLocaleTimeString("fa-IR", { hour: "2-digit", minute: "2-digit" })}
+            <div className="text-emerald-900 text-lg font-semibold min-h-[28px]">{currentDate}</div>
+            <div className="text-emerald-700/80 text-sm min-h-[20px]">
+              {currentTime}
             </div>
           </div>
         </div>
@@ -179,11 +192,10 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
                   }
                 }}
                 className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl border transition-all duration-300 ease-out cursor-pointer relative overflow-hidden focus:outline-none
-                           ${
-                             isActive
-                               ? "bg-emerald-100/90 border-emerald-300 ring-1 ring-emerald-200"
-                               : "bg-white border-slate-200 hover:bg-emerald-50 hover:border-emerald-200"
-                           } focus-visible:ring-2 focus-visible:ring-emerald-400`}
+                           ${isActive
+                    ? "bg-emerald-100/90 border-emerald-300 ring-1 ring-emerald-200"
+                    : "bg-white border-slate-200 hover:bg-emerald-50 hover:border-emerald-200"
+                  } focus-visible:ring-2 focus-visible:ring-emerald-400`}
               >
                 {/* subtle emerald sweep on hover */}
                 <div
@@ -200,10 +212,9 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
                 {/* icon chip */}
                 <div
                   className={`relative z-10 h-9 w-9 grid place-items-center rounded-lg transition-all
-                    ${
-                      isActive
-                        ? "bg-emerald-100 ring-1 ring-emerald-300 text-emerald-700 scale-105"
-                        : "bg-emerald-50 ring-1 ring-emerald-200 text-emerald-600 group-hover:bg-emerald-100 group-hover:ring-emerald-300 group-hover:scale-105"
+                    ${isActive
+                      ? "bg-emerald-100 ring-1 ring-emerald-300 text-emerald-700 scale-105"
+                      : "bg-emerald-50 ring-1 ring-emerald-200 text-emerald-600 group-hover:bg-emerald-100 group-hover:ring-emerald-300 group-hover:scale-105"
                     }`}
                   aria-hidden="true"
                 >
@@ -221,23 +232,20 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
                 {/* chevron or expand icon */}
                 {hasSubmenu ? (
                   <div
-                    className={`relative z-10 transition-transform duration-300 ${
-                      isExpanded ? "rotate-180" : "rotate-0"
-                    }`}
+                    className={`relative z-10 transition-transform duration-300 ${isExpanded ? "rotate-180" : "rotate-0"
+                      }`}
                   >
                     <DownOutlined
-                      className={`text-xs ${
-                        isActive ? "text-emerald-600" : "text-emerald-500 group-hover:text-emerald-600"
-                      }`}
+                      className={`text-xs ${isActive ? "text-emerald-600" : "text-emerald-500 group-hover:text-emerald-600"
+                        }`}
                     />
                   </div>
                 ) : (
                   <svg
                     className={`relative z-10 w-3.5 h-3.5 transition-all duration-300
-                      ${
-                        isActive
-                          ? "text-emerald-600 opacity-100 translate-x-0.5"
-                          : "text-emerald-500 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5"
+                      ${isActive
+                        ? "text-emerald-600 opacity-100 translate-x-0.5"
+                        : "text-emerald-500 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5"
                       }`}
                     fill="none"
                     stroke="currentColor"
@@ -252,9 +260,8 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
               {/* Submenu Items */}
               {hasSubmenu && (
                 <div
-                  className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                    isExpanded ? "max-h-96 opacity-100 mt-1.5" : "max-h-0 opacity-0"
-                  }`}
+                  className={`overflow-hidden transition-all duration-300 ease-in-out ${isExpanded ? "max-h-96 opacity-100 mt-1.5" : "max-h-0 opacity-0"
+                    }`}
                 >
                   <div className="space-y-1.5 pr-3 mr-3 border-r-4 border-emerald-200/80 bg-emerald-50/60 rounded-xl p-2">
                     {item.submenu?.map((subItem, subIndex) => {
@@ -273,29 +280,26 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
                             }
                           }}
                           className={`group flex items-center gap-3 px-3.5 py-2.5 rounded-lg border transition-all duration-200 cursor-pointer focus:outline-none
-                                     ${
-                                       isSubActive
-                                         ? "bg-white border-emerald-300 ring-1 ring-emerald-200 border-r-4"
-                                         : "bg-white/70 border-slate-200 hover:bg-emerald-100/70 hover:border-emerald-200"
-                                     } focus-visible:ring-2 focus-visible:ring-emerald-300`}
+                                     ${isSubActive
+                              ? "bg-white border-emerald-300 ring-1 ring-emerald-200 border-r-4"
+                              : "bg-white/70 border-slate-200 hover:bg-emerald-100/70 hover:border-emerald-200"
+                            } focus-visible:ring-2 focus-visible:ring-emerald-300`}
                         >
                           {/* sub item dot */}
                           <div
                             className={`w-2 h-2 rounded-full transition-all
-                              ${
-                                isSubActive
-                                  ? "bg-emerald-600 ring-2 ring-emerald-200 scale-110"
-                                  : "bg-slate-300 group-hover:bg-emerald-500"
+                              ${isSubActive
+                                ? "bg-emerald-600 ring-2 ring-emerald-200 scale-110"
+                                : "bg-slate-300 group-hover:bg-emerald-500"
                               }`}
                           />
 
                           {/* sub item title */}
                           <span
                             className={`flex-1 text-[13px] md:text-sm font-medium transition-colors
-                              ${
-                                isSubActive
-                                  ? "text-emerald-900 font-semibold"
-                                  : "text-slate-800 group-hover:text-slate-900"
+                              ${isSubActive
+                                ? "text-emerald-900 font-semibold"
+                                : "text-slate-800 group-hover:text-slate-900"
                               }`}
                           >
                             {subItem.title}
@@ -304,10 +308,9 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
                           {/* sub item chevron */}
                           <svg
                             className={`w-3.5 h-3.5 transition-all duration-200
-                              ${
-                                isSubActive
-                                  ? "text-emerald-500 opacity-100 translate-x-0.5"
-                                  : "text-emerald-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5"
+                              ${isSubActive
+                                ? "text-emerald-500 opacity-100 translate-x-0.5"
+                                : "text-emerald-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5"
                               }`}
                             fill="none"
                             stroke="currentColor"
