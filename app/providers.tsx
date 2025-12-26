@@ -7,7 +7,7 @@ import GlobalFaDigits from "./utils/CastToPersian";
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ConfigProvider locale={faIR} direction="rtl" theme={{ token: { fontFamily: "IransansR" } }}>
-      <GlobalFaDigits />
+      {/* <GlobalFaDigits /> */}
       {children}
     </ConfigProvider>
   );
