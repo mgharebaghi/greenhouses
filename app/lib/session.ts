@@ -18,7 +18,7 @@ function b64url(buf: Buffer) {
 export async function CreateSession(data: { userId: number; remember: boolean }) {
   const publicId = b64url(randomBytes(12));
   const secret = b64url(randomBytes(32));
-  const secretHash = await bcrypt.hash(secret, 12);
+  const secretHash = await bcrypt.hash(secret, 10);
 
   const ttlDays = data.remember ? 30 : 1;
   const expiresAt = new Date(Date.now() + ttlDays * 24 * 60 * 60 * 1000);
