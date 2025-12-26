@@ -27,19 +27,7 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
   const route = useRouter();
   const pathname = usePathname();
   const [expandedMenus, setExpandedMenus] = useState<{ [key: string]: boolean }>({});
-  const [currentDate, setCurrentDate] = useState<string>("");
-  const [currentTime, setCurrentTime] = useState<string>("");
 
-  useEffect(() => {
-    setCurrentDate(new Date().toLocaleDateString("fa-IR"));
-    setCurrentTime(new Date().toLocaleTimeString("fa-IR", { hour: "2-digit", minute: "2-digit" }));
-
-    const timer = setInterval(() => {
-      setCurrentTime(new Date().toLocaleTimeString("fa-IR", { hour: "2-digit", minute: "2-digit" }));
-    }, 60000);
-
-    return () => clearInterval(timer);
-  }, []);
 
   const menuItems: MenuItem[] = [
     {
@@ -136,9 +124,11 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
 
           {/* Date info */}
           <div className="bg-white border border-emerald-100 rounded-lg p-3 text-center shadow-sm">
-            <div className="text-emerald-900 text-lg font-semibold min-h-[28px]">{currentDate}</div>
-            <div className="text-emerald-700/80 text-sm min-h-[20px]">
-              {currentTime}
+            <div className="text-emerald-900 text-lg font-semibold min-h-[28px]" suppressHydrationWarning>
+              {new Date().toLocaleDateString("fa-IR")}
+            </div>
+            <div className="text-emerald-700/80 text-sm min-h-[20px]" suppressHydrationWarning>
+              {new Date().toLocaleTimeString("fa-IR", { hour: "2-digit", minute: "2-digit" })}
             </div>
           </div>
         </div>
