@@ -24,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fa">
+    <html lang="fa" suppressHydrationWarning>
       <body className={`antialiased`}>
         <Providers>{children}</Providers>
       </body>
