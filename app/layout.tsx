@@ -37,6 +37,7 @@ export default function RootLayout({
           easing="ease"
           speed={200}
           shadow="0 0 10px #10b981,0 0 5px #10b981"
+          zIndex={99999}
         />
         <Providers>{children}</Providers>
       </body>
