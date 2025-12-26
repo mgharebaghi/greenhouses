@@ -12,6 +12,7 @@ import {
   BarChartOutlined,
 } from "@ant-design/icons";
 import { useRouter, usePathname } from "next/navigation";
+import Link from "next/link";
 import GreenhouseButton from "@/app/components/UI/GreenhouseButton";
 import { removeAuth } from "@/app/lib/auth";
 import { useState, useEffect } from "react";
@@ -93,6 +94,70 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
     await removeAuth();
   };
 
+  // Helper component for menu content to avoid duplication
+  const MenuContent = ({ item, isActive, isExpanded, hasSubmenu }: { item: MenuItem, isActive: boolean, isExpanded?: boolean, hasSubmenu: boolean }) => (
+    <>
+      {/* subtle emerald sweep on hover */}
+      <div
+        className={`pointer-events-none absolute inset-0 bg-gradient-to-r from-emerald-100/0 via-emerald-100/60 to-emerald-100/0 transition-opacity duration-300
+          ${isActive ? "opacity-60" : "opacity-0 group-hover:opacity-100"}`}
+      />
+
+      {/* right accent line */}
+      <div
+        className={`absolute right-0 top-1/2 -translate-y-1/2 bg-emerald-500 rounded-l-full transition-all duration-300
+          ${isActive ? "w-1 h-6" : "w-0 h-4 group-hover:w-1"}`}
+      />
+
+      {/* icon chip */}
+      <div
+        className={`relative z-10 h-9 w-9 grid place-items-center rounded-lg transition-all
+          ${isActive
+            ? "bg-emerald-100 ring-1 ring-emerald-300 text-emerald-700 scale-105"
+            : "bg-emerald-50 ring-1 ring-emerald-200 text-emerald-600 group-hover:bg-emerald-100 group-hover:ring-emerald-300 group-hover:scale-105"
+          }`}
+        aria-hidden="true"
+      >
+        {item.icon}
+      </div>
+
+      {/* title */}
+      <span
+        className={`relative z-10 flex-1 mr-1 font-medium text-sm tracking-tight transition-colors
+          ${isActive ? "text-emerald-900" : "text-slate-800 group-hover:text-slate-900"}`}
+      >
+        {item.title}
+      </span>
+
+      {/* chevron or expand icon */}
+      {hasSubmenu ? (
+        <div
+          className={`relative z-10 transition-transform duration-300 ${isExpanded ? "rotate-180" : "rotate-0"
+            }`}
+        >
+          <DownOutlined
+            className={`text-xs ${isActive ? "text-emerald-600" : "text-emerald-500 group-hover:text-emerald-600"
+              }`}
+          />
+        </div>
+      ) : (
+        <svg
+          className={`relative z-10 w-3.5 h-3.5 transition-all duration-300
+            ${isActive
+              ? "text-emerald-600 opacity-100 translate-x-0.5"
+              : "text-emerald-500 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5"
+            }`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+        </svg>
+      )}
+    </>
+  );
+
   return (
     <Drawer
       title={
@@ -159,93 +224,41 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
           return (
             <div key={index}>
               {/* Main Menu Item */}
-              <div
-                role="button"
-                tabIndex={0}
-                aria-expanded={hasSubmenu ? isExpanded : undefined}
-                aria-current={isActive ? "page" : undefined}
-                onClick={() => {
-                  if (hasSubmenu) {
-                    toggleMenu(item.title);
-                  } else if (item.page) {
-                    handleItems(item.page);
-                  }
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    if (hasSubmenu) {
+              {hasSubmenu ? (
+                <div
+                  role="button"
+                  tabIndex={0}
+                  aria-expanded={isExpanded}
+                  aria-current={isActive ? "page" : undefined}
+                  onClick={() => toggleMenu(item.title)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
                       toggleMenu(item.title);
-                    } else if (item.page) {
-                      handleItems(item.page);
                     }
-                  }
-                }}
-                className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl border transition-all duration-300 ease-out cursor-pointer relative overflow-hidden focus:outline-none
-                           ${isActive
-                    ? "bg-emerald-100/90 border-emerald-300 ring-1 ring-emerald-200"
-                    : "bg-white border-slate-200 hover:bg-emerald-50 hover:border-emerald-200"
-                  } focus-visible:ring-2 focus-visible:ring-emerald-400`}
-              >
-                {/* subtle emerald sweep on hover */}
-                <div
-                  className={`pointer-events-none absolute inset-0 bg-gradient-to-r from-emerald-100/0 via-emerald-100/60 to-emerald-100/0 transition-opacity duration-300
-                    ${isActive ? "opacity-60" : "opacity-0 group-hover:opacity-100"}`}
-                />
-
-                {/* right accent line */}
-                <div
-                  className={`absolute right-0 top-1/2 -translate-y-1/2 bg-emerald-500 rounded-l-full transition-all duration-300
-                    ${isActive ? "w-1 h-6" : "w-0 h-4 group-hover:w-1"}`}
-                />
-
-                {/* icon chip */}
-                <div
-                  className={`relative z-10 h-9 w-9 grid place-items-center rounded-lg transition-all
-                    ${isActive
-                      ? "bg-emerald-100 ring-1 ring-emerald-300 text-emerald-700 scale-105"
-                      : "bg-emerald-50 ring-1 ring-emerald-200 text-emerald-600 group-hover:bg-emerald-100 group-hover:ring-emerald-300 group-hover:scale-105"
-                    }`}
-                  aria-hidden="true"
+                  }}
+                  className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl border transition-all duration-300 ease-out cursor-pointer relative overflow-hidden focus:outline-none
+                             ${isActive
+                      ? "bg-emerald-100/90 border-emerald-300 ring-1 ring-emerald-200"
+                      : "bg-white border-slate-200 hover:bg-emerald-50 hover:border-emerald-200"
+                    } focus-visible:ring-2 focus-visible:ring-emerald-400`}
                 >
-                  {item.icon}
+                  {/* content for submenu trigger */}
+                  <MenuContent item={item} isActive={isActive} isExpanded={isExpanded} hasSubmenu={true} />
                 </div>
-
-                {/* title */}
-                <span
-                  className={`relative z-10 flex-1 mr-1 font-medium text-sm tracking-tight transition-colors
-                    ${isActive ? "text-emerald-900" : "text-slate-800 group-hover:text-slate-900"}`}
+              ) : (
+                <Link
+                  href={item.page || "#"}
+                  onClick={onClose}
+                  className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl border transition-all duration-300 ease-out cursor-pointer relative overflow-hidden focus:outline-none
+                             ${isActive
+                      ? "bg-emerald-100/90 border-emerald-300 ring-1 ring-emerald-200"
+                      : "bg-white border-slate-200 hover:bg-emerald-50 hover:border-emerald-200"
+                    } focus-visible:ring-2 focus-visible:ring-emerald-400`}
                 >
-                  {item.title}
-                </span>
-
-                {/* chevron or expand icon */}
-                {hasSubmenu ? (
-                  <div
-                    className={`relative z-10 transition-transform duration-300 ${isExpanded ? "rotate-180" : "rotate-0"
-                      }`}
-                  >
-                    <DownOutlined
-                      className={`text-xs ${isActive ? "text-emerald-600" : "text-emerald-500 group-hover:text-emerald-600"
-                        }`}
-                    />
-                  </div>
-                ) : (
-                  <svg
-                    className={`relative z-10 w-3.5 h-3.5 transition-all duration-300
-                      ${isActive
-                        ? "text-emerald-600 opacity-100 translate-x-0.5"
-                        : "text-emerald-500 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5"
-                      }`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
-                  </svg>
-                )}
-              </div>
+                  <MenuContent item={item} isActive={isActive} isExpanded={isExpanded} hasSubmenu={false} />
+                </Link>
+              )}
 
               {/* Submenu Items */}
               {hasSubmenu && (
@@ -257,18 +270,10 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
                     {item.submenu?.map((subItem, subIndex) => {
                       const isSubActive = pathname === subItem.page;
                       return (
-                        <div
+                        <Link
                           key={subIndex}
-                          role="link"
-                          tabIndex={isExpanded ? 0 : -1}
-                          aria-current={isSubActive ? "page" : undefined}
-                          onClick={() => handleItems(subItem.page)}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter" || e.key === " ") {
-                              e.preventDefault();
-                              handleItems(subItem.page);
-                            }
-                          }}
+                          href={subItem.page}
+                          onClick={onClose}
                           className={`group flex items-center gap-3 px-3.5 py-2.5 rounded-lg border transition-all duration-200 cursor-pointer focus:outline-none
                                      ${isSubActive
                               ? "bg-white border-emerald-300 ring-1 ring-emerald-200 border-r-4"
@@ -308,7 +313,7 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
                           >
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
                           </svg>
-                        </div>
+                        </Link>
                       );
                     })}
                   </div>
