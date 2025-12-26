@@ -13,6 +13,7 @@ import {
 } from "@ant-design/icons";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
+import NProgress from "nprogress";
 import GreenhouseButton from "@/app/components/UI/GreenhouseButton";
 import { removeAuth } from "@/app/lib/auth";
 import { useState, useEffect } from "react";
@@ -70,6 +71,7 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
 
   const handleItems = (page: string) => {
     onClose();
+    NProgress.start();
     route.push(page);
   };
 
@@ -249,7 +251,10 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
               ) : (
                 <Link
                   href={item.page || "#"}
-                  onClick={onClose}
+                  onClick={() => {
+                    NProgress.start();
+                    onClose();
+                  }}
                   className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl border transition-all duration-300 ease-out cursor-pointer relative overflow-hidden focus:outline-none
                              ${isActive
                       ? "bg-emerald-100/90 border-emerald-300 ring-1 ring-emerald-200"
@@ -273,7 +278,10 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
                         <Link
                           key={subIndex}
                           href={subItem.page}
-                          onClick={onClose}
+                          onClick={() => {
+                            NProgress.start();
+                            onClose();
+                          }}
                           className={`group flex items-center gap-3 px-3.5 py-2.5 rounded-lg border transition-all duration-200 cursor-pointer focus:outline-none
                                      ${isSubActive
                               ? "bg-white border-emerald-300 ring-1 ring-emerald-200 border-r-4"
