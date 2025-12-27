@@ -16,7 +16,7 @@ import Link from "next/link";
 import NProgress from "nprogress";
 import GreenhouseButton from "@/app/components/UI/GreenhouseButton";
 import { removeAuth } from "@/app/lib/auth";
-import { useState, useEffect, useTransition } from "react";
+import { useState, useEffect } from "react";
 
 type MenuItem = {
   icon: React.ReactNode;
@@ -29,21 +29,6 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
   const route = useRouter();
   const pathname = usePathname();
   const [expandedMenus, setExpandedMenus] = useState<{ [key: string]: boolean }>({});
-  const [isPending, startTransition] = useTransition();
-
-  useEffect(() => {
-    // If transition ends, we mark progress as done.
-    // NOTE: NavigationProgressBar handles the "done" on pathname change, 
-    // but we can also ensure it's done when pending stops.
-    if (!isPending) {
-      // NProgress.done() is called by NavigationProgressBar logic typically,
-      // but we can leave this effect empty if relying on that.
-      // For strictly manual control:
-      // NProgress.done(); 
-      // However, we want the bar to persist UNTIL the new route loads.
-      // isPending stays true until the new route is ready.
-    }
-  }, [isPending]);
 
 
   const menuItems: MenuItem[] = [
@@ -87,9 +72,7 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
   const handleItems = (page: string) => {
     onClose();
     NProgress.start();
-    startTransition(() => {
-      route.push(page);
-    });
+    route.push(page);
   };
 
   // Accordion behavior: only one submenu open at a time
@@ -266,15 +249,11 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
                   <MenuContent item={item} isActive={isActive} isExpanded={isExpanded} hasSubmenu={true} />
                 </div>
               ) : (
-                <div
-                  role="button"
-                  tabIndex={0}
+                <Link
+                  href={item.page || "#"}
                   onClick={() => {
                     NProgress.start();
                     onClose();
-                    startTransition(() => {
-                      route.push(item.page || "#");
-                    });
                   }}
                   className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl border transition-all duration-300 ease-out cursor-pointer relative overflow-hidden focus:outline-none
                              ${isActive
@@ -283,7 +262,7 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
                     } focus-visible:ring-2 focus-visible:ring-emerald-400`}
                 >
                   <MenuContent item={item} isActive={isActive} isExpanded={isExpanded} hasSubmenu={false} />
-                </div>
+                </Link>
               )}
 
               {/* Submenu Items */}
@@ -296,16 +275,12 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
                     {item.submenu?.map((subItem, subIndex) => {
                       const isSubActive = pathname === subItem.page;
                       return (
-                        <div
+                        <Link
                           key={subIndex}
-                          role="button"
-                          tabIndex={0}
+                          href={subItem.page}
                           onClick={() => {
                             NProgress.start();
                             onClose();
-                            startTransition(() => {
-                              route.push(subItem.page);
-                            });
                           }}
                           className={`group flex items-center gap-3 px-3.5 py-2.5 rounded-lg border transition-all duration-200 cursor-pointer focus:outline-none
                                      ${isSubActive
@@ -346,7 +321,7 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
                           >
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
                           </svg>
-                        </div>
+                        </Link>
                       );
                     })}
                   </div>
