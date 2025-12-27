@@ -8,8 +8,27 @@ import DashboardMenu from "./_components/UI/Menu";
 import GreenhouseButton from "../components/UI/GreenhouseButton";
 import { MenuOutlined, EnvironmentOutlined, UserOutlined } from "@ant-design/icons";
 
+import { usePathname } from "next/navigation";
+
+// Mapping of paths to titles
+const PAGE_TITLES: Record<string, string> = {
+  "/dashboard": "داشبورد",
+  "/dashboard/owners": "اطلاعات اشخاص",
+  "/dashboard/suppliers": "اطلاعات تامین کنندگان",
+  "/dashboard/greenhouse": "اطلاعات گلخانه ها",
+  "/dashboard/plants": "اطلاعات پایه گیاهی",
+  "/dashboard/plantvarities": "اطلاعات گونه گیاهی",
+  "/dashboard/growthstages": "مراحل رشد گیاه",
+  "/dashboard/planting": "اطلاعات کاشت",
+  "/dashboard/growthdaily": "پایش رشد گیاه",
+  "/dashboard/climatedaily": "ثبت اطلاعات اقلیمی",
+  "/dashboard/irrigation": "آبیاری",
+};
+
 export default function DashboardShell({ children }: { children: React.ReactNode }) {
   const [openDrawer, setOpenDrawer] = useState(false);
+  const pathname = usePathname();
+  const currentTitle = PAGE_TITLES[pathname] || "سامانه گلخانه";
 
   return (
     <Layout className="h-dvh flex flex-col bg-gradient-to-br from-emerald-50/50 via-white to-lime-50/50">
@@ -33,8 +52,8 @@ export default function DashboardShell({ children }: { children: React.ReactNode
                 <EnvironmentOutlined className="text-lg" />
               </span>
               <div className="hidden sm:block">
-                <h1 className="text-emerald-900 font-semibold text-lg leading-none">سامانه گلخانه</h1>
-                <p className="text-emerald-700/70 text-sm leading-none mt-1">مدیریت هوشمند کشاورزی</p>
+                <h1 className="text-emerald-900 font-semibold text-lg leading-none">{currentTitle}</h1>
+                <p className="text-emerald-700/70 text-sm leading-none mt-1">سامانه مدیریت گلخانه</p>
               </div>
             </div>
           </div>

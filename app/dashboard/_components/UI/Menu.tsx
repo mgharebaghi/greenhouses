@@ -13,6 +13,7 @@ import {
 } from "@ant-design/icons";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import NProgress from "nprogress";
 import GreenhouseButton from "@/app/components/UI/GreenhouseButton";
 import { removeAuth } from "@/app/lib/auth";
@@ -168,9 +169,13 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="relative">
-                <span className="h-10 w-10 rounded-full bg-gradient-to-br from-emerald-500 to-lime-500 grid place-items-center text-white text-lg shadow-md">
-                  <EnvironmentOutlined />
-                </span>
+                <Image
+                  src="/Images/Logo.png"
+                  alt="Logo"
+                  width={40}
+                  height={40}
+                  className="rounded-full object-cover bg-emerald-500 shadow-md"
+                />
                 <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 bg-emerald-500 border-2 border-white rounded-full"></span>
               </div>
               <div>

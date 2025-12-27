@@ -1,12 +1,13 @@
 import Login from "./components/auth/LoginForm";
 import { requireAuth } from "./lib/auth";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "ورود به سامانه",
+};
 
 export default async function Home() {
   await requireAuth("/");
 
-  return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      <Login />
-    </div>
-  );
+  return <Login />;
 }

@@ -27,6 +27,12 @@ export type PlantVarietyDTO = {
   } | null;
 };
 
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "اطلاعات گونه گیاهی",
+};
+
 export default async function PlantVaritiesPage() {
   const initialData: PlantVarietyDTO[] = await getPlantVarieties();
   return <PlantsVaritiesDashboard initialData={initialData} />;
