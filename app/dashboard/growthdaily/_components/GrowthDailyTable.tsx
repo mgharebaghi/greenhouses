@@ -238,7 +238,7 @@ export default function GrowthDailyTable(props: GrowthDailyTableProps) {
         rowKey="PlantGrowthDailyID"
         scroll={{ x: 300 }}
         loading={tableLoading}
-        pagination={false}
+        pagination={{ pageSize: 5 }}
       />
 
       <GrowthDailyInsUpModal

@@ -192,7 +192,7 @@ export default function IrrigationTable(props: IrrigationTableProps) {
         rowKey="EventID"
         scroll={{ x: 300 }}
         loading={tableLoading}
-        pagination={false}
+        pagination={{ pageSize: 5 }}
       />
 
       {irrigationInsUpModal?.open && (

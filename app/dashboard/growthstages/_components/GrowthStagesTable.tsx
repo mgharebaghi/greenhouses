@@ -104,7 +104,7 @@ export default function GrowthStagesTable(props: GrowthStagesTableProps) {
         loading={props.loading}
         rowKey="StageID"
         scroll={{ x: 300 }}
-        pagination={false}
+        pagination={{ pageSize: 5 }}
       />
 
       <StagesInsUpModal

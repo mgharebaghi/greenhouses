@@ -113,7 +113,7 @@ export default function GreenHousesTable({
         }}
         data={data}
       />
-      <Table columns={columns} dataSource={data} loading={loading} rowKey="GreenhouseID" pagination={false} />
+      <Table columns={columns} dataSource={data} loading={loading} rowKey="GreenhouseID" pagination={{ pageSize: 5 }} />
       <GreenHouseInsertModal
         modalOpen={insertModal}
         setModalOpen={setInsertModal}

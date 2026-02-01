@@ -101,7 +101,7 @@ export default function PlantsTable(props: PlantsTableProps) {
         data={props.data}
       />
 
-      <Table columns={columns} dataSource={props.data} loading={props.loading} rowKey="PlantID" pagination={false} />
+      <Table columns={columns} dataSource={props.data} loading={props.loading} rowKey="PlantID" pagination={{ pageSize: 5 }} />
 
       <PlantsEditModal
         isOpen={openEditModal?.isOpen || false}

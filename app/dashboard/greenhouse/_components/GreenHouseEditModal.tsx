@@ -46,6 +46,7 @@ export default function GreenHouseEditModal(props: EditModalProps) {
   const [ownersLoading, setOwnersLoading] = useState(false);
   const [form] = Form.useForm();
   const [zoneForm] = Form.useForm();
+  const [mounted, setMounted] = useState(false);
 
   const [pagination, setPagination] = useState({ current: 1, pageSize: 5 });
   const [zonesModalOpen, setZonesModalOpen] = useState(false);
@@ -187,6 +188,7 @@ export default function GreenHouseEditModal(props: EditModalProps) {
   };
 
   useEffect(() => {
+    setMounted(true);
     setLoading(false);
     fetchOwners();
     if (props.isOpen && props.data) {
@@ -251,6 +253,8 @@ export default function GreenHouseEditModal(props: EditModalProps) {
     setOnEditZone(null);
   };
 
+  if (!mounted) return null;
+
   return (
     <>
       <Modal
@@ -271,12 +275,13 @@ export default function GreenHouseEditModal(props: EditModalProps) {
             minHeight: "480px",
           },
         }}
+        forceRender
       >
         {/* Header */}
-        <div className="relative px-6 py-6 bg-gradient-to-br from-amber-50 via-orange-50/80 to-white border-b border-amber-100">
+        <div className="relative px-6 py-6 bg-gradient-to-br from-amber-50 via-orange-50/80 to-white dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 border-b border-amber-100 dark:border-slate-700">
           <button
             onClick={handleClose}
-            className="absolute top-5 left-5 h-9 w-9 rounded-xl bg-white hover:bg-amber-50 border border-amber-200 hover:border-amber-300 transition-all flex items-center justify-center text-amber-600 hover:text-amber-700 shadow-sm hover:shadow"
+            className="absolute top-5 left-5 h-9 w-9 rounded-xl bg-white dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-amber-900/20 border border-amber-200 dark:border-slate-600 hover:border-amber-300 dark:hover:border-amber-700 transition-all flex items-center justify-center text-amber-600 dark:text-amber-500 hover:text-amber-700 shadow-sm hover:shadow"
             aria-label="بستن"
           >
             <CloseOutlined className="text-sm" />
@@ -287,11 +292,11 @@ export default function GreenHouseEditModal(props: EditModalProps) {
               <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-amber-500 via-amber-600 to-orange-600 shadow-lg flex items-center justify-center text-white">
                 <EditOutlined className="text-2xl" />
               </div>
-              <div className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-orange-400 border-2 border-white"></div>
+              <div className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-orange-400 border-2 border-white dark:border-slate-800"></div>
             </div>
             <div>
-              <h3 className="font-bold text-2xl text-amber-900">ویرایش اطلاعات گلخانه</h3>
-              <p className="text-sm text-amber-600/80 mt-1 flex items-center gap-1.5">
+              <h3 className="font-bold text-2xl text-amber-900 dark:text-slate-100">ویرایش اطلاعات گلخانه</h3>
+              <p className="text-sm text-amber-600/80 dark:text-slate-400 mt-1 flex items-center gap-1.5">
                 <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-pulse"></span>
                 اطلاعات گلخانه و سالن‌ها را ویرایش کنید
               </p>
@@ -300,8 +305,8 @@ export default function GreenHouseEditModal(props: EditModalProps) {
         </div>
 
         {/* Body */}
-        <div className="px-6 py-6 bg-gradient-to-br from-white to-slate-50/30 max-h-[70vh] overflow-y-auto">
-          {props.data !== undefined ? (
+        <div className="px-6 py-6 bg-gradient-to-br from-white to-slate-50/30 dark:from-slate-900 dark:to-slate-950 max-h-[70vh] overflow-y-auto">
+          <div style={{ display: props.data !== undefined ? "block" : "none" }}>
             <>
               <Form form={form} layout="vertical" onFinish={submitGreenHouse} requiredMark={false}>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -309,7 +314,7 @@ export default function GreenHouseEditModal(props: EditModalProps) {
                     <Form.Item
                       key={field.name}
                       label={
-                        <span className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                        <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
                           <span className="text-base">{field.icon}</span>
                           {field.label}
                           {field.required && <span className="text-rose-500 text-xs">*</span>}
@@ -335,7 +340,7 @@ export default function GreenHouseEditModal(props: EditModalProps) {
                           onChange={() => setModalMsg(null)}
                           disabled={loading}
                           size="large"
-                          className="rounded-xl border-2 border-slate-200 hover:border-amber-300 focus:border-amber-400 transition-all shadow-sm hover:shadow"
+                          className="rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-amber-300 dark:hover:border-amber-700 focus:border-amber-400 dark:focus:border-amber-600 transition-all shadow-sm hover:shadow dark:bg-slate-800 dark:text-white dark:placeholder-slate-500"
                           style={{ height: "46px", fontSize: "14px" }}
                         />
                       )}
@@ -345,7 +350,7 @@ export default function GreenHouseEditModal(props: EditModalProps) {
 
                 <Form.Item
                   label={
-                    <span className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
                       <span>📝</span>توضیحات
                     </span>
                   }
@@ -355,28 +360,26 @@ export default function GreenHouseEditModal(props: EditModalProps) {
                   <Input.TextArea
                     disabled={loading}
                     rows={3}
-                    className="rounded-xl border-2 border-slate-200 hover:border-amber-300 focus:border-amber-400 transition-all"
+                    className="rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-amber-300 dark:hover:border-amber-700 focus:border-amber-400 dark:focus:border-amber-600 transition-all dark:bg-slate-800 dark:text-white"
                     style={{ resize: "none" }}
                   />
                 </Form.Item>
 
                 {modalMsg && (
                   <div
-                    className={`mt-4 p-4 rounded-xl border-2 flex items-start gap-3 animate-in fade-in slide-in-from-top-3 duration-300 shadow-sm ${
-                      modalMsg.status === "ok"
-                        ? "bg-gradient-to-br from-emerald-50 to-emerald-100/50 border-emerald-300 text-emerald-900"
-                        : "bg-gradient-to-br from-rose-50 to-rose-100/50 border-rose-300 text-rose-900"
-                    }`}
+                    className={`mt-4 p-4 rounded-xl border-2 flex items-start gap-3 animate-in fade-in slide-in-from-top-3 duration-300 shadow-sm ${modalMsg.status === "ok"
+                      ? "bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-900/30 dark:to-emerald-900/10 border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-300"
+                      : "bg-gradient-to-br from-rose-50 to-rose-100/50 dark:from-rose-900/30 dark:to-rose-900/10 border-rose-300 dark:border-rose-800 text-rose-900 dark:text-rose-300"
+                      }`}
                   >
                     <div
-                      className={`mt-0.5 p-1.5 rounded-lg ${
-                        modalMsg.status === "ok" ? "bg-emerald-200/50" : "bg-rose-200/50"
-                      }`}
+                      className={`mt-0.5 p-1.5 rounded-lg ${modalMsg.status === "ok" ? "bg-emerald-200/50 dark:bg-emerald-800/50" : "bg-rose-200/50 dark:bg-rose-800/50"
+                        }`}
                     >
                       {modalMsg.status === "ok" ? (
-                        <CheckCircleOutlined className="text-lg text-emerald-700" />
+                        <CheckCircleOutlined className="text-lg text-emerald-700 dark:text-emerald-400" />
                       ) : (
-                        <ExclamationCircleOutlined className="text-lg text-rose-700" />
+                        <ExclamationCircleOutlined className="text-lg text-rose-700 dark:text-rose-400" />
                       )}
                     </div>
                     <div className="flex-1">
@@ -386,7 +389,7 @@ export default function GreenHouseEditModal(props: EditModalProps) {
                   </div>
                 )}
 
-                <div className="flex justify-end gap-3 mt-6 pt-4  border-slate-200">
+                <div className="flex justify-end gap-3 mt-6 pt-4  border-slate-200 dark:border-slate-700">
                   <GreenhouseButton
                     text="افزودن سالن"
                     variant="secondary"
@@ -408,10 +411,10 @@ export default function GreenHouseEditModal(props: EditModalProps) {
               {/* Zones Table */}
               {zonesData.length > 0 && (
                 <>
-                  <Divider className="my-6">
-                    <span className="text-slate-600 font-semibold">سالن‌های گلخانه</span>
+                  <Divider className="my-6 custom-divider-dark">
+                    <span className="text-slate-600 dark:text-slate-300 font-semibold">سالن‌های گلخانه</span>
                   </Divider>
-                  <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+                  <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
                     <Table
                       columns={zonesColumns}
                       dataSource={zonesData}
@@ -430,13 +433,14 @@ export default function GreenHouseEditModal(props: EditModalProps) {
                 </>
               )}
             </>
-          ) : (
+          </div>
+          {props.data === undefined && (
             <div className="flex items-center justify-center py-12">
               <div className="text-slate-600">در حال بارگذاری...</div>
             </div>
           )}
         </div>
-      </Modal>
+      </Modal >
 
       {/* Add Zone Modal */}
       <Modal
@@ -452,14 +456,15 @@ export default function GreenHouseEditModal(props: EditModalProps) {
         styles={{
           content: { padding: 0, borderRadius: "1rem", overflow: "hidden" },
         }}
+        forceRender
       >
-        <div className="relative px-6 py-5 bg-gradient-to-br from-emerald-50/80 via-lime-50/60 to-white border-b border-emerald-100">
+        <div className="relative px-6 py-5 bg-gradient-to-br from-emerald-50/80 via-lime-50/60 to-white dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 border-b border-emerald-100 dark:border-slate-700">
           <button
             onClick={() => {
               setZonesModalOpen(false);
               zoneForm.resetFields();
             }}
-            className="absolute top-4 left-4 h-8 w-8 rounded-lg bg-white/80 hover:bg-white border border-emerald-100 hover:border-emerald-200 transition-all flex items-center justify-center text-emerald-600 hover:text-emerald-700"
+            className="absolute top-4 left-4 h-8 w-8 rounded-lg bg-white/80 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 border border-emerald-100 dark:border-slate-600 hover:border-emerald-200 dark:hover:border-slate-500 transition-all flex items-center justify-center text-emerald-600 dark:text-emerald-400 hover:text-emerald-700"
           >
             <CloseOutlined className="text-sm" />
           </button>
@@ -468,20 +473,20 @@ export default function GreenHouseEditModal(props: EditModalProps) {
               <PlusOutlined className="text-2xl" />
             </div>
             <div>
-              <h3 className="font-bold text-xl text-emerald-900">افزودن سالن جدید</h3>
-              <p className="text-sm text-emerald-700/70 mt-0.5">اطلاعات سالن را وارد کنید</p>
+              <h3 className="font-bold text-xl text-emerald-900 dark:text-slate-100">افزودن سالن جدید</h3>
+              <p className="text-sm text-emerald-700/70 dark:text-slate-400 mt-0.5">اطلاعات سالن را وارد کنید</p>
             </div>
           </div>
         </div>
 
-        <div className="px-6 py-6 bg-white">
+        <div className="px-6 py-6 bg-white dark:bg-slate-900">
           <Form form={zoneForm} layout="vertical" onFinish={submitZone} requiredMark={false}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               {zoneFields.map((field) => (
                 <Form.Item
                   key={field.name}
                   label={
-                    <span className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
                       <span className="text-base">{field.icon}</span>
                       {field.label}
                       {field.required && <span className="text-rose-500 text-xs">*</span>}
@@ -496,7 +501,7 @@ export default function GreenHouseEditModal(props: EditModalProps) {
                     placeholder={field.placeholder}
                     disabled={zonesLoading}
                     size="large"
-                    className="rounded-xl border-2 border-slate-200 hover:border-emerald-300 focus:border-emerald-400 transition-all shadow-sm hover:shadow"
+                    className="rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-emerald-300 dark:hover:border-emerald-700 focus:border-emerald-400 dark:focus:border-emerald-600 transition-all shadow-sm hover:shadow dark:bg-slate-800 dark:text-white dark:placeholder-slate-500"
                     style={{ height: "46px", fontSize: "14px" }}
                   />
                 </Form.Item>
@@ -505,7 +510,7 @@ export default function GreenHouseEditModal(props: EditModalProps) {
 
             <Form.Item
               label={
-                <span className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
                   <span>📝</span>توضیحات سالن
                 </span>
               }
@@ -516,12 +521,12 @@ export default function GreenHouseEditModal(props: EditModalProps) {
                 placeholder="توضیحات سالن"
                 disabled={zonesLoading}
                 rows={3}
-                className="rounded-xl border-2 border-slate-200 hover:border-emerald-300 focus:border-emerald-400 transition-all"
+                className="rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-emerald-300 dark:hover:border-emerald-700 focus:border-emerald-400 dark:focus:border-emerald-600 transition-all dark:bg-slate-800 dark:text-white"
                 style={{ resize: "none" }}
               />
             </Form.Item>
 
-            <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 mt-6 pt-4 border-t border-slate-100">
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 mt-6 pt-4 border-t border-slate-100 dark:border-slate-700">
               <GreenhouseButton
                 text="انصراف"
                 variant="secondary"
@@ -542,7 +547,7 @@ export default function GreenHouseEditModal(props: EditModalProps) {
             </div>
           </Form>
         </div>
-      </Modal>
+      </Modal >
     </>
   );
 }

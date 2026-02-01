@@ -33,7 +33,7 @@ export default function Login() {
   };
 
   return (
-    <div dir="rtl" className="min-h-screen w-full flex font-IransansR overflow-hidden bg-[#f0fdf4]">
+    <div dir="rtl" className="min-h-screen w-full flex font-IransansR overflow-hidden bg-[#f0fdf4] dark:bg-slate-950 transition-colors duration-500">
 
       {/* 
         ========================================
@@ -56,11 +56,11 @@ export default function Login() {
           {/* Center Hub */}
           <div className="absolute z-20 w-80 bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-6 shadow-2xl animate-fade-in-up">
             <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center text-emerald-300">
-                <Image src="/Images/Logo.png" alt="Logo" width={32} height={32} className="opacity-90" />
+              <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center text-emerald-300 overflow-hidden p-1">
+                <Image src="/fakoor-logo.png" alt="Logo" width={40} height={40} className="opacity-90 object-contain" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-slate-100">Greenhouse OS</h3>
+                <h3 className="text-lg font-bold text-slate-100">Fakoor OS</h3>
                 <span className="text-xs text-emerald-400 font-mono">v2.4.0 • Live</span>
               </div>
             </div>
@@ -122,12 +122,12 @@ export default function Login() {
         {/* --- Content Section --- */}
         <div className="relative z-10 w-full max-w-lg mt-8 animate-fade-in-up animation-delay-200 text-center lg:text-right px-4">
           <h2 className="text-3xl xl:text-4xl font-black mb-4 text-white leading-tight drop-shadow-lg">
-            آینده کشاورزی <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-teal-200">در دستان شماست</span>
+            سامانه مدیریت هوشمند گلخانه <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-teal-200">فکور پیوند آریا</span>
           </h2>
-          <p className="text-slate-300 text-base xl:text-lg font-light leading-loose mb-8 text-justify opacity-90">
-            پلتفرمی جامع برای پایش لحظه‌ای و کنترل هوشمند گلخانه‌های صنعتی.
-            با بهره‌گیری از هوش مصنوعی، مصرف انرژی را کاهش داده و کیفیت محصولات خود را به سطح جهانی برسانید.
+          <p className="text-slate-300 text-base xl:text-md font-light leading-loose mb-8 text-justify opacity-80">
+            این سامانه جهت پایش، کنترل و مدیریت یکپارچه واحدهای گلخانه‌ای فکور پیوند آریا طراحی و پیاده‌سازی شده است.
+            دسترسی به این پنل صرفاً برای پرسنل مجاز امکان‌پذیر می‌باشد.
           </p>
 
           <div className="grid grid-cols-2 gap-4">
@@ -157,7 +157,7 @@ export default function Login() {
             </div>
           </div>
         </div>
-      </div>
+      </div >
 
 
       {/* 
@@ -165,46 +165,49 @@ export default function Login() {
         RIGHT PANEL: The Glass Control Interface
         ========================================
       */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 relative">
+      < div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 relative" >
 
         {/* Animated Background Blob for Depth */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-emerald-100/50 rounded-full blur-[100px] -z-10 animate-pulse-slow"></div>
+        < div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-emerald-100/50 dark:bg-emerald-900/10 rounded-full blur-[100px] -z-10 animate-pulse-slow" ></div >
 
-        <div className="absolute top-0 left-0 w-full p-6 flex justify-between items-center lg:hidden z-20">
-          <Image src="/Images/Logo.png" alt="Logo" width={40} height={40} />
-        </div>
+
 
         <div className="w-full max-w-[460px] relative z-10">
 
           {/* THE GLASS CARD */}
-          <div className="bg-white/60 backdrop-blur-xl rounded-[2.5rem] p-8 sm:p-12 shadow-[0_30px_60px_-15px_rgba(16,185,129,0.1)] border border-white/60 relative overflow-hidden animate-fade-in-up">
+          <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl rounded-[2.5rem] p-8 sm:p-12 shadow-[0_30px_60px_-15px_rgba(16,185,129,0.1)] dark:shadow-none border border-white/60 dark:border-slate-700/50 relative overflow-hidden animate-fade-in-up">
 
             {/* Top Accent Light */}
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-emerald-400/50 to-transparent"></div>
 
-            <div className="mb-10 text-center">
-              <h2 className="text-3xl font-black text-slate-800 font-IransansB mb-2 tracking-tight">خوش آمدید</h2>
-              <p className="text-slate-500 text-sm font-medium">لطفا مشخصات ورود خود را وارد کنید</p>
+            <div className="mb-8 text-center">
+              <div className="flex justify-center mb-6">
+                <div className="w-24 h-24 bg-white dark:bg-slate-800 rounded-2xl shadow-[0_10px_30px_-5px_rgba(16,185,129,0.15)] dark:shadow-none border border-emerald-50 dark:border-slate-700 flex items-center justify-center p-2 animate-fade-in-up">
+                  <Image src="/fakoor-logo.png" alt="Logo" width={80} height={80} className="object-contain" />
+                </div>
+              </div>
+              <h2 className="text-3xl font-black text-slate-800 dark:text-slate-100 font-IransansB mb-2 tracking-tight">خوش آمدید</h2>
+              <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">لطفا مشخصات ورود خود را وارد کنید</p>
             </div>
 
             <Form form={form} layout="vertical" onFinish={handleSubmit} requiredMark={false} size="large" className="space-y-6">
               <Form.Item name="username" rules={[{ required: true, message: 'نام کاربری الزامی است' }]} className="mb-0">
-                <div className={`relative transition-all duration-300 rounded-2xl ${focusedField === 'username' ? 'bg-white ring-4 ring-emerald-500/10 border-emerald-500/50' : error ? 'bg-red-50 border-red-200' : 'bg-white/50 border-white/50 hover:bg-white'} border shadow-sm`}>
-                  <Input prefix={<UserOutlined className={`text-lg ml-3 transition-colors ${focusedField === 'username' ? 'text-emerald-600' : 'text-slate-400'}`} />} placeholder="نام کاربری" className="!bg-transparent !border-none !shadow-none h-14 text-base font-medium text-slate-700 placeholder:text-slate-400/80" onFocus={() => setFocusedField('username')} onBlur={() => setFocusedField(null)} />
+                <div className={`relative transition-all duration-300 rounded-2xl ${focusedField === 'username' ? 'bg-white dark:bg-slate-800 ring-4 ring-emerald-500/10 border-emerald-500/50' : error ? 'bg-red-50 border-red-200' : 'bg-white/50 dark:bg-slate-800/50 border-white/50 dark:border-slate-600/50 hover:bg-white dark:hover:bg-slate-800'} border shadow-sm`}>
+                  <Input prefix={<UserOutlined className={`text-lg ml-3 transition-colors ${focusedField === 'username' ? 'text-emerald-600' : 'text-slate-400'}`} />} placeholder="نام کاربری" className="!bg-transparent !border-none !shadow-none h-14 text-base font-medium text-slate-700 dark:text-slate-200 placeholder:text-slate-400/80" onFocus={() => setFocusedField('username')} onBlur={() => setFocusedField(null)} />
                 </div>
               </Form.Item>
               <Form.Item name="password" rules={[{ required: true, message: 'رمز عبور الزامی است' }]} className="mb-2">
-                <div className={`relative transition-all duration-300 rounded-2xl ${focusedField === 'password' ? 'bg-white ring-4 ring-emerald-500/10 border-emerald-500/50' : error ? 'bg-red-50 border-red-200' : 'bg-white/50 border-white/50 hover:bg-white'} border shadow-sm`}>
-                  <Input.Password prefix={<LockOutlined className={`text-lg ml-3 transition-colors ${focusedField === 'password' ? 'text-emerald-600' : 'text-slate-400'}`} />} placeholder="رمز عبور" className="!bg-transparent !border-none !shadow-none h-14 text-base font-medium text-slate-700 placeholder:text-slate-400/80" onFocus={() => setFocusedField('password')} onBlur={() => setFocusedField(null)} />
+                <div className={`relative transition-all duration-300 rounded-2xl ${focusedField === 'password' ? 'bg-white dark:bg-slate-800 ring-4 ring-emerald-500/10 border-emerald-500/50' : error ? 'bg-red-50 border-red-200' : 'bg-white/50 dark:bg-slate-800/50 border-white/50 dark:border-slate-600/50 hover:bg-white dark:hover:bg-slate-800'} border shadow-sm`}>
+                  <Input.Password prefix={<LockOutlined className={`text-lg ml-3 transition-colors ${focusedField === 'password' ? 'text-emerald-600' : 'text-slate-400'}`} />} placeholder="رمز عبور" className="!bg-transparent !border-none !shadow-none h-14 text-base font-medium text-slate-700 dark:text-slate-200 placeholder:text-slate-400/80" onFocus={() => setFocusedField('password')} onBlur={() => setFocusedField(null)} />
                 </div>
               </Form.Item>
               <div className="flex items-center justify-between pt-1">
                 <Form.Item name="remember" valuePropName="checked" initialValue={true} noStyle>
-                  <Checkbox className="text-slate-500 text-xs font-bold hover:text-slate-700 transition-colors">مرا به خاطر بسپار</Checkbox>
+                  <Checkbox className="text-slate-500 dark:text-slate-400 text-xs font-bold hover:text-slate-700 dark:hover:text-slate-200 transition-colors">مرا به خاطر بسپار</Checkbox>
                 </Form.Item>
-                <a href="#" className="text-xs font-bold text-emerald-600 hover:text-emerald-700 transition-colors hover:underline">فراموشی رمز عبور؟</a>
+                <a href="#" className="text-xs font-bold text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 transition-colors hover:underline">فراموشی رمز عبور؟</a>
               </div>
-              <button type="submit" disabled={loading} className={`relative w-full h-14 rounded-2xl font-bold text-lg text-white shadow-[0_10px_20px_rgba(16,185,129,0.2)] transition-all duration-300 transform hover:-translate-y-1 active:scale-[0.98] ${loading ? 'bg-slate-300 cursor-not-allowed shadow-none' : 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:shadow-[0_20px_40px_rgba(16,185,129,0.3)]'}`}>
+              <button type="submit" disabled={loading} className={`relative w-full h-14 rounded-2xl font-bold text-lg text-white shadow-[0_10px_20px_rgba(16,185,129,0.2)] dark:shadow-none transition-all duration-300 transform hover:-translate-y-1 active:scale-[0.98] ${loading ? 'bg-slate-300 cursor-not-allowed shadow-none' : 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:shadow-[0_20px_40px_rgba(16,185,129,0.3)]'}`}>
                 <span className={`flex items-center justify-center  gap-2 ${loading ? 'opacity-0' : 'opacity-100'} cursor-pointer`}>ورود به سیستم</span>
                 {loading && (<div className="absolute inset-0 flex items-center justify-center"><LoadingOutlined className="text-2xl animate-spin text-white" /></div>)}
               </button>
@@ -222,10 +225,10 @@ export default function Login() {
             </Form>
           </div>
           <div className="mt-8 text-center animate-fade-in-up animation-delay-200">
-            <p className="text-slate-400 text-xs font-medium">© ۲۰۲۵ سامانه هوشمند مدیریت گلخانه</p>
+            <p className="text-slate-400 dark:text-slate-500 text-xs font-medium">© ۲۰۲۵ سامانه هوشمند مدیریت گلخانه - فکور پیوند آریا</p>
           </div>
         </div>
-      </div>
+      </div >
 
       <style jsx global>{`
         .font-IransansR { font-family: "IransansR", sans-serif !important; }
@@ -246,6 +249,6 @@ export default function Login() {
         .animation-delay-1000 { animation-delay: 1s; }
         .perspective-1000 { perspective: 1000px; }
       `}</style>
-    </div>
+    </div >
   );
 }

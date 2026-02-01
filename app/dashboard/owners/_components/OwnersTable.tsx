@@ -115,7 +115,7 @@ export default function OwnersTable(props: OwnersProps) {
         columns={columns}
         dataSource={props.data}
         rowKey="ID"
-        pagination={false}
+        pagination={{ pageSize: 5 }}
         loading={props.loading}
       />
 

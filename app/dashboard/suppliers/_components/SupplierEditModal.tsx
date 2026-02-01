@@ -86,10 +86,10 @@ export default function SupplierEditModal({
         },
       }}
     >
-      <div className="relative px-6 py-6 bg-gradient-to-br from-amber-50 via-orange-50/80 to-white border-b border-amber-100">
+      <div className="relative px-6 py-6 bg-gradient-to-br from-amber-50 via-orange-50/80 to-white dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 border-b border-amber-100 dark:border-slate-700">
         <button
           onClick={handleClose}
-          className="absolute top-5 left-5 h-9 w-9 rounded-xl bg-white hover:bg-amber-50 border border-amber-200 hover:border-amber-300 transition-all flex items-center justify-center text-amber-600 hover:text-amber-700 shadow-sm hover:shadow"
+          className="absolute top-5 left-5 h-9 w-9 rounded-xl bg-white dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-amber-900/20 border border-amber-200 dark:border-slate-600 hover:border-amber-300 dark:hover:border-amber-700 transition-all flex items-center justify-center text-amber-600 dark:text-amber-500 hover:text-amber-700 shadow-sm hover:shadow"
           aria-label="بستن"
         >
           <CloseOutlined className="text-sm" />
@@ -100,11 +100,11 @@ export default function SupplierEditModal({
             <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-amber-500 via-amber-600 to-orange-600 shadow-lg flex items-center justify-center text-white">
               <EditOutlined className="text-2xl" />
             </div>
-            <div className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-orange-400 border-2 border-white"></div>
+            <div className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-orange-400 border-2 border-white dark:border-slate-800"></div>
           </div>
           <div>
-            <h3 className="font-bold text-2xl text-amber-900">ویرایش تامین‌کننده</h3>
-            <p className="text-sm text-amber-600/80 mt-1 flex items-center gap-1.5">
+            <h3 className="font-bold text-2xl text-amber-900 dark:text-slate-100">ویرایش تامین‌کننده</h3>
+            <p className="text-sm text-amber-600/80 dark:text-slate-400 mt-1 flex items-center gap-1.5">
               <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-pulse"></span>
               اطلاعات تامین‌کننده را ویرایش کنید
             </p>
@@ -112,7 +112,7 @@ export default function SupplierEditModal({
         </div>
       </div>
 
-      <div className="px-6 py-6 bg-gradient-to-br from-white to-slate-50/30">
+      <div className="px-6 py-6 bg-gradient-to-br from-white to-slate-50/30 dark:from-slate-900 dark:to-slate-950">
         {record !== undefined ? (
           <Form form={form} layout="vertical" onFinish={handleSubmit} requiredMark={false}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -120,7 +120,7 @@ export default function SupplierEditModal({
                 <Form.Item
                   key={field.name}
                   label={
-                    <span className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
                       {field.icon && <span className="text-base">{field.icon}</span>}
                       {field.label}
                       {field.required && <span className="text-rose-500 text-xs">*</span>}
@@ -139,7 +139,7 @@ export default function SupplierEditModal({
                       placeholder={field.placeholder}
                       disabled={loading}
                       size="large"
-                      className="rounded-xl border-2 border-slate-200 hover:border-amber-300 focus:border-amber-400 transition-all shadow-sm hover:shadow"
+                      className="rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-amber-300 dark:hover:border-amber-700 focus:border-amber-400 dark:focus:border-amber-600 transition-all shadow-sm hover:shadow dark:bg-slate-800 dark:text-white dark:placeholder-slate-500"
                       style={{ height: "46px", fontSize: "14px" }}
                     />
                   )}
@@ -149,21 +149,19 @@ export default function SupplierEditModal({
 
             {message && (
               <div
-                className={`mt-5 p-4 rounded-xl border-2 flex items-start gap-3 animate-in fade-in slide-in-from-top-3 duration-300 shadow-sm ${
-                  message.includes("موفقیت")
-                    ? "bg-gradient-to-br from-emerald-50 to-emerald-100/50 border-emerald-300 text-emerald-900"
-                    : "bg-gradient-to-br from-rose-50 to-rose-100/50 border-rose-300 text-rose-900"
-                }`}
+                className={`mt-5 p-4 rounded-xl border-2 flex items-start gap-3 animate-in fade-in slide-in-from-top-3 duration-300 shadow-sm ${message.includes("موفقیت")
+                    ? "bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-900/30 dark:to-emerald-900/10 border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-300"
+                    : "bg-gradient-to-br from-rose-50 to-rose-100/50 dark:from-rose-900/30 dark:to-rose-900/10 border-rose-300 dark:border-rose-800 text-rose-900 dark:text-rose-300"
+                  }`}
               >
                 <div
-                  className={`mt-0.5 p-1.5 rounded-lg ${
-                    message.includes("موفقیت") ? "bg-emerald-200/50" : "bg-rose-200/50"
-                  }`}
+                  className={`mt-0.5 p-1.5 rounded-lg ${message.includes("موفقیت") ? "bg-emerald-200/50 dark:bg-emerald-800/50" : "bg-rose-200/50 dark:bg-rose-800/50"
+                    }`}
                 >
                   {message.includes("موفقیت") ? (
-                    <CheckCircleOutlined className="text-lg text-emerald-700" />
+                    <CheckCircleOutlined className="text-lg text-emerald-700 dark:text-emerald-400" />
                   ) : (
-                    <ExclamationCircleOutlined className="text-lg text-rose-700" />
+                    <ExclamationCircleOutlined className="text-lg text-rose-700 dark:text-rose-400" />
                   )}
                 </div>
                 <div className="flex-1">
@@ -173,7 +171,7 @@ export default function SupplierEditModal({
               </div>
             )}
 
-            <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 mt-8 pt-6 border-t-2 border-slate-200">
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 mt-8 pt-6 border-t-2 border-slate-200 dark:border-slate-700">
               <GreenhouseButton
                 text="انصراف"
                 variant="secondary"

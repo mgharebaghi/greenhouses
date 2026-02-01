@@ -198,7 +198,7 @@ export default function PlantingTable({ data, loading, setMainData, setMainLoadi
         loading={loading}
         rowKey="PlantingID"
         scroll={{ x: 300 }}
-        pagination={false}
+        pagination={{ pageSize: 5 }}
       />
 
       <PlantingInsUpModal

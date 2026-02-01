@@ -210,8 +210,8 @@ export default function GrowthDailyInsUpModal(props: GrowthDailyInsUpModalProps)
       PestObserved: pestObservedChecked,
       RecordDate: values.RecordDate
         ? new Date(
-            Date.UTC(dayjs(values.RecordDate).year(), dayjs(values.RecordDate).month(), dayjs(values.RecordDate).date())
-          )
+          Date.UTC(dayjs(values.RecordDate).year(), dayjs(values.RecordDate).month(), dayjs(values.RecordDate).date())
+        )
         : undefined,
     };
 
@@ -268,19 +268,17 @@ export default function GrowthDailyInsUpModal(props: GrowthDailyInsUpModalProps)
     >
       {/* Header */}
       <div
-        className={`relative px-6 py-6 bg-gradient-to-br border-b ${
-          props.isEdititng
-            ? "from-amber-50 via-orange-50/80 to-white border-amber-100"
-            : "from-emerald-50 via-lime-50/80 to-white border-emerald-100"
-        }`}
+        className={`relative px-6 py-6 bg-gradient-to-br border-b ${props.isEdititng
+            ? "from-amber-50 via-orange-50/80 to-white border-amber-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 dark:border-slate-700"
+            : "from-emerald-50 via-lime-50/80 to-white border-emerald-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 dark:border-slate-700"
+          }`}
       >
         <button
           onClick={handleClose}
-          className={`absolute top-5 left-5 h-9 w-9 rounded-xl bg-white border transition-all flex items-center justify-center shadow-sm hover:shadow ${
-            props.isEdititng
-              ? "hover:bg-amber-50 border-amber-200 hover:border-amber-300 text-amber-600 hover:text-amber-700"
-              : "hover:bg-emerald-50 border-emerald-200 hover:border-emerald-300 text-emerald-600 hover:text-emerald-700"
-          }`}
+          className={`absolute top-5 left-5 h-9 w-9 rounded-xl bg-white dark:bg-slate-800 border transition-all flex items-center justify-center shadow-sm hover:shadow ${props.isEdititng
+              ? "hover:bg-amber-50 border-amber-200 hover:border-amber-300 text-amber-600 hover:text-amber-700 dark:border-slate-600 dark:hover:border-amber-700 dark:hover:bg-amber-900/20 dark:text-amber-500"
+              : "hover:bg-emerald-50 border-emerald-200 hover:border-emerald-300 text-emerald-600 hover:text-emerald-700 dark:border-slate-600 dark:hover:border-emerald-700 dark:hover:bg-emerald-900/20 dark:text-emerald-500"
+            }`}
           aria-label="بستن"
         >
           <CloseOutlined className="text-sm" />
@@ -289,33 +287,29 @@ export default function GrowthDailyInsUpModal(props: GrowthDailyInsUpModalProps)
         <div className="flex items-center gap-4">
           <div className="relative">
             <div
-              className={`h-14 w-14 rounded-2xl bg-gradient-to-br shadow-lg flex items-center justify-center text-white ${
-                props.isEdititng
+              className={`h-14 w-14 rounded-2xl bg-gradient-to-br shadow-lg flex items-center justify-center text-white ${props.isEdititng
                   ? "from-amber-500 via-amber-600 to-orange-600"
                   : "from-emerald-500 via-emerald-600 to-emerald-700"
-              }`}
+                }`}
             >
               {props.isEdititng ? <EditOutlined className="text-2xl" /> : <PlusOutlined className="text-2xl" />}
             </div>
             <div
-              className={`absolute -bottom-1 -right-1 h-5 w-5 rounded-full border-2 border-white ${
-                props.isEdititng ? "bg-orange-400" : "bg-lime-400"
-              }`}
+              className={`absolute -bottom-1 -right-1 h-5 w-5 rounded-full border-2 border-white dark:border-slate-800 ${props.isEdititng ? "bg-orange-400" : "bg-lime-400"
+                }`}
             ></div>
           </div>
           <div>
-            <h3 className={`font-bold text-2xl ${props.isEdititng ? "text-amber-900" : "text-emerald-900"}`}>
+            <h3 className={`font-bold text-2xl ${props.isEdititng ? "text-amber-900 dark:text-slate-100" : "text-emerald-900 dark:text-slate-100"}`}>
               {props.isEdititng ? "ویرایش پایش روزانه رشد" : "افزودن پایش روزانه رشد"}
             </h3>
             <p
-              className={`text-sm mt-1 flex items-center gap-1.5 ${
-                props.isEdititng ? "text-amber-600/80" : "text-emerald-600/80"
-              }`}
+              className={`text-sm mt-1 flex items-center gap-1.5 ${props.isEdititng ? "text-amber-600/80 dark:text-slate-400" : "text-emerald-600/80 dark:text-slate-400"
+                }`}
             >
               <span
-                className={`h-1.5 w-1.5 rounded-full animate-pulse ${
-                  props.isEdititng ? "bg-amber-400" : "bg-emerald-400"
-                }`}
+                className={`h-1.5 w-1.5 rounded-full animate-pulse ${props.isEdititng ? "bg-amber-400" : "bg-emerald-400"
+                  }`}
               ></span>
               {props.isEdititng ? "اطلاعات پایش را ویرایش کنید" : "اطلاعات پایش را با دقت وارد کنید"}
             </p>
@@ -324,14 +318,14 @@ export default function GrowthDailyInsUpModal(props: GrowthDailyInsUpModalProps)
       </div>
 
       {/* Body */}
-      <div className="px-6 py-6 bg-gradient-to-br from-white to-slate-50/30 max-h-[70vh] overflow-y-auto">
+      <div className="px-6 py-6 bg-gradient-to-br from-white to-slate-50/30 dark:from-slate-900 dark:to-slate-950 max-h-[70vh] overflow-y-auto">
         <Form form={form} layout="vertical" onFinish={handleSubmit} requiredMark={false}>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {fields.map((field) => (
               <Form.Item
                 key={field.name}
                 label={
-                  <span className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                  <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
                     <span className="text-base">{field.icon}</span>
                     {field.label}
                     {field.required && <span className="text-rose-500 text-xs">*</span>}
@@ -367,9 +361,11 @@ export default function GrowthDailyInsUpModal(props: GrowthDailyInsUpModalProps)
                       height: "46px",
                       fontSize: "14px",
                       borderRadius: "0.75rem",
-                      border: "2px solid #e2e8f0",
+                      border: "2px solid #e2e8f0", // We need to override this in CSS or handle it separately since inline styles override classes. 
+                      // actually let's try to remove inline border and use class
                       padding: "0 1rem",
                     }}
+                    inputClass={`!w-full !h-full bg-transparent outline-none dark:text-white dark:bg-slate-800 rounded-xl border-2 border-slate-200 dark:border-slate-700 ${props.isEdititng ? "hover:border-amber-300 focus:border-amber-400 dark:hover:border-amber-700 dark:focus:border-amber-600" : "hover:border-emerald-300 focus:border-emerald-400 dark:hover:border-emerald-700 dark:focus:border-emerald-600"}`}
                     onChange={() => setSubmitMessage(null)}
                   />
                 ) : field.type === "checkbox" ? (
@@ -385,7 +381,7 @@ export default function GrowthDailyInsUpModal(props: GrowthDailyInsUpModalProps)
                     }}
                     disabled={loading}
                   >
-                    <span className="text-sm text-slate-600">{field.label}</span>
+                    <span className="text-sm text-slate-600 dark:text-slate-400">{field.label}</span>
                   </Checkbox>
                 ) : (
                   <InputNumber
@@ -394,11 +390,10 @@ export default function GrowthDailyInsUpModal(props: GrowthDailyInsUpModalProps)
                     size="large"
                     controls={false}
                     onChange={() => setSubmitMessage(null)}
-                    className={`!w-full rounded-xl border-2 border-slate-200 transition-all shadow-sm hover:shadow ${
-                      props.isEdititng
-                        ? "hover:border-amber-300 focus:border-amber-400"
-                        : "hover:border-emerald-300 focus:border-emerald-400"
-                    }`}
+                    className={`!w-full rounded-xl border-2 border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder-slate-500 transition-all shadow-sm hover:shadow ${props.isEdititng
+                        ? "hover:border-amber-300 focus:border-amber-400 dark:hover:border-amber-700 dark:focus:border-amber-600"
+                        : "hover:border-emerald-300 focus:border-emerald-400 dark:hover:border-emerald-700 dark:focus:border-emerald-600"
+                      }`}
                     style={{ width: "100%", height: "46px", fontSize: "14px" }}
                   />
                 )}
@@ -420,11 +415,10 @@ export default function GrowthDailyInsUpModal(props: GrowthDailyInsUpModalProps)
               placeholder="توضیحات اضافی"
               disabled={loading}
               rows={3}
-              className={`rounded-xl border-2 border-slate-200 transition-all ${
-                props.isEdititng
-                  ? "hover:border-amber-300 focus:border-amber-400"
-                  : "hover:border-emerald-300 focus:border-emerald-400"
-              }`}
+              className={`rounded-xl border-2 border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder-slate-500 transition-all ${props.isEdititng
+                  ? "hover:border-amber-300 focus:border-amber-400 dark:hover:border-amber-700 dark:focus:border-amber-600"
+                  : "hover:border-emerald-300 focus:border-emerald-400 dark:hover:border-emerald-700 dark:focus:border-emerald-600"
+                }`}
               style={{ resize: "none" }}
             />
           </Form.Item>
@@ -432,21 +426,19 @@ export default function GrowthDailyInsUpModal(props: GrowthDailyInsUpModalProps)
           {/* Message Display */}
           {submitMessage && (
             <div
-              className={`mt-5 p-4 rounded-xl border-2 flex items-start gap-3 animate-in fade-in slide-in-from-top-3 duration-300 shadow-sm ${
-                submitMessage.status === "ok"
-                  ? "bg-gradient-to-br from-emerald-50 to-emerald-100/50 border-emerald-300 text-emerald-900"
-                  : "bg-gradient-to-br from-rose-50 to-rose-100/50 border-rose-300 text-rose-900"
-              }`}
+              className={`mt-5 p-4 rounded-xl border-2 flex items-start gap-3 animate-in fade-in slide-in-from-top-3 duration-300 shadow-sm ${submitMessage.status === "ok"
+                  ? "bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-900/30 dark:to-emerald-900/10 border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-300"
+                  : "bg-gradient-to-br from-rose-50 to-rose-100/50 dark:from-rose-900/30 dark:to-rose-900/10 border-rose-300 dark:border-rose-800 text-rose-900 dark:text-rose-300"
+                }`}
             >
               <div
-                className={`mt-0.5 p-1.5 rounded-lg ${
-                  submitMessage.status === "ok" ? "bg-emerald-200/50" : "bg-rose-200/50"
-                }`}
+                className={`mt-0.5 p-1.5 rounded-lg ${submitMessage.status === "ok" ? "bg-emerald-200/50 dark:bg-emerald-800/50" : "bg-rose-200/50 dark:bg-rose-800/50"
+                  }`}
               >
                 {submitMessage.status === "ok" ? (
-                  <CheckCircleOutlined className="text-lg text-emerald-700" />
+                  <CheckCircleOutlined className="text-lg text-emerald-700 dark:text-emerald-400" />
                 ) : (
-                  <ExclamationCircleOutlined className="text-lg text-rose-700" />
+                  <ExclamationCircleOutlined className="text-lg text-rose-700 dark:text-rose-400" />
                 )}
               </div>
               <div className="flex-1">
@@ -457,7 +449,7 @@ export default function GrowthDailyInsUpModal(props: GrowthDailyInsUpModalProps)
           )}
 
           {/* Actions */}
-          <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 mt-8 pt-6 border-t-2 border-slate-200">
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 mt-8 pt-6 border-t-2 border-slate-200 dark:border-slate-700">
             <GreenhouseButton
               text="انصراف"
               variant="secondary"
@@ -472,8 +464,8 @@ export default function GrowthDailyInsUpModal(props: GrowthDailyInsUpModalProps)
                     ? "در حال ویرایش..."
                     : "در حال ثبت..."
                   : props.isEdititng
-                  ? "ویرایش پایش روزانه"
-                  : "افزودن پایش روزانه"
+                    ? "ویرایش پایش روزانه"
+                    : "افزودن پایش روزانه"
               }
               variant="primary"
               type="submit"

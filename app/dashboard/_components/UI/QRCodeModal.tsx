@@ -177,7 +177,7 @@ export default function QRCodeModal({ visible, url, onClose, title, serial }: QR
       title={
         <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "16px" }}>
           <QrcodeOutlined style={{ fontSize: "20px", color: "#1890ff" }} />
-          <span>{title || "کد QR"}</span>
+          <span>{title  || "کد QR"}</span>
         </div>
       }
       onCancel={onClose}

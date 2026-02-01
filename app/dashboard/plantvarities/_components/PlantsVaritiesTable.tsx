@@ -132,6 +132,7 @@ export default function PlantVaritiesTable({
           const csvData = await plantVarietiesCSVData(data as any);
           const options = mkConfig({ useKeysAsHeaders: false, columnHeaders: headers, filename: "plant-varieties" });
           const csv = generateCsv(options)(csvData);
+
           download(options)(csv);
         }}
         data={data}
@@ -142,7 +143,7 @@ export default function PlantVaritiesTable({
         dataSource={data}
         rowKey="VarietyID"
         loading={loading}
-        pagination={false}
+        pagination={{ pageSize: 5 }}
         scroll={{ x: 1000 }}
       />
 

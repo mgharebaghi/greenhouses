@@ -90,7 +90,7 @@ export default function SuppliersTable({
         data={data}
       />
 
-      <Table columns={columns} dataSource={data} rowKey="ID" pagination={false} loading={loading} />
+      <Table columns={columns} dataSource={data} rowKey="ID" pagination={{ pageSize: 5 }} loading={loading} />
 
       <DeleteModal
         open={deleteModal?.open || false}

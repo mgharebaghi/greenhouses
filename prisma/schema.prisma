@@ -1,12 +1,12 @@
 generator client {
-  provider = "prisma-client-js"
-  output   = "../app/generated/prisma"
+  provider      = "prisma-client-js"
+  output        = "../app/generated/prisma"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
 datasource db {
-  provider          = "sqlserver"
-  url               = env("DATABASE_URL")
-  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
 }
 
 model Greenhouses {
@@ -83,7 +83,6 @@ model Users {
   Sessions     Session[]
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model Session {
   ID         String    @id(map: "PK_Session") @default(cuid()) @db.NVarChar(100)
   PublicID   String    @unique(map: "UQ_Session_PublicID") @db.NVarChar(100)
@@ -116,6 +115,7 @@ model Owner_Observer {
   ClimateDaily        ClimateDaily[]
   Greenhouses         Greenhouses[]
   PlantingGrowthDaily PlantingGrowthDaily[]
+  Warehouses          Warehouses[]
 }
 
 model PlantingGrowthDaily {
@@ -168,6 +168,7 @@ model PlantVarities {
   PlantGrowthStages   PlantGrowthStages[]
   Plantings           Plantings[]
   Plants              Plants?             @relation(fields: [PlantID], references: [PlantID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PlantVarities_Plants")
+  SeedBatch           SeedBatch[]
 }
 
 model ClimateDaily {
@@ -245,13 +246,92 @@ model PlantingSamples {
 }
 
 model Suppliers {
-  ID             Int         @id(map: "PK_Suppliers") @default(autoincrement())
-  Legal          Boolean?
-  CompanyName    String?     @db.NVarChar(150)
-  CompanyAddress String?     @db.NVarChar(150)
-  FirstName      String?     @db.NVarChar(150)
-  LastName       String?     @db.NVarChar(150)
-  ContactEmail   String?     @db.NVarChar(150)
-  ContactTel     String?     @db.NVarChar(50)
-  Plantings      Plantings[]
+  ID              Int         @id(map: "PK_Suppliers") @default(autoincrement())
+  Legal           Boolean?
+  CompanyName     String?     @db.NVarChar(150)
+  BrandName       String?     @db.NVarChar(150)
+  SupplierCountry String?     @db.NVarChar(150)
+  SupplierCity    String?     @db.NVarChar(150)
+  FirstName       String?     @db.NVarChar(150)
+  LastName        String?     @db.NVarChar(150)
+  ContactEmail    String?     @db.NVarChar(150)
+  ContactTel      String?     @db.NVarChar(50)
+  CompanyAddress  String?     @db.NVarChar(Max)
+  LicenseNumber   String?     @db.NVarChar(50)
+  Plantings       Plantings[]
+  SeedBatch       SeedBatch[]
+}
+
+model NurseryRoom {
+  NurseryRoomID        Int       @id(map: "PK_NurseryRoom") @default(autoincrement())
+  NurseryRoomCode      String?   @db.NVarChar(50)
+  NurseryRoomName      String?   @db.NVarChar(100)
+  TemperatureMin       Decimal?  @db.Decimal(5, 2)
+  TemperatureMax       Decimal?  @db.Decimal(5, 2)
+  HumidityMin          Decimal?  @db.Decimal(5, 2)
+  HumidityMax          Decimal?  @db.Decimal(5, 2)
+  LightType            String?   @db.NVarChar(50)
+  LightHoursPerDay     Decimal?  @db.Decimal(4, 1)
+  CO2Range             String?   @db.NVarChar(50)
+  StrelizationMethod   String?   @db.NVarChar(200)
+  NurseryRoomCreatedAt DateTime? @db.Date
+}
+
+model SeedBatch {
+  SeedBatchID     Int            @id(map: "PK_SeedBatch") @default(autoincrement())
+  ProducerID      Int?
+  BatchCode       Int?
+  CropVariety     Int?
+  GerminationRate Int?
+  PurityPercent   Int?
+  ProductionDate  DateTime?      @db.Date
+  ExpirationDate  DateTime?      @db.Date
+  QualityGrade    String?        @db.NVarChar(50)
+  BatchNotes      String?        @db.NChar(10)
+  PlantVarities   PlantVarities? @relation(fields: [CropVariety], references: [VarietyID], onDelete: NoAction, onUpdate: NoAction, map: "FK_SeedBatch_PlantVarities")
+  Suppliers       Suppliers?     @relation(fields: [ProducerID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_SeedBatch_Suppliers")
+  SeedPackage     SeedPackage[]
+}
+
+model SeedPackage {
+  SeedPackageID          Int                      @id(map: "PK_SeedPackage") @default(autoincrement())
+  SeedBatchID            Int?
+  SerialNumber           String?                  @db.NVarChar(50)
+  PackageType            String?                  @db.NVarChar(50)
+  SeedCount              Int?
+  WeightGram             Decimal?                 @db.Decimal(8, 2)
+  PackagingDate          DateTime?                @db.Date
+  PackagingLine          String?                  @db.NVarChar(50)
+  Status                 String?                  @db.NVarChar(50)
+  QRCode                 Bytes?
+  IsCertified            Boolean?
+  SeedBatch              SeedBatch?               @relation(fields: [SeedBatchID], references: [SeedBatchID], onDelete: NoAction, onUpdate: NoAction, map: "FK_SeedPackage_SeedBatch")
+  WarehousesTransactions WarehousesTransactions[]
+}
+
+model Warehouses {
+  WarehouseID            Int                      @id(map: "PK_Warehouses") @default(autoincrement())
+  WarehouseCode          String?                  @db.NVarChar(50)
+  WarehouseName          String?                  @db.NVarChar(150)
+  WarehouseLocation      String?                  @db.NVarChar(200)
+  TemperatureRange       String?                  @db.NVarChar(50)
+  HumidityRange          String?                  @db.NVarChar(50)
+  Capacity               Int?
+  WarehouseManagerName   Int?
+  WarehouseCreatedAt     DateTime?                @db.Date
+  Owner_Observer         Owner_Observer?          @relation(fields: [WarehouseManagerName], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Warehouses_Owner_Observer")
+  WarehousesTransactions WarehousesTransactions[]
+}
+
+model WarehousesTransactions {
+  TransactionID   Int          @id(map: "PK_WarehousesTransactions") @default(autoincrement())
+  SeedPackageID   Int?
+  WarehouseID     Int?
+  TransactionType Boolean?
+  PackageQuantity Int?
+  TransactionDate DateTime?    @db.DateTime
+  DestinationType String?      @db.NVarChar(50)
+  RecordedBy      String?      @db.NVarChar(150)
+  SeedPackage     SeedPackage? @relation(fields: [SeedPackageID], references: [SeedPackageID], onDelete: NoAction, onUpdate: NoAction, map: "FK_WarehousesTransactions_SeedPackage")
+  Warehouses      Warehouses?  @relation(fields: [WarehouseID], references: [WarehouseID], onDelete: NoAction, onUpdate: NoAction, map: "FK_WarehousesTransactions_Warehouses")
 }
