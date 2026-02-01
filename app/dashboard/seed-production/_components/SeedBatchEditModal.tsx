@@ -223,7 +223,7 @@ export default function SeedBatchEditModal(props: EditModalProps) {
                                         size="large"
                                         className="rounded-xl dark:bg-slate-800 dark:border-slate-700 dark:text-white dark:hover:border-amber-700 dark:focus:border-amber-600"
                                         disabled={loading}
-                                        classNames={{ popup: "dark:bg-slate-800" }}
+                                        popupClassName="dark:bg-slate-800"
                                     />
                                 ) : field.type === "date" ? (
                                     <DatePicker
