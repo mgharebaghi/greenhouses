@@ -135,7 +135,7 @@ export default function NurseryPlantingTable({
     return (
         <div className="w-full">
             <InsertionRow
-                text="کاشت نشاء جدید"
+                text="نشاء "
                 insertOnclick={() => setInsertModal(true)}
                 data={data}
                 csvOnclick={() => { }}

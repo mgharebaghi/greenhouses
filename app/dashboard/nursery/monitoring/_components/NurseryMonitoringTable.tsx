@@ -128,7 +128,7 @@ export default function NurseryMonitoringTable({
     return (
         <div className="w-full">
             <InsertionRow
-                text="ثبت پایش جدید"
+                text=" پایش"
                 insertOnclick={() => setInsertModal(true)}
                 data={data}
                 csvOnclick={() => { }}
