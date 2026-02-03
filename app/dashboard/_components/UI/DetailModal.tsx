@@ -29,7 +29,7 @@ export const InfoCard = ({ title, icon, color, items }: InfoCardProps) => (
       },
       body: { padding: "16px" },
     }}
-    bordered={false}
+    variant="borderless"
     title={
       <div className="flex items-center gap-2">
         <span style={{ color }} className="dark:brightness-125 transition-all">{icon}</span>

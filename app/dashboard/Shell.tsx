@@ -30,6 +30,10 @@ const PAGE_TITLES: Record<string, string> = {
   "/dashboard/seed-warehousing": "انبارداری بذر",
   "/dashboard/warehouses": "مدیریت انبارها",
   "/dashboard/nursery-rooms": "مدیریت اتاق های نشاء",
+  "/dashboard/nursery/planting": "کاشت نشاء",
+  "/dashboard/nursery/monitoring": "پایش نشاء",
+  "/dashboard/grafting/rootstock": "اطلاعات گیاه پایه",
+  "/dashboard/grafting/grafted-seedling": "نشاء پیوندی",
 };
 
 export default function DashboardShell({ children }: { children: React.ReactNode }) {

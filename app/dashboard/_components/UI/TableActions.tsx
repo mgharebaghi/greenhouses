@@ -1,4 +1,4 @@
-import { EditOutlined, DeleteOutlined, QrcodeOutlined, PrinterOutlined } from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined, QrcodeOutlined, PrinterOutlined, EyeOutlined } from "@ant-design/icons";
 
 interface TableActionsProps {
   onEdit: () => void;
@@ -9,6 +9,8 @@ interface TableActionsProps {
   disabledDelete?: boolean;
   qrcode?: () => void;
   onPrint?: () => void;
+  onView?: () => void;
+  viewTitle?: string;
 }
 
 export default function TableActions({
@@ -20,9 +22,26 @@ export default function TableActions({
   disabledDelete = false,
   qrcode,
   onPrint,
+  onView,
+  viewTitle,
 }: TableActionsProps) {
   return (
     <div className="flex gap-3 items-center">
+      {onView && (
+        <button
+          onClick={onView}
+          title={viewTitle || "مشاهده جزئیات"}
+          aria-label={viewTitle || "مشاهده جزئیات"}
+          className={`h-8 w-8 flex items-center justify-center rounded-full border border-sky-100 dark:border-sky-800 bg-sky-50/60 dark:bg-sky-900/20 shadow-sm transition-all
+            hover:bg-sky-100 dark:hover:bg-sky-900/40 hover:border-sky-300 dark:hover:border-sky-700 hover:shadow-md
+            focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-200
+            disabled:opacity-50 disabled:cursor-not-allowed
+            group`}
+          type="button"
+        >
+          <EyeOutlined className="text-sky-500 dark:text-sky-400 text-base group-hover:scale-110 transition-transform" />
+        </button>
+      )}
       {qrcode && (
         <button
           onClick={qrcode}

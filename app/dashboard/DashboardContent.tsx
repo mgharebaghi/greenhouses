@@ -7,6 +7,7 @@ export default function DashboardContent() {
   const [currentPhraseIndex, setCurrentPhraseIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const [particles, setParticles] = useState<any[]>([]);
 
   const phrases = [
     "مدیریت پیشرفته کشاورزی با فناوری‌های نوین",
@@ -53,6 +54,17 @@ export default function DashboardContent() {
     return () => clearTimeout(timeout);
   }, [typedText, currentPhraseIndex, isDeleting, isPaused]);
 
+  useEffect(() => {
+    setParticles([...Array(20)].map(() => ({
+      left: `${Math.random() * 100}%`,
+      bottom: '-20px',
+      width: `${Math.random() * 6 + 2}px`,
+      height: `${Math.random() * 6 + 6}px`,
+      animationDuration: `${Math.random() * 10 + 10}s`,
+      animationDelay: `${Math.random() * 5}s`,
+    })));
+  }, []);
+
   return (
     <div className="h-full w-full overflow-hidden relative">
       {/* Animated Mesh Gradient Background */}
@@ -67,18 +79,11 @@ export default function DashboardContent() {
 
       {/* Particle Effect - Floating Spores */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-        {[...Array(20)].map((_, i) => (
+        {particles.map((style, i) => (
           <div
             key={i}
             className="absolute rounded-full bg-emerald-400 dark:bg-emerald-500 opacity-20 dark:opacity-40 animate-rise"
-            style={{
-              left: `${Math.random() * 100}%`,
-              bottom: '-20px',
-              width: `${Math.random() * 6 + 2}px`,
-              height: `${Math.random() * 6 + 6}px`,
-              animationDuration: `${Math.random() * 10 + 10}s`,
-              animationDelay: `${Math.random() * 5}s`,
-            }}
+            style={style}
           ></div>
         ))}
       </div>

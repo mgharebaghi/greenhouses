@@ -79,6 +79,22 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
       ],
     },
     {
+      icon: <AppstoreOutlined />,
+      title: "نشاء کاری",
+      submenu: [
+        { title: "کاشت نشاء", page: "/dashboard/nursery/planting", icon: <NodeIndexOutlined /> },
+        { title: "پایش نشاء", page: "/dashboard/nursery/monitoring", icon: <LineChartOutlined /> },
+      ],
+    },
+    {
+      icon: <GatewayOutlined />,
+      title: "عملیات پیوند",
+      submenu: [
+        { title: "اطلاعات گیاه پایه", page: "/dashboard/grafting/rootstock", icon: <FileTextOutlined /> },
+        { title: "نشاء پیوندی", page: "/dashboard/grafting/grafted-seedling", icon: <ExperimentOutlined /> },
+      ],
+    },
+    {
       icon: <BarChartOutlined />,
       title: "پایش و رشد",
       submenu: [
