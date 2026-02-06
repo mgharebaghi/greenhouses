@@ -1,6 +1,6 @@
 "use client";
 
-import { Modal, Form, Select, InputNumber, Input, Button, ConfigProvider, notification } from "antd";
+import { Modal, Form, Select, InputNumber, Input, Button, ConfigProvider, notification, AutoComplete } from "antd";
 import { ExperimentOutlined, EditOutlined } from "@ant-design/icons";
 import { useState, useEffect } from "react";
 import { updateGraftedSeedling } from "@/app/lib/services/grafting/grafted-seedling/update";
@@ -107,7 +107,7 @@ export default function GraftedSeedlingEditModal({
 
                         <Form.Item
                             name="GraftingID"
-                            label={<span className={labelStyleClass}>عملیات پیوند مرجع</span>}
+                            label={<span className={labelStyleClass}>انتخاب پیوند</span>}
                             rules={[{ required: true }]}
                             className="md:col-span-2"
                         >
@@ -124,11 +124,11 @@ export default function GraftedSeedlingEditModal({
                         </Form.Item>
 
                         <Form.Item name="QualityGrade" label={<span className={labelStyleClass}>درجه کیفی</span>}>
-                            <Select size="large" placeholder="انتخاب کنید">
+                            <AutoComplete size="large" placeholder="انتخاب کنید">
                                 <Select.Option value="A">درجه A (عالی)</Select.Option>
                                 <Select.Option value="B">درجه B (خوب)</Select.Option>
                                 <Select.Option value="C">درجه C (متوسط)</Select.Option>
-                            </Select>
+                            </AutoComplete>
                         </Form.Item>
 
                         <Form.Item name="GraftedNumber" label={<span className={labelStyleClass}>تعداد نشاء</span>}>

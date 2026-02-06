@@ -91,7 +91,7 @@ export default function GraftedSeedlingTable({
             render: (id: number) => <span className="font-semibold text-slate-700 dark:text-slate-300">#{id}</span>
         },
         {
-            title: "والد (بذر)",
+            title: "نشاء (بذر)",
             key: "ParentInfo",
             width: 220,
             render: (_: any, record: any) => {
@@ -139,7 +139,7 @@ export default function GraftedSeedlingTable({
             }
         },
         {
-            title: "پایه (Rootstock)",
+            title: "گیاه پایه",
             key: "RootstockName",
             render: (_: any, record: any) => {
                 const variety = record.GraftingOperation?.RootStockPlant?.PlantVarities?.VarietyName;
@@ -153,11 +153,6 @@ export default function GraftedSeedlingTable({
                 const method = record.GraftingOperation?.GraftingMethod;
                 return methodMap[method] || method || "—";
             }
-        },
-        {
-            title: "اپراتور",
-            key: "OperatorName",
-            render: (_: any, record: any) => record.GraftingOperation?.OperatorName || "—"
         },
         {
             title: "تاریخ آماده‌سازی",

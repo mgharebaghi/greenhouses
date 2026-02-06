@@ -82,11 +82,10 @@ export default function GraftedSeedlingPrintModal({ open, setOpen, data }: Graft
 
                         {/* Content Grid */}
                         <div className="grid grid-cols-2 gap-x-8 gap-y-4 mb-6">
+                            <PrintRow label="گیاه پایه" value={data.GraftingOperation?.RootStockPlant?.PlantVarities?.VarietyName} />
+                            <PrintRow label="نشاء (بذر)" value={data.GraftingOperation?.NurserySeed?.SeedPackage?.SeedBatch?.PlantVarities?.VarietyName} />
                             <PrintRow label="شناسه پیوند" value={`#${data.GraftedPlantID}`} />
-                            <PrintRow label="والد (بذر)" value={data.GraftingOperation?.NurserySeed?.SeedPackage?.SeedBatch?.PlantVarities?.VarietyName} />
-                            <PrintRow label="پایه (Rootstock)" value={data.GraftingOperation?.RootStockPlant?.PlantVarities?.VarietyName} />
                             <PrintRow label="روش پیوند" value={methodMap[data.GraftingOperation?.GraftingMethod] || data.GraftingOperation?.GraftingMethod} />
-                            <PrintRow label="اپراتور" value={data.GraftingOperation?.OperatorName} />
                             <PrintRow
                                 label="تاریخ آماده‌سازی"
                                 value={data.ReadyForSaleDate ? dayjs(data.ReadyForSaleDate).calendar("jalali").format("YYYY/MM/DD") : "-"}
