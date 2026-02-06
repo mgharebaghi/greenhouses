@@ -12,6 +12,8 @@ import GraftedSeedlingDetailsModal from "./GraftedSeedlingDetailsModal";
 import GraftedSeedlingInsertModal from "./GraftedSeedlingInsertModal";
 import GraftedSeedlingEditModal from "./GraftedSeedlingEditModal";
 import { deleteGraftedSeedling } from "@/app/lib/services/grafting/grafted-seedling/delete";
+import GraftedSeedlingPrintModal from "./GraftedSeedlingPrintModal";
+import QRCodeModal from "@/app/dashboard/_components/UI/QRCodeModal";
 // Fixed imports
 import dayjs from "dayjs";
 import jalaliday from "jalaliday";
@@ -38,6 +40,8 @@ export default function GraftedSeedlingTable({
     const [editModal, setEditModal] = useState<{ open: boolean, data: any | null }>({ open: false, data: null });
     const [detailsModal, setDetailsModal] = useState<{ open: boolean, data: any | null }>({ open: false, data: null });
     const [deleteModal, setDeleteModal] = useState<{ open: boolean, id: number | null, name: string }>({ open: false, id: null, name: "" });
+    const [printModal, setPrintModal] = useState<{ open: boolean, data: any | null }>({ open: false, data: null });
+    const [qrModal, setQrModal] = useState<{ open: boolean, url: string, title: string }>({ open: false, url: "", title: "" });
 
     const handleDelete = async (id: number) => {
         setLoading(true);
@@ -97,12 +101,14 @@ export default function GraftedSeedlingTable({
                 const variety = seedPackage?.SeedBatch?.PlantVarities?.VarietyName;
                 const serial = seedPackage?.SerialNumber;
 
+                const qrUrl = `https://mygreenhouses.ir/public/scan/seed-package/${record.GraftedPlantID}`;
+
                 return (
                     <div className="flex items-center gap-3">
                         {src ? (
                             <div
                                 className="relative group cursor-pointer"
-                                onClick={() => setDetailsModal({ open: true, data: record })}
+                                onClick={() => setQrModal({ open: true, url: qrUrl, title: "شناسنامه دیجیتال نشاء" })}
                             >
                                 <Image
                                     src={src}
@@ -125,7 +131,7 @@ export default function GraftedSeedlingTable({
                                 {variety || "نامشخص"}
                             </span>
                             <span className="text-xs text-slate-500">
-                                سریال: {serial || "---"}
+                                سریال والد: {serial || "---"}
                             </span>
                         </div>
                     </div>
@@ -160,6 +166,13 @@ export default function GraftedSeedlingTable({
             render: (date: string) => date ? dayjs(date).calendar("jalali").format("YYYY/MM/DD") : "—"
         },
         {
+            title: "تعداد",
+            dataIndex: "GraftedNumber",
+            key: "GraftedNumber",
+            width: 80,
+            render: (value: number) => <span className="text-slate-700 dark:text-slate-300 font-medium">{value}</span>
+        },
+        {
             title: "کیفیت",
             dataIndex: "QualityGrade",
             key: "QualityGrade",
@@ -190,11 +203,12 @@ export default function GraftedSeedlingTable({
         {
             title: "عملیات",
             key: "actions",
-            width: 140,
+            width: 160,
             render: (_: any, record: any) => (
                 <TableActions
                     onEdit={() => setEditModal({ open: true, data: record })}
                     onDelete={() => setDeleteModal({ open: true, id: record.GraftedPlantID, name: `رکورد #${record.GraftedPlantID}` })}
+                    onPrint={() => setPrintModal({ open: true, data: record })}
                 />
             )
         }
@@ -236,6 +250,20 @@ export default function GraftedSeedlingTable({
                 data={editModal.data}
                 refreshData={refreshData}
                 options={options}
+            />
+
+            <GraftedSeedlingPrintModal
+                open={printModal.open}
+                setOpen={(open) => setPrintModal(prev => ({ ...prev, open }))}
+                data={printModal.data}
+            />
+
+            <QRCodeModal
+                visible={qrModal.open}
+                onClose={() => setQrModal({ ...qrModal, open: false })}
+                url={qrModal.url}
+                title={qrModal.title}
+                serial={data.find(d => `https://mygreenhouses.ir/public/scan/grafted-seedling/${d.GraftedPlantID}` === qrModal.url)?.GraftedPlantID.toString()}
             />
 
             <DeleteModal

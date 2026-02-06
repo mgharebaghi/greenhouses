@@ -73,7 +73,7 @@ export default function SeedPackageTable({ data, loading, setLoading, setData }:
         window.location.reload(); // Simple reload to refresh data
     };
 
-    const qrLink = qrModal.id ? `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/public/scan/seed-package/${qrModal.id}` : "#";
+    const qrLink = qrModal.id ? `https://mygreenhouses.ir/public/scan/seed-package/${qrModal.id}` : "#";
 
     return (
         <div className="w-full">

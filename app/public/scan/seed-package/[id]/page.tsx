@@ -42,7 +42,7 @@ export default async function PublicSeedPackagePage({ params }: { params: Promis
                 </div>
 
                 <div className="bg-slate-50 p-4 text-center text-xs text-slate-400">
-                    سامانه مدیریت گلخانه هوشمند
+                    فکور پیوند آریا
                 </div>
             </div>
         </div>

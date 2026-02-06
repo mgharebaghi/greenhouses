@@ -155,7 +155,7 @@ export default function GraftedSeedlingEditModal({
                         </Form.Item>
 
                         <Form.Item name="SurvivalRate" label={<span className={labelStyleClass}>نرخ بقا</span>}>
-                            <InputNumber
+                            <InputNumber<number>
                                 className={inputStyleClass}
                                 style={{ width: "100%" }}
                                 size="large"

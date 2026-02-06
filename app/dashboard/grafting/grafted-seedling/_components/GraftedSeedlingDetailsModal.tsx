@@ -105,23 +105,7 @@ export default function GraftedSeedlingDetailsModal({
                     ]}
                 />
 
-                {qrImageSrc && (
-                    <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
-                        <div className="bg-slate-50 dark:bg-slate-900/50 px-4 py-3 border-b border-slate-200 dark:border-slate-700 flex items-center gap-2">
-                            <QrcodeOutlined className="text-slate-500" />
-                            <span className="font-semibold text-slate-700 dark:text-slate-300">QR Code بسته بذر</span>
-                        </div>
-                        <div className="p-4 flex justify-center bg-white">
-                            <Image
-                                src={qrImageSrc}
-                                alt="Seed Package QR Code"
-                                width={200}
-                                height={200}
-                                className="object-contain border-4 border-white shadow-md rounded-lg"
-                            />
-                        </div>
-                    </div>
-                )}
+
 
                 {data.GraftedPlantNotes && (
                     <InfoCard
