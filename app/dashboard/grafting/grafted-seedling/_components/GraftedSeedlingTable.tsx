@@ -130,9 +130,6 @@ export default function GraftedSeedlingTable({
                             <span className="font-medium text-slate-800 dark:text-slate-200 text-sm">
                                 {variety || "نامشخص"}
                             </span>
-                            <span className="text-xs text-slate-500">
-                                سریال والد: {serial || "---"}
-                            </span>
                         </div>
                     </div>
                 );
