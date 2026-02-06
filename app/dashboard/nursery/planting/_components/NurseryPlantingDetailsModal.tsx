@@ -7,7 +7,8 @@ import {
     ExperimentOutlined,
     QrcodeOutlined,
     HeartOutlined,
-    InfoCircleOutlined
+    InfoCircleOutlined,
+    AppstoreOutlined
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import jalaliday from "jalaliday";
@@ -119,6 +120,28 @@ export default function NurseryPlantingDetailsModal({
                     { label: "کد اتاق", value: data.NurseryRoom?.NurseryRoomCode },
                     { label: "نوردهی", value: data.NurseryRoom?.LightType },
                     { label: "دما/رطوبت", value: `${data.NurseryRoom?.TemperatureMin || 0}° - ${data.NurseryRoom?.HumidityMin || 0}%` },
+                    ...(data.LocationInNursaryRoom && data.LocationInNursaryRoom.length > 0 ? [
+                        {
+                            label: "موقعیت‌ها (سینی)",
+                            value: (
+                                <div className="flex flex-wrap gap-2 mt-1">
+                                    {data.LocationInNursaryRoom.map((loc: any, index: number) => (
+                                        <div key={index} className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-md px-3 py-1.5 text-xs flex items-center gap-2 shadow-sm">
+                                            <AppstoreOutlined className="text-emerald-500" />
+                                            <span className="font-bold text-emerald-700 dark:text-emerald-400">سینی {loc.TrayNumber}</span>
+                                            {loc.CellNumber && (
+                                                <>
+                                                    <span className="w-[1px] h-3 bg-emerald-300 dark:bg-emerald-700"></span>
+                                                    <span className="text-emerald-600 dark:text-emerald-500">سلول {loc.CellNumber}</span>
+                                                </>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            ),
+                            span: true
+                        }
+                    ] : [])
                 ]}
             />
 

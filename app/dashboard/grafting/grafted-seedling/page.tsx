@@ -5,6 +5,12 @@ export const metadata: Metadata = {
     title: "نشاء پیوندی",
 };
 
-export default function Page() {
-    return <ClientPage />;
+import { getAllGraftedSeedlings, getGraftingOperationOptions } from "@/app/lib/services/grafting/grafted-seedling/read";
+
+export default async function Page() {
+    const [initialData, options] = await Promise.all([
+        getAllGraftedSeedlings(),
+        getGraftingOperationOptions()
+    ]);
+    return <ClientPage initialData={initialData} options={options} />;
 }

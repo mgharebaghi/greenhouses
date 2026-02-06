@@ -343,6 +343,7 @@ model WarehousesTransactions {
 model GraftedPlant {
   GraftedPlantID    Int                @id(map: "PK_GraftedPlant") @default(autoincrement())
   GraftingID        Int?
+  GraftedNumber     Int?
   ReadyForSaleDate  DateTime?          @db.Date
   QualityGrade      String?            @db.NVarChar(50)
   SurvivalRate      Decimal?           @db.Decimal(5, 2)
@@ -355,7 +356,8 @@ model GraftingOperation {
   NurserySeedID      Int?
   RootstockID        Int?
   GraftingMethod     String?         @db.NVarChar(50)
-  GraftingDate       DateTime?       @db.Date
+  GraftedNumber      Int?
+  SucceedGrafted     Int?
   OperatorName       String?         @db.NVarChar(50)
   SuccessRate        Decimal?        @db.Decimal(5, 2)
   InitialResult      String?         @db.NVarChar(50)

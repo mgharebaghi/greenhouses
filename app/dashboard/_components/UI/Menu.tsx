@@ -91,6 +91,7 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
       title: "عملیات پیوند",
       submenu: [
         { title: "اطلاعات گیاه پایه", page: "/dashboard/grafting/rootstock", icon: <FileTextOutlined /> },
+        { title: "پیوند زنی", page: "/dashboard/grafting/operation", icon: <ExperimentOutlined /> },
         { title: "نشاء پیوندی", page: "/dashboard/grafting/grafted-seedling", icon: <ExperimentOutlined /> },
       ],
     },

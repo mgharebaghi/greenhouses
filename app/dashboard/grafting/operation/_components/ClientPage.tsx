@@ -1,12 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import GraftedSeedlingTable from "./GraftedSeedlingTable";
-import { getAllGraftedSeedlings } from "@/app/lib/services/grafting/grafted-seedling/read";
+import GraftingOperationTable from "./GraftingOperationTable";
+import { getAllGraftingOperations } from "@/app/lib/services/grafting/operation/read";
 
 interface ClientPageProps {
     initialData: any[];
-    options: { label: string, value: number }[];
+    options: {
+        seeds: { label: string, value: number }[];
+        rootstocks: { label: string, value: number }[];
+    };
 }
 
 export default function ClientPage({ initialData, options }: ClientPageProps) {
@@ -14,15 +17,15 @@ export default function ClientPage({ initialData, options }: ClientPageProps) {
     const [loading, setLoading] = useState(false);
 
     const refreshData = async () => {
-        // setLoading(true); // Silent refresh
-        const newData = await getAllGraftedSeedlings();
+        // setLoading(true); // Optional: silent refresh preferred for better UX
+        const newData = await getAllGraftingOperations();
         setData(newData);
         setLoading(false);
     };
 
     return (
         <div className="w-full">
-            <GraftedSeedlingTable
+            <GraftingOperationTable
                 data={data}
                 loading={loading}
                 setLoading={setLoading}

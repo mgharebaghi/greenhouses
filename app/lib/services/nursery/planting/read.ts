@@ -69,6 +69,7 @@ export async function getAllNurserySeeds() {
                 },
                 LocationInNursaryRoom: {
                     select: {
+                        ID: true,
                         TrayNumber: true,
                         CellNumber: true
                     }
