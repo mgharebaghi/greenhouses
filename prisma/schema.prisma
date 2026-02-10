@@ -9,416 +9,193 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Greenhouses {
-  GreenhouseID     Int             @id(map: "PK_Greenhouses") @default(autoincrement())
-  OwnerID          Int?
-  GreenhouseName   String?         @db.NVarChar(150)
-  GreenhouseType   String?         @db.NVarChar(150)
-  AreaSqM          Decimal?        @db.Decimal(10, 2)
-  ConstructionDate DateTime?       @db.Date
-  CreatedAt        DateTime?
-  Address          String?         @db.NVarChar(250)
-  IsActive         Boolean?
-  Notes            String?         @db.NVarChar(500)
-  Owner_Observer   Owner_Observer? @relation(fields: [OwnerID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Greenhouses_Owner_Observer")
-  Zones            Zones[]
-}
-
-model PlantGrowthStages {
-  StageID             Int                   @id(map: "PK_PlantGrowthStages") @default(autoincrement())
-  VarietyID           Int?
-  StageOrder          Int?
-  StageName           String?               @db.NVarChar(100)
-  EntryCriteria       String?               @db.NVarChar(100)
-  StartDay            Int?
-  ExitCriteria        String?               @db.NVarChar(100)
-  EndDay              Int?
-  Description         String?               @db.NVarChar(500)
-  PlantVarieties      PlantVarities?        @relation(fields: [VarietyID], references: [VarietyID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Stages_Varieties")
-  PlantingGrowthDaily PlantingGrowthDaily[]
-}
-
-model Plantings {
-  PlantingID          BigInt            @id(map: "PK_Plantings") @default(autoincrement())
-  GreenhouseID        Int?
-  ZoneID              Int?
-  VarietyID           Int?
-  PlantDate           DateTime?         @db.Date
-  SupplierID          Int?
-  NumPlants           Int?
-  PlantsPerM2         Decimal?          @db.Decimal(9, 3)
-  ExpectedHarvestDate DateTime?         @db.Date
-  ActualHarvestDate   DateTime?         @db.Date
-  SeedingMethod       String?           @db.NVarChar(100)
-  TransplantDate      DateTime?         @db.Date
-  PlantCountMeasured  Int?
-  Notes               String?           @db.NVarChar(500)
-  Suppliers           Suppliers?        @relation(fields: [SupplierID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Plantings_Suppliers")
-  PlantVarieties      PlantVarities?    @relation(fields: [VarietyID], references: [VarietyID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Plantings_Varieties")
-  Zones               Zones?            @relation(fields: [ZoneID], references: [ZoneID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Plantings_Zones")
-  PlantingSamples     PlantingSamples[]
-}
-
 model sysdiagrams {
   name         String @db.NVarChar(128)
   principal_id Int
-  diagram_id   Int    @id(map: "PK__sysdiagr__C2B05B616C7FF742") @default(autoincrement())
+  diagram_id   Int    @id(map: "PK__sysdiagr__C2B05B6133002054") @default(autoincrement())
   version      Int?
   definition   Bytes?
 
   @@unique([principal_id, name], map: "UK_principal_name")
 }
 
-model Users {
-  UserID       Int       @id(map: "PK_Users") @default(autoincrement())
-  Username     String    @unique @db.NVarChar(100)
-  PasswordHash String    @db.NVarChar(256)
-  FullName     String?   @db.NVarChar(150)
-  Email        String?   @unique @db.NVarChar(200)
-  Phone        String?   @db.NVarChar(50)
-  RoleID       Int?
-  IsActive     Boolean?
-  CreatedAt    DateTime?
-  LastLoginAt  DateTime?
-  Sessions     Session[]
+model Tbl_Greenhouses {
+  ID                   Int                    @id(map: "PK_Tbl_Greenhouses") @default(autoincrement())
+  OwnerID              Int?
+  GreenhouseName       String?                @db.NVarChar(150)
+  GreenhouseType       String?                @db.NVarChar(150)
+  AreaSqM              Decimal?               @db.Decimal(10, 2)
+  ConstructionDate     DateTime?              @db.Date
+  GreenhouseAddress    String?                @db.NVarChar(250)
+  IsActive             Boolean?
+  Notes                String?                @db.NVarChar(500)
+  Tbl_People           Tbl_People?            @relation(fields: [OwnerID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_Greenhouses_Tbl_People")
+  Tbl_SeedlingPlanting Tbl_SeedlingPlanting[]
+  Tbl_SeedPlanting     Tbl_SeedPlanting[]
 }
 
-model Session {
-  ID         String    @id(map: "PK_Session") @default(cuid()) @db.NVarChar(100)
-  PublicID   String    @unique(map: "UQ_Session_PublicID") @db.NVarChar(100)
-  SecretHash String
-  UserId     Int?
-  CreatedAt  DateTime?
-  ExpiresAt  DateTime?
-  LastUsedAt DateTime?
-  User       Users?    @relation(fields: [UserId], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Session_Users")
+model Tbl_NurseryRoom {
+  ID                   Int                @id(map: "PK_Tbl_NurseryRoom") @default(autoincrement())
+  NurseryRoomCode      String?            @db.NVarChar(50)
+  NurseryRoomName      String?            @db.NVarChar(100)
+  TemperatureMin       Decimal?           @db.Decimal(5, 2)
+  TemperatureMax       Decimal?           @db.Decimal(5, 2)
+  HumidityMin          Decimal?           @db.Decimal(5, 2)
+  HumidityMax          Decimal?           @db.Decimal(5, 2)
+  LightType            String?            @db.NVarChar(50)
+  LightHoursPerDay     Decimal?           @db.Decimal(4, 1)
+  CO2Range             String?            @db.NVarChar(50)
+  StrelizationMethod   String?            @db.NVarChar(200)
+  NurseryRoomCreatedAt DateTime?          @db.Date
+  Tbl_SeedPlanting     Tbl_SeedPlanting[]
 }
 
-model Zones {
-  ZoneID            Int               @id(map: "PK_Zones") @default(autoincrement())
-  GreenhouseID      Int?
-  Name              String?           @db.NVarChar(100)
-  AreaSqM           Decimal?          @db.Decimal(9, 2)
-  MicroclimateNotes String?           @db.NVarChar(500)
-  ClimateDaily      ClimateDaily[]
-  IrrigationEvent   IrrigationEvent[]
-  Plantings         Plantings[]
-  Greenhouses       Greenhouses?      @relation(fields: [GreenhouseID], references: [GreenhouseID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Zones_Greenhouses")
+model Tbl_People {
+  ID              Int               @id(map: "PK_Tbl_People") @default(autoincrement())
+  FirstName       String?           @db.NVarChar(150)
+  LastName        String?           @db.NVarChar(150)
+  PhoneNumber     String?           @db.NVarChar(150)
+  EmailAddress    String?           @db.NVarChar(50)
+  Profesion       String?           @db.NVarChar(150)
+  Tbl_Greenhouses Tbl_Greenhouses[]
 }
 
-model Owner_Observer {
-  ID                  Int                   @id(map: "PK_Owner_Observer") @default(autoincrement())
-  FirstName           String?               @db.NVarChar(150)
-  LastName            String?               @db.NVarChar(150)
-  PhoneNumber         String?               @db.NVarChar(150)
-  Profesion           String?               @db.NVarChar(150)
-  ClimateDaily        ClimateDaily[]
-  Greenhouses         Greenhouses[]
-  PlantingGrowthDaily PlantingGrowthDaily[]
-  Warehouses          Warehouses[]
+model Tbl_PlantGrowthStage {
+  ID               Int               @id(map: "PK_Tbl_PlantGrowthStage") @default(autoincrement())
+  VarietyID        Int?
+  StageOrder       Int?
+  StageName        String?           @db.NVarChar(100)
+  EntryCriteria    String?           @db.NVarChar(100)
+  StartDay         Int?
+  ExitCriteria     String?           @db.NVarChar(100)
+  EndDay           Int?
+  note             String?           @db.NVarChar(500)
+  Tbl_plantVariety Tbl_plantVariety? @relation(fields: [VarietyID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_PlantGrowthStage_Tbl_plantVariety")
 }
 
-model PlantingGrowthDaily {
-  PlantGrowthDailyID BigInt             @id(map: "PK_PlantingGrowthDaily") @default(autoincrement())
-  ObserverID         Int?
-  SampleID           BigInt?
-  StageID            Int?
-  RecordDate         DateTime?          @db.Date
-  HeightCm           Decimal?           @db.Decimal(9, 3)
-  LeafCount          Int?
-  FlowerCount        Int?
-  FruitCount         Int?
-  RootLength         Int?
-  Rootdiameter       Int?
-  IsEstimated        Boolean?
-  HealthScore        Decimal?           @db.Decimal(5, 2)
-  PestObserved       Boolean?
-  Notes              String?            @db.NVarChar(500)
-  Owner_Observer     Owner_Observer?    @relation(fields: [ObserverID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PlantingGrowthDaily_Owner_Observer")
-  PlantGrowthStages  PlantGrowthStages? @relation(fields: [StageID], references: [StageID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PlantingGrowthDaily_PlantGrowthStages")
-  PlantingSamples    PlantingSamples?   @relation(fields: [SampleID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PlantingGrowthDaily_PlantingSamples")
+model Tbl_Plants {
+  ID               Int                @id(map: "PK_Tbl_Plants") @default(autoincrement())
+  CommonName       String?            @db.NVarChar(150)
+  ScientificName   String?            @db.NVarChar(250)
+  PlantFamily      String?            @db.NVarChar(150)
+  Notes            String?            @db.NVarChar(500)
+  Tbl_plantVariety Tbl_plantVariety[]
 }
 
-model Plants {
-  PlantID        Int             @id(map: "PK_Plants") @default(autoincrement())
-  CommonName     String?         @db.NVarChar(150)
-  ScientificName String?         @db.NVarChar(250)
-  Family         String?         @db.NVarChar(150)
-  Notes          String?         @db.NVarChar(500)
-  PlantVarities  PlantVarities[]
+model Tbl_plantVariety {
+  ID                   Int                    @id(map: "PK_Tbl_plantVariety") @default(autoincrement())
+  PlantID              Int?
+  VarietyName          String?                @db.NVarChar(200)
+  DaysToGermination    Int?
+  DaysToSprout         Int?
+  DaysToSeedling       Int?
+  DaysToMaturity       Int?
+  IdealTempMin         Decimal?               @db.Decimal(6, 2)
+  IdealTempMax         Decimal?               @db.Decimal(6, 2)
+  IdealHumidityMin     Decimal?               @db.Decimal(6, 2)
+  IdealHumidityMax     Decimal?               @db.Decimal(6, 2)
+  LightRequirement     String?                @db.NVarChar(100)
+  Notes                String?                @db.NVarChar(500)
+  Tbl_PlantGrowthStage Tbl_PlantGrowthStage[]
+  Tbl_Plants           Tbl_Plants?            @relation(fields: [PlantID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_plantVariety_Tbl_Plants")
+  Tbl_SeedlingPlanting Tbl_SeedlingPlanting[]
 }
 
-model PlantVarities {
-  VarietyID           Int                 @id(map: "PK_PlantVarities") @default(autoincrement())
-  PlantID             Int?
-  VarietyName         String?             @db.NVarChar(200)
-  SeedCompany         String?             @db.NVarChar(200)
-  DaysToGermination   Int?
-  DaysToSprout        Int?
-  DaysToSeedling      Int?
-  DaysToMaturity      Int?
-  TypicalYieldKgPerM2 Decimal?            @db.Decimal(10, 3)
-  IdealTempMin        Decimal?            @db.Decimal(6, 2)
-  IdealTempMax        Decimal?            @db.Decimal(6, 2)
-  IdealHumidityMin    Decimal?            @db.Decimal(6, 2)
-  IdealHumidityMax    Decimal?            @db.Decimal(6, 2)
-  LightRequirement    String?             @db.NVarChar(100)
-  GrowthCycleDays     Int?
-  Notes               String?             @db.NVarChar(500)
-  PlantGrowthStages   PlantGrowthStages[]
-  Plantings           Plantings[]
-  Plants              Plants?             @relation(fields: [PlantID], references: [PlantID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PlantVarities_Plants")
-  RootStockPlant      RootStockPlant[]
-  SeedBatch           SeedBatch[]
+model Tbl_SeedlingPlanting {
+  ID                  BigInt            @id(map: "PK_Tbl_SeedlingPlanting") @default(autoincrement())
+  GreenhouseID        Int?
+  VarietyID           Int?
+  SupplierID          Int?
+  PlantDate           DateTime?         @db.Date
+  NumPlants           Int?
+  PlantsPerM2         Decimal?          @db.Decimal(9, 3)
+  ExpectedHarvestDate DateTime?         @db.Date
+  ActualHarvestDate   DateTime?         @db.Date
+  SeedingMethod       String?           @db.NVarChar(100)
+  Notes               String?           @db.NVarChar(500)
+  Tbl_Greenhouses     Tbl_Greenhouses?  @relation(fields: [GreenhouseID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_SeedlingPlanting_Tbl_Greenhouses")
+  Tbl_plantVariety    Tbl_plantVariety? @relation(fields: [VarietyID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_SeedlingPlanting_Tbl_plantVariety")
+  Tbl_suppliers       Tbl_suppliers?    @relation(fields: [SupplierID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_SeedlingPlanting_Tbl_suppliers")
 }
 
-model ClimateDaily {
-  ClimateDailyID     Int             @id(map: "PK_ClimateDaily") @default(autoincrement())
-  ZoneID             Int?
-  ObserverID         Int?
-  RecordDate         DateTime?       @db.Date
-  RecordTime         DateTime?       @db.Time
-  ExternalTemp       Decimal?        @db.Decimal(6, 2)
-  ExternalHumidity   Decimal?        @db.Decimal(6, 2)
-  ExternalPressure   Decimal?        @db.Decimal(8, 2)
-  ExternalRainfallMM Decimal?        @db.Decimal(8, 2)
-  InternalTemp       Decimal?        @db.Decimal(6, 2)
-  InternalHumidity   Decimal?        @db.Decimal(6, 2)
-  CO2ppm             Decimal?        @db.Decimal(8, 2)
-  ExternalPAR        Decimal?        @db.Decimal(10, 2)
-  ExternalDLI        Decimal?        @db.Decimal(8, 2)
-  InternalPAR        Decimal?        @db.Decimal(8, 2)
-  InternalDLI        Decimal?        @db.Decimal(8, 2)
-  WindSpeed          Decimal?        @db.Decimal(5, 2)
-  WindDirection      Int?
-  VentOpenPct        Decimal?        @db.Decimal(5, 2)
-  VentErrorCount     Int?
-  VPD                Decimal?        @db.Decimal(4, 2)
-  Notes              String?         @db.NVarChar(50)
-  Owner_Observer     Owner_Observer? @relation(fields: [ObserverID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_ClimateDaily_Owner_Observer")
-  Zones              Zones?          @relation(fields: [ZoneID], references: [ZoneID], onDelete: NoAction, onUpdate: NoAction, map: "FK_ClimateDaily_Zones")
+model Tbl_SeedPackage {
+  ID                        Int                         @id(map: "PK_Tbl_SeedPackage") @default(autoincrement())
+  ProducerID                Int?
+  CropVariety               Int?
+  GerminationRate           Int?
+  PurityPercent             Int?
+  ProductionDate            DateTime?                   @db.Date
+  ExpirationDate            DateTime?                   @db.Date
+  QualityGrade              String?                     @db.NVarChar(50)
+  SerialNumber              String?                     @db.NVarChar(50)
+  PackageType               String?                     @db.NVarChar(50)
+  SeedCount                 Int?
+  WeightGram                Decimal?                    @db.Decimal(8, 2)
+  PackagingDate             DateTime?                   @db.Date
+  PackagingLine             String?                     @db.NVarChar(50)
+  QRCode                    Bytes?
+  IsCertified               Boolean?
+  Tbl_suppliers             Tbl_suppliers?              @relation(fields: [ProducerID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_SeedPackage_Tbl_suppliers")
+  Tbl_SeedPlanting          Tbl_SeedPlanting[]
+  Tbl_WarehousesTransaction Tbl_WarehousesTransaction[]
 }
 
-model IrrigationEvent {
-  EventID              Int                 @id(map: "PK_IrrigationEvent") @default(autoincrement())
-  ZoneID               Int?
-  StartTime            DateTime?           @db.DateTime
-  EndTime              DateTime?           @db.DateTime
-  VolumeLiter          Decimal?            @db.Decimal(12, 3)
-  ECIn                 Decimal?            @db.Decimal(5, 2)
-  ECOut                Decimal?            @db.Decimal(5, 2)
-  pHIn                 Decimal?            @db.Decimal(4, 2)
-  pHOut                Decimal?            @db.Decimal(4, 2)
-  DrainPct             Decimal?            @db.Decimal(5, 2)
-  CyclesCount          Int?
-  TotalDurationSeconds Int?
-  TriggerType          String?             @db.NVarChar(100)
-  AvgFlowRate          Decimal?            @db.Decimal(6, 2)
-  Zones                Zones?              @relation(fields: [ZoneID], references: [ZoneID], onDelete: NoAction, onUpdate: NoAction, map: "FK_IrrigationEvent_Zones")
-  IrrigationRecords    IrrigationRecords[]
+model Tbl_SeedPlanting {
+  ID                   Int              @id(map: "PK_Tbl_SeedPlanting") @default(autoincrement())
+  SeedPackageID        Int?
+  GreenhouseID         Int?
+  NurseryRoomID        Int?
+  PlantingDate         DateTime?        @db.Date
+  EmergenceDate        DateTime?        @db.Date
+  CurrentStage         String?          @db.NVarChar(50)
+  HealthStatus         String?          @db.NVarChar(50)
+  GrowthRate           Decimal?         @db.Decimal(5, 2)
+  DiseaseObserved      String?          @db.NVarChar(200)
+  ReadyForGraftingDate DateTime?        @db.Date
+  Tbl_Greenhouses      Tbl_Greenhouses? @relation(fields: [GreenhouseID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_SeedPlanting_Tbl_Greenhouses")
+  Tbl_NurseryRoom      Tbl_NurseryRoom? @relation(fields: [NurseryRoomID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_SeedPlanting_Tbl_NurseryRoom")
+  Tbl_SeedPackage      Tbl_SeedPackage? @relation(fields: [SeedPackageID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_SeedPlanting_Tbl_SeedPackage")
 }
 
-model IrrigationRecords {
-  RecordID           Int              @id(map: "PK_IrrigationRecords") @default(autoincrement())
-  EventID            Int?
-  CycleNumber        Int?
-  StartTime          DateTime?
-  EndTime            DateTime?
-  DurationSeconds    String?          @db.NVarChar(50)
-  VolumeLiters       Decimal?         @db.Decimal(12, 3)
-  Method             String?          @db.NVarChar(50)
-  SourceWater        String?          @db.NVarChar(50)
-  ECIn               Decimal?         @db.Decimal(5, 2)
-  ECOut              Decimal?         @db.Decimal(5, 2)
-  pHIn               Decimal?         @db.Decimal(4, 2)
-  pHOut              Decimal?         @db.Decimal(4, 2)
-  FlowRate_L_per_min Decimal?         @db.Decimal(8, 3)
-  QualityFlag        String?          @db.NVarChar(50)
-  notes              String?          @db.NVarChar(50)
-  IrrigationEvent    IrrigationEvent? @relation(fields: [EventID], references: [EventID], onDelete: NoAction, onUpdate: NoAction, map: "FK_IrrigationRecords_IrrigationEvent")
+model Tbl_suppliers {
+  ID                   Int                    @id(map: "PK_Tbl_suppliers") @default(autoincrement())
+  Legal                Boolean?
+  CompanyName          String?                @db.NVarChar(150)
+  BrandName            String?                @db.NVarChar(150)
+  SupplierCountry      String?                @db.NVarChar(150)
+  SupplierCity         String?                @db.NVarChar(150)
+  FirstName            String?                @db.NVarChar(150)
+  LastName             String?                @db.NVarChar(150)
+  ContactEmail         String?                @db.NVarChar(150)
+  ContactTel           String?                @db.NVarChar(50)
+  CompanyAddress       String?                @db.NVarChar(Max)
+  LicenseNumber        String?                @db.NVarChar(50)
+  Tbl_SeedlingPlanting Tbl_SeedlingPlanting[]
+  Tbl_SeedPackage      Tbl_SeedPackage[]
 }
 
-model PlantingSamples {
-  ID                  BigInt                @id(map: "PK_PlantingSamples") @default(autoincrement())
-  SerialID            String?               @db.NVarChar(50)
-  PlantingID          BigInt?
-  PlantingGrowthDaily PlantingGrowthDaily[]
-  Plantings           Plantings?            @relation(fields: [PlantingID], references: [PlantingID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PlantingSamples_Plantings")
+model Tbl_Warehouses {
+  ID                        Int                         @id(map: "PK_Tbl_Warehouses") @default(autoincrement())
+  WarehouseCode             String?                     @db.NVarChar(50)
+  WarehouseName             String?                     @db.NVarChar(150)
+  WarehouseLocation         String?                     @db.NVarChar(200)
+  TemperatureRange          String?                     @db.NVarChar(50)
+  HumidityRange             String?                     @db.NVarChar(50)
+  Capacity                  Int?
+  WarehouseManagerName      Int?
+  WarehouseCreatedAt        DateTime?                   @db.Date
+  Tbl_WarehousesTransaction Tbl_WarehousesTransaction[]
 }
 
-model Suppliers {
-  ID              Int              @id(map: "PK_Suppliers") @default(autoincrement())
-  Legal           Boolean?
-  CompanyName     String?          @db.NVarChar(150)
-  BrandName       String?          @db.NVarChar(150)
-  SupplierCountry String?          @db.NVarChar(150)
-  SupplierCity    String?          @db.NVarChar(150)
-  FirstName       String?          @db.NVarChar(150)
-  LastName        String?          @db.NVarChar(150)
-  ContactEmail    String?          @db.NVarChar(150)
-  ContactTel      String?          @db.NVarChar(50)
-  CompanyAddress  String?          @db.NVarChar(Max)
-  LicenseNumber   String?          @db.NVarChar(50)
-  Plantings       Plantings[]
-  RootStockPlant  RootStockPlant[]
-  SeedBatch       SeedBatch[]
-}
-
-model NurseryRoom {
-  NurseryRoomID        Int           @id(map: "PK_NurseryRoom") @default(autoincrement())
-  NurseryRoomCode      String?       @db.NVarChar(50)
-  NurseryRoomName      String?       @db.NVarChar(100)
-  TemperatureMin       Decimal?      @db.Decimal(5, 2)
-  TemperatureMax       Decimal?      @db.Decimal(5, 2)
-  HumidityMin          Decimal?      @db.Decimal(5, 2)
-  HumidityMax          Decimal?      @db.Decimal(5, 2)
-  LightType            String?       @db.NVarChar(50)
-  LightHoursPerDay     Decimal?      @db.Decimal(4, 1)
-  CO2Range             String?       @db.NVarChar(50)
-  StrelizationMethod   String?       @db.NVarChar(200)
-  NurseryRoomCreatedAt DateTime?     @db.Date
-  NurserySeed          NurserySeed[]
-}
-
-model SeedBatch {
-  SeedBatchID     Int            @id(map: "PK_SeedBatch") @default(autoincrement())
-  ProducerID      Int?
-  BatchCode       Int?
-  CropVariety     Int?
-  GerminationRate Int?
-  PurityPercent   Int?
-  ProductionDate  DateTime?      @db.Date
-  ExpirationDate  DateTime?      @db.Date
-  QualityGrade    String?        @db.NVarChar(50)
-  BatchNotes      String?        @db.NChar(10)
-  PlantVarities   PlantVarities? @relation(fields: [CropVariety], references: [VarietyID], onDelete: NoAction, onUpdate: NoAction, map: "FK_SeedBatch_PlantVarities")
-  Suppliers       Suppliers?     @relation(fields: [ProducerID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_SeedBatch_Suppliers")
-  SeedPackage     SeedPackage[]
-}
-
-model SeedPackage {
-  SeedPackageID          Int                      @id(map: "PK_SeedPackage") @default(autoincrement())
-  SeedBatchID            Int?
-  SerialNumber           String?                  @db.NVarChar(50)
-  PackageType            String?                  @db.NVarChar(50)
-  SeedCount              Int?
-  WeightGram             Decimal?                 @db.Decimal(8, 2)
-  PackagingDate          DateTime?                @db.Date
-  PackagingLine          String?                  @db.NVarChar(50)
-  Status                 String?                  @db.NVarChar(50)
-  QRCode                 Bytes?
-  IsCertified            Boolean?
-  NurserySeed            NurserySeed[]
-  SeedBatch              SeedBatch?               @relation(fields: [SeedBatchID], references: [SeedBatchID], onDelete: NoAction, onUpdate: NoAction, map: "FK_SeedPackage_SeedBatch")
-  WarehousesTransactions WarehousesTransactions[]
-}
-
-model Warehouses {
-  WarehouseID            Int                      @id(map: "PK_Warehouses") @default(autoincrement())
-  WarehouseCode          String?                  @db.NVarChar(50)
-  WarehouseName          String?                  @db.NVarChar(150)
-  WarehouseLocation      String?                  @db.NVarChar(200)
-  TemperatureRange       String?                  @db.NVarChar(50)
-  HumidityRange          String?                  @db.NVarChar(50)
-  Capacity               Int?
-  WarehouseManagerName   Int?
-  WarehouseCreatedAt     DateTime?                @db.Date
-  Owner_Observer         Owner_Observer?          @relation(fields: [WarehouseManagerName], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Warehouses_Owner_Observer")
-  WarehousesTransactions WarehousesTransactions[]
-}
-
-model WarehousesTransactions {
-  TransactionID   Int          @id(map: "PK_WarehousesTransactions") @default(autoincrement())
+model Tbl_WarehousesTransaction {
+  ID              Int              @id(map: "PK_Tbl_WarehousesTransaction") @default(autoincrement())
   SeedPackageID   Int?
   WarehouseID     Int?
   TransactionType Boolean?
   PackageQuantity Int?
-  TransactionDate DateTime?    @db.DateTime
-  DestinationType String?      @db.NVarChar(50)
-  RecordedBy      String?      @db.NVarChar(150)
-  SeedPackage     SeedPackage? @relation(fields: [SeedPackageID], references: [SeedPackageID], onDelete: NoAction, onUpdate: NoAction, map: "FK_WarehousesTransactions_SeedPackage")
-  Warehouses      Warehouses?  @relation(fields: [WarehouseID], references: [WarehouseID], onDelete: NoAction, onUpdate: NoAction, map: "FK_WarehousesTransactions_Warehouses")
-}
-
-model GraftedPlant {
-  GraftedPlantID    Int                @id(map: "PK_GraftedPlant") @default(autoincrement())
-  GraftingID        Int?
-  GraftedNumber     Int?
-  ReadyForSaleDate  DateTime?          @db.Date
-  QualityGrade      String?            @db.NVarChar(50)
-  SurvivalRate      Decimal?           @db.Decimal(5, 2)
-  GraftedPlantNotes String?            @db.NVarChar(200)
-  GraftingOperation GraftingOperation? @relation(fields: [GraftingID], references: [GraftingID], onDelete: NoAction, onUpdate: NoAction, map: "FK_GraftedPlant_GraftingOperation")
-}
-
-model GraftingOperation {
-  GraftingID         Int             @id(map: "PK_GraftingOperation") @default(autoincrement())
-  NurserySeedID      Int?
-  RootstockID        Int?
-  GraftingMethod     String?         @db.NVarChar(50)
-  GraftedNumber      Int?
-  SucceedGrafted     Int?
-  OperatorName       String?         @db.NVarChar(50)
-  SuccessRate        Decimal?        @db.Decimal(5, 2)
-  InitialResult      String?         @db.NVarChar(50)
-  FinalResult        String?         @db.NVarChar(50)
-  RecoveryPeriodDays Int?
-  GraftNotes         String?         @db.NVarChar(200)
-  GraftedPlant       GraftedPlant[]
-  NurserySeed        NurserySeed?    @relation(fields: [NurserySeedID], references: [NurserySeedID], onDelete: NoAction, onUpdate: NoAction, map: "FK_GraftingOperation_NurserySeed")
-  RootStockPlant     RootStockPlant? @relation(fields: [RootstockID], references: [RootstockID], onDelete: NoAction, onUpdate: NoAction, map: "FK_GraftingOperation_RootStockPlant")
-}
-
-model LocationInNursaryRoom {
-  ID            Int          @id(map: "PK_LocationInNursaryRoom") @default(autoincrement())
-  NurserySeedID Int?
-  CellNumber    String?      @db.NVarChar(50)
-  TrayNumber    String?      @db.NVarChar(50)
-  NurserySeed   NurserySeed? @relation(fields: [NurserySeedID], references: [NurserySeedID], onDelete: NoAction, onUpdate: NoAction, map: "FK_LocationInNursaryRoom_NurserySeed")
-}
-
-model NurseryCareLog {
-  CareLogID       Int          @id(map: "PK_NurseryCareLog") @default(autoincrement())
-  NurserySeedID   Int?
-  CareType        String?      @db.NVarChar(50)
-  MaterialUsed    String?      @db.NVarChar(150)
-  MaterialDose    String?      @db.NVarChar(50)
-  RoomTemperature Decimal?     @db.Decimal(5, 2)
-  RoomHumidity    Decimal?     @db.Decimal(5, 2)
-  SupervisorName  String?      @db.NVarChar(150)
-  CareDate        DateTime?    @db.DateTime
-  CareNote        String?      @db.NVarChar(200)
-  NurserySeed     NurserySeed? @relation(fields: [NurserySeedID], references: [NurserySeedID], onDelete: NoAction, onUpdate: NoAction, map: "FK_NurseryCareLog_NurserySeed")
-}
-
-model NurserySeed {
-  NurserySeedID         Int                     @id(map: "PK_NurserySeed") @default(autoincrement())
-  SeedPackageID         Int?
-  NurseryRoomID         Int?
-  PlantingDate          DateTime?               @db.Date
-  EmergenceDate         DateTime?               @db.Date
-  CurrentStage          String?                 @db.NVarChar(50)
-  HealthStatus          String?                 @db.NVarChar(50)
-  GrowthRate            Decimal?                @db.Decimal(5, 2)
-  DiseaseObserved       String?                 @db.NVarChar(200)
-  ReadyForGraftingDate  DateTime?               @db.Date
-  GraftingOperation     GraftingOperation[]
-  LocationInNursaryRoom LocationInNursaryRoom[]
-  NurseryCareLog        NurseryCareLog[]
-  NurseryRoom           NurseryRoom?            @relation(fields: [NurseryRoomID], references: [NurseryRoomID], onDelete: NoAction, onUpdate: NoAction, map: "FK_NurserySeed_NurseryRoom")
-  SeedPackage           SeedPackage?            @relation(fields: [SeedPackageID], references: [SeedPackageID], onDelete: NoAction, onUpdate: NoAction, map: "FK_NurserySeed_SeedPackage")
-}
-
-model RootStockPlant {
-  RootstockID       Int                 @id(map: "PK_RootStockPlant") @default(autoincrement())
-  BatchCode         String?             @db.NVarChar(100)
-  PlantVariety      Int?
-  SupplierID        Int?
-  ProductionDate    DateTime?           @db.Date
-  StemDiameter      Decimal?            @db.Decimal(5, 2)
-  HealthStatus      String?             @db.NVarChar(150)
-  GrowthStage       String?             @db.NVarChar(50)
-  GraftingOperation GraftingOperation[]
-  PlantVarities     PlantVarities?      @relation(fields: [PlantVariety], references: [VarietyID], onDelete: NoAction, onUpdate: NoAction, map: "FK_RootStockPlant_PlantVarities")
-  Suppliers         Suppliers?          @relation(fields: [SupplierID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_RootStockPlant_Suppliers")
+  TransactionDate DateTime?        @db.DateTime
+  DestinationType String?          @db.NVarChar(50)
+  RecordedBy      String?          @db.NVarChar(150)
+  Tbl_SeedPackage Tbl_SeedPackage? @relation(fields: [SeedPackageID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_WarehousesTransaction_Tbl_SeedPackage")
+  Tbl_Warehouses  Tbl_Warehouses?  @relation(fields: [WarehouseID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_WarehousesTransaction_Tbl_Warehouses")
 }

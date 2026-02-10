@@ -7,7 +7,6 @@ const nextConfig: NextConfig = {
       allowedOrigins: ["mygreenhouses.ir", "www.mygreenhouses.ir", "localhost:3000"],
     },
   },
-  
 };
 
 export default nextConfig;
