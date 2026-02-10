@@ -1,8 +1,8 @@
 "use server";
 import { prisma } from "@/app/lib/singletone";
-import type { Suppliers } from "@/app/generated/prisma";
+import type { Tbl_suppliers } from "@/app/generated/prisma";
 
-export async function createSupplier(data: Suppliers): Promise<boolean> {
-  await prisma.suppliers.create({ data });
+export async function createSupplier(data: Tbl_suppliers): Promise<boolean> {
+  await prisma.tbl_suppliers.create({ data });
   return true;
 }

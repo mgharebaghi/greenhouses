@@ -10,10 +10,16 @@ export async function suppliersCSVData(source?: SupplierRawArray): Promise<Suppl
 }
 
 export const headers = [
+  { displayLabel: "شناسه", key: "ID" },
+  { displayLabel: "نوع (حقیقی/حقوقی)", key: "Legal" },
   { displayLabel: "نام شرکت", key: "CompanyName" },
-  { displayLabel: "آدرس", key: "CompanyAddress" },
+  { displayLabel: "نام برند", key: "BrandName" },
+  { displayLabel: "کشور", key: "SupplierCountry" },
+  { displayLabel: "شهر", key: "SupplierCity" },
   { displayLabel: "نام", key: "FirstName" },
   { displayLabel: "نام خانوادگی", key: "LastName" },
-  { displayLabel: "تلفن", key: "ContactTel" },
   { displayLabel: "ایمیل", key: "ContactEmail" },
+  { displayLabel: "تلفن", key: "ContactTel" },
+  { displayLabel: "آدرس", key: "CompanyAddress" },
+  { displayLabel: "شماره مجوز", key: "LicenseNumber" },
 ];

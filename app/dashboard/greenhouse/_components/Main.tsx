@@ -2,23 +2,16 @@
 import { Col, Row } from "antd";
 import { useState } from "react";
 import GreenHousesTable from "./GreenHousesTable";
-import { Greenhouses as GreenHouse } from "@/app/generated/prisma/client";
-import GreenHouseEditModal, { EditModalProps } from "./GreenHouseEditModal";
+import { Tbl_Greenhouses } from "@/app/generated/prisma/client";
 
 export type ModalMsg = {
   status: "ok" | "error";
   message: string;
 };
 
-export default function GreenHouses({ initialData }: { initialData?: GreenHouse[] }) {
+export default function GreenHouses({ initialData }: { initialData?: Tbl_Greenhouses[] }) {
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState<GreenHouse[]>(initialData || []);
-  const [editModal, setEditModal] = useState<EditModalProps>({ isOpen: false });
-
-  // Edit greenhouse (dummy function)
-  const openEditModal = (record: GreenHouse) => {
-    setEditModal({ isOpen: true, data: record });
-  };
+  const [data, setData] = useState<Tbl_Greenhouses[]>(initialData || []);
 
   return (
     <div className="w-full p-4 overflow-hidden">
@@ -27,20 +20,12 @@ export default function GreenHouses({ initialData }: { initialData?: GreenHouse[
           <GreenHousesTable
             data={data}
             loading={loading}
-            handleEdit={openEditModal}
             setMainLoading={setLoading}
             setMainData={setData}
           />
         </Col>
       </Row>
 
-      <GreenHouseEditModal
-        isOpen={editModal.isOpen}
-        onClose={() => setEditModal({ isOpen: false })}
-        data={editModal.data}
-        setMainLoading={setLoading}
-        setMainData={setData}
-      />
     </div>
   );
 }

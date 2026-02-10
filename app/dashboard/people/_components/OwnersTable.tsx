@@ -36,6 +36,11 @@ export default function OwnersTable(props: OwnersProps) {
       key: "LastName",
     },
     {
+      title: "آدرس  ایمیل",
+      dataIndex: "EmailAddress",
+      key: "EmailAddress"
+    },
+    {
       title: "شماره تماس",
       dataIndex: "PhoneNumber",
       key: "PhoneNumber",

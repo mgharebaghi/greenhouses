@@ -3,14 +3,14 @@
 import { useState } from "react";
 import type { SupplierDTO } from "../types";
 import SuppliersTable from "./SuppliersTable";
-import SupplierInsertModal from "./SupplierInsertModal";
-import SupplierEditModal, { SupplierEditModalProps } from "./SupplierEditModal";
+// import SupplierInsertModal from "./SupplierInsertModal"; // Deleted
+// import SupplierEditModal, { SupplierEditModalProps } from "./SupplierEditModal"; // Deleted
 
 export default function SuppliersDashboard({ initialData }: { initialData: SupplierDTO[] }) {
   const [data, setData] = useState<SupplierDTO[]>(initialData);
   const [loading, setLoading] = useState(false);
-  const [insertOpen, setInsertOpen] = useState(false);
-  const [editModal, setEditModal] = useState<SupplierEditModalProps>({ isOpen: false });
+  // const [insertOpen, setInsertOpen] = useState(false); // Managed internally by SuppliersTable
+  // const [editModal, setEditModal] = useState<SupplierEditModalProps>({ isOpen: false }); // Managed internally by SuppliersTable
 
   return (
     <div className="w-full h-full">
@@ -20,25 +20,12 @@ export default function SuppliersDashboard({ initialData }: { initialData: Suppl
           loading={loading}
           setData={setData}
           setLoading={setLoading}
-          onEdit={(record: SupplierDTO) => setEditModal({ isOpen: true, record })}
-          setInsertModal={setInsertOpen}
+        // onEdit={(record: SupplierDTO) => setEditModal({ isOpen: true, record })} // Managed internally
+        // setInsertModal={setInsertOpen} // Managed internally
         />
       </div>
 
-      <SupplierInsertModal
-        isOpen={insertOpen}
-        setIsOpen={setInsertOpen}
-        setMainData={setData}
-        setMainLoading={setLoading}
-      />
-
-      <SupplierEditModal
-        isOpen={editModal.isOpen}
-        setIsOpen={() => setEditModal({ isOpen: false })}
-        record={editModal.record}
-        setMainData={setData}
-        setMainLoading={setLoading}
-      />
+      {/* Insert and Edit Modals are now managed internally by SuppliersTable using SupplierFormModal */}
     </div>
   );
 }

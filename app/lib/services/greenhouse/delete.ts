@@ -12,8 +12,8 @@ export async function deleteGreenHouse(id: number) {
   try {
     await deleteZones(id);
 
-    await prisma.greenhouses.delete({
-      where: { GreenhouseID: id },
+    await prisma.tbl_Greenhouses.delete({
+      where: { ID: id },
     });
     return { status: "ok", message: "عملیات با موفقیت انجام شد." };
   } catch (error) {

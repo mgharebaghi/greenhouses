@@ -21,6 +21,7 @@ export default function OwnersInsertModal({ isOpen, setIsOpen, setMainData, setM
   const fields = [
     { name: "FirstName", label: "نام", required: true, placeholder: "نام را وارد کنید", icon: "👤" },
     { name: "LastName", label: "نام خانوادگی", required: true, placeholder: "نام خانوادگی را وارد کنید", icon: "👥" },
+    { name: "EmailAddress", label: "ایمیل", required: true, placeholder: "ایمیل را وارد کنید", icon: "📧" },
     { name: "PhoneNumber", label: "شماره تماس", required: true, placeholder: "09123456789", icon: "📱" },
     { name: "Profesion", label: "تخصص", required: true, placeholder: "تخصص را وارد کنید", icon: "💼" },
   ];
