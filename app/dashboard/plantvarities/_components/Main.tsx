@@ -1,16 +1,12 @@
 "use client";
 
-import { Button } from "antd";
 import { PlantVarietyDTO } from "../page";
 import { useState } from "react";
 import PlantVaritiesTable from "./PlantsVaritiesTable";
-import VarietiesInsUpModal from "./VarietiesInsUpModal";
 
 export default function PlantsVaritiesDashboard({ initialData }: { initialData: PlantVarietyDTO[] }) {
   const [data, setData] = useState<PlantVarietyDTO[]>(initialData);
   const [loading, setLoading] = useState(false);
-
-  const [isInsertModalOpen, setIsInsertModalOpen] = useState(false);
 
   return (
     <div className="p-4 w-full h-full">
@@ -20,17 +16,8 @@ export default function PlantsVaritiesDashboard({ initialData }: { initialData: 
           loading={loading}
           setMainData={setData}
           setMainLoading={setLoading}
-          setIsInsertModalOpen={setIsInsertModalOpen}
         />
       </div>
-
-      <VarietiesInsUpModal
-        isOpen={isInsertModalOpen}
-        onClose={() => setIsInsertModalOpen(false)}
-        setMainLoading={setLoading}
-        setMainData={setData as any}
-        isEditMode={false}
-      />
     </div>
   );
 }

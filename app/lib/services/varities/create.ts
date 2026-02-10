@@ -1,12 +1,15 @@
 "use server";
-import { PlantVarietyDTO } from "@/app/dashboard/plantvarities/page";
-import { PlantVarities } from "@/app/generated/prisma";
+import { Tbl_plantVariety } from "@/app/generated/prisma";
 import { prisma } from "@/app/lib/singletone";
 
-export async function createPlantVariety(data: PlantVarities) {
-  await prisma.plantVarities.create({
-    data: data,
-  });
-
-  return true;
+export async function createPlantVariety(data: Tbl_plantVariety) {
+  try {
+    await prisma.tbl_plantVariety.create({
+      data: data,
+    });
+    return true;
+  } catch (error) {
+    console.error("Error creating plant variety:", error);
+    return false;
+  }
 }

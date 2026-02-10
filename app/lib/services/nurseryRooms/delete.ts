@@ -5,8 +5,8 @@ import { revalidatePath } from "next/cache";
 
 export async function deleteNurseryRoom(id: number) {
     try {
-        await prisma.nurseryRoom.delete({
-            where: { NurseryRoomID: id },
+        await prisma.tbl_NurseryRoom.delete({
+            where: { ID: id },
         });
 
         revalidatePath("/dashboard/nursery-rooms");

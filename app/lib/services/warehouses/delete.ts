@@ -7,8 +7,8 @@ export async function deleteWarehouse(id: number) {
     try {
         // Check for dependencies if needed (e.g., Transactions)
         // For now, assuming simple delete or caught by FK constraint
-        await prisma.warehouses.delete({
-            where: { WarehouseID: id },
+        await prisma.tbl_Warehouses.delete({
+            where: { ID: id },
         });
 
         revalidatePath("/dashboard/warehouses");

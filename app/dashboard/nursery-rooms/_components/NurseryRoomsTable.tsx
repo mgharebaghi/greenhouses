@@ -4,8 +4,7 @@ import Table from "@/app/dashboard/_components/UI/Table";
 import InsertionRow from "@/app/dashboard/_components/UI/InsertionRow";
 import TableActions from "@/app/dashboard/_components/UI/TableActions";
 import DeleteModal from "@/app/dashboard/_components/UI/DeleteModal";
-import NurseryRoomsInsertModal from "./NurseryRoomsInsertModal";
-import NurseryRoomsEditModal from "./NurseryRoomsEditModal";
+import NurseryRoomsInsUpModal from "./NurseryRoomsInsUpModal";
 import NurseryRoomsDetailModal from "./NurseryRoomsDetailModal";
 import { useState } from "react";
 import { deleteNurseryRoom } from "@/app/lib/services/nurseryRooms";
@@ -22,8 +21,7 @@ interface NurseryRoomsTableProps {
 
 export default function NurseryRoomsTable({ data, loading, setLoading, setData, refreshData }: NurseryRoomsTableProps) {
     const [deleteModal, setDeleteModal] = useState<any>(null);
-    const [insertModal, setInsertModal] = useState(false);
-    const [editModal, setEditModal] = useState<{ open: boolean, data: any | null }>({ open: false, data: null });
+    const [insUpModal, setInsUpModal] = useState<{ open: boolean, data: any | null }>({ open: false, data: null });
     const [detailModal, setDetailModal] = useState<{ open: boolean, data: any | null }>({ open: false, data: null });
 
     const columns = [
@@ -61,8 +59,8 @@ export default function NurseryRoomsTable({ data, loading, setLoading, setData, 
             key: "actions",
             render: (_: any, record: any) => (
                 <TableActions
-                    onDelete={() => setDeleteModal({ open: true, id: record.NurseryRoomID, name: record.NurseryRoomName })}
-                    onEdit={() => setEditModal({ open: true, data: record })}
+                    onDelete={() => setDeleteModal({ open: true, id: record.ID, name: record.NurseryRoomName })}
+                    onEdit={() => setInsUpModal({ open: true, data: record })}
                 />
             )
         }
@@ -78,8 +76,8 @@ export default function NurseryRoomsTable({ data, loading, setLoading, setData, 
     return (
         <div className="w-full">
             <InsertionRow
-                text="اتاق نشاء"
-                insertOnclick={() => setInsertModal(true)}
+                text="اتاق ریکاوری"
+                insertOnclick={() => setInsUpModal({ open: true, data: null })}
                 data={data}
                 csvOnclick={() => { }}
             />
@@ -88,23 +86,15 @@ export default function NurseryRoomsTable({ data, loading, setLoading, setData, 
                 columns={columns}
                 dataSource={data}
                 loading={loading}
-                rowKey="NurseryRoomID"
+                rowKey="ID"
                 pagination={{ pageSize: 5 }}
             />
 
-            <NurseryRoomsInsertModal
-                open={insertModal}
-                setOpen={setInsertModal}
+            <NurseryRoomsInsUpModal
+                open={insUpModal.open}
+                setOpen={(open) => setInsUpModal(prev => ({ ...prev, open }))}
                 setLoading={setLoading}
-                setData={setData}
-                refreshData={refreshData}
-            />
-
-            <NurseryRoomsEditModal
-                open={editModal.open}
-                setOpen={(open) => setEditModal(prev => ({ ...prev, open }))}
-                setLoading={setLoading}
-                data={editModal.data}
+                data={insUpModal.data}
                 refreshData={refreshData}
             />
 

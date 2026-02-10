@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 
 export async function createNurseryRoom(data: NurseryRoomInput) {
     try {
-        await prisma.nurseryRoom.create({
+        await prisma.tbl_NurseryRoom.create({
             data: {
                 NurseryRoomCode: data.NurseryRoomCode,
                 NurseryRoomName: data.NurseryRoomName,

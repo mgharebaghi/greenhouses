@@ -1,10 +1,10 @@
 "use client";
-import { PlantGrowthStages } from "@/app/generated/prisma";
+import { Tbl_PlantGrowthStage } from "@/app/generated/prisma";
 import { useState } from "react";
 import GrowthStagesTable from "./GrowthStagesTable";
 
-export default function GrowthStagesDashboard({ initialData }: { initialData: PlantGrowthStages[] }) {
-  const [data, setData] = useState<PlantGrowthStages[]>(initialData);
+export default function GrowthStagesDashboard({ initialData }: { initialData: Tbl_PlantGrowthStage[] }) {
+  const [data, setData] = useState<Tbl_PlantGrowthStage[]>(initialData);
   const [loading, setMainLoading] = useState<boolean>(false);
 
   return (

@@ -1,11 +1,15 @@
 "use server";
-import { PlantGrowthStages } from "@/app/generated/prisma";
+import { Tbl_PlantGrowthStage } from "@/app/generated/prisma";
 import { prisma } from "@/app/lib/singletone";
 
-export async function createGrowthStage(data: PlantGrowthStages) {
-  await prisma.plantGrowthStages.create({
-    data: data,
-  });
-
-  return true;
+export async function createGrowthStage(data: Omit<Tbl_PlantGrowthStage, "ID">) {
+  try {
+    await prisma.tbl_PlantGrowthStage.create({
+      data: data as any,
+    });
+    return true;
+  } catch (error) {
+    console.error("Error creating growth stage:", error);
+    return false;
+  }
 }

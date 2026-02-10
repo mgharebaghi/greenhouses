@@ -1,4 +1,4 @@
-import type { PlantGrowthStages } from "@/app/generated/prisma";
+import { Tbl_PlantGrowthStage, Tbl_plantVariety } from "@/app/generated/prisma";
 import { getGrowthStages } from "@/app/lib/services/growthstages";
 import { createGrowthStage } from "@/app/lib/services/growthstages/create";
 import { updateGrowthStage } from "@/app/lib/services/growthstages/update";
@@ -14,22 +14,20 @@ import {
 } from "@ant-design/icons";
 import GreenhouseButton from "@/app/components/UI/GreenhouseButton";
 
-export type GrowthStagesInsUpModalProps = {
+export type GrowthStageFormModalProps = {
   isOpen: boolean;
   onClose?: () => void;
   setMainLoading?: (loading: boolean) => void;
-  setMainData?: (data: PlantGrowthStages[]) => void;
-  isEditMode?: boolean;
-  editData?: PlantGrowthStages;
-  StageID?: number;
+  setMainData?: (data: any[]) => void;
+  record?: Tbl_PlantGrowthStage | null;
 };
 
-type SelectOption<T> = {
+type SelectOption = {
   label: string;
   value: number | string;
 };
 
-export const stageNameOptions: SelectOption<string>[] = [
+export const stageNameOptions: SelectOption[] = [
   { label: "جوانه زنی", value: "جوانه زنی" },
   { label: "نهال", value: "نهال" },
   { label: "رشد رویشی", value: "رشد رویشی" },
@@ -40,14 +38,16 @@ export const stageNameOptions: SelectOption<string>[] = [
   { label: "نشاء", value: "نشاء" },
 ];
 
-export default function StagesInsUpModal(props: GrowthStagesInsUpModalProps) {
+export default function GrowthStageFormModal({ isOpen, onClose, setMainLoading, setMainData, record }: GrowthStageFormModalProps) {
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
   const [submitMessage, setSubmitMessage] = useState<{ status: "ok" | "error"; message: string } | null>(null);
-  const [varityOptions, setVarityOptions] = useState<SelectOption<number>[]>([]);
+  const [varityOptions, setVarityOptions] = useState<SelectOption[]>([]);
   const [varityLoading, setVarityLoading] = useState<boolean>(false);
 
-  const stageOrderOptions: SelectOption<number>[] = [
+  const isEdit = !!record;
+
+  const stageOrderOptions: SelectOption[] = [
     { label: "مرحله 1", value: 1 },
     { label: "مرحله 2", value: 2 },
     { label: "مرحله 3", value: 3 },
@@ -55,22 +55,26 @@ export default function StagesInsUpModal(props: GrowthStagesInsUpModalProps) {
     { label: "مرحله 5", value: 5 },
     { label: "مرحله 6", value: 6 },
     { label: "مرحله 7", value: 7 },
+    { label: "مرحله 8", value: 8 },
   ];
 
   useEffect(() => {
-    if (props.isOpen) {
+    if (isOpen) {
       getVarityOptions();
       setSubmitMessage(null);
-      if (props.isEditMode && props.editData) {
-        form.setFieldsValue(props.editData);
+      if (record) {
+        form.setFieldsValue(record);
+      } else {
+        form.resetFields();
       }
     }
-  }, [props.isOpen, props.isEditMode, props.editData, form]);
+  }, [isOpen, record, form]);
 
   const getVarityOptions = async () => {
     setVarityLoading(true);
-    const varities = await getPlantVarieties();
-    const options = varities.map((v) => ({ label: v.VarietyName || "", value: v.VarietyID }));
+    // Note: getPlantVarieties returns formatted objects with decimal conversions, but base struct has ID and VarietyName
+    const varities: any[] = await getPlantVarieties();
+    const options = varities.map((v) => ({ label: v.VarietyName || "بدون نام", value: v.ID }));
     setVarityOptions(options);
     setVarityLoading(false);
   };
@@ -108,7 +112,7 @@ export default function StagesInsUpModal(props: GrowthStagesInsUpModalProps) {
       label: "علایم ورود به این مرحله",
       placeholder: "علایم ورود را شرح دهید",
       type: "textArea",
-      required: true,
+      required: false,
       icon: "🚪",
     },
     {
@@ -116,7 +120,7 @@ export default function StagesInsUpModal(props: GrowthStagesInsUpModalProps) {
       label: "تعداد روز ورود به این مرحله",
       placeholder: "تعداد روز",
       type: "number",
-      required: true,
+      required: false,
       icon: "📅",
     },
     {
@@ -124,7 +128,7 @@ export default function StagesInsUpModal(props: GrowthStagesInsUpModalProps) {
       label: "علائم خروج از این مرحله",
       placeholder: "علائم خروج را شرح دهید",
       type: "textArea",
-      required: true,
+      required: false,
       icon: "🚶",
     },
     {
@@ -132,30 +136,32 @@ export default function StagesInsUpModal(props: GrowthStagesInsUpModalProps) {
       label: "تعداد روز خروج از این مرحله",
       placeholder: "تعداد روز",
       type: "number",
-      required: true,
+      required: false,
       icon: "📅",
     },
   ];
 
-  const handleSubmit = async (values: PlantGrowthStages) => {
+  const handleSubmit = async (values: Tbl_PlantGrowthStage) => {
     setLoading(true);
     setSubmitMessage(null);
-    const res = props.isEditMode
-      ? await updateGrowthStage(props?.editData?.StageID || 0, values)
+    const res = isEdit
+      ? await updateGrowthStage(record?.ID || 0, values)
       : await createGrowthStage(values);
 
     if (res) {
       setSubmitMessage({
         status: "ok",
-        message: props.isEditMode ? "مرحله رشد با موفقیت ویرایش شد" : "مرحله رشد با موفقیت افزوده شد",
+        message: isEdit ? "مرحله رشد با موفقیت ویرایش شد" : "مرحله رشد با موفقیت افزوده شد",
       });
-      props.setMainLoading?.(true);
+      setMainLoading?.(true);
       const newData = await getGrowthStages();
-      props.setMainData?.(newData);
-      props.setMainLoading?.(false);
-      form.resetFields();
+      setMainData?.(newData);
+      setMainLoading?.(false);
+
+      if (!isEdit) form.resetFields();
+
       setTimeout(() => {
-        props.onClose?.();
+        onClose?.();
         setSubmitMessage(null);
       }, 1500);
     } else {
@@ -165,14 +171,14 @@ export default function StagesInsUpModal(props: GrowthStagesInsUpModalProps) {
   };
 
   const handleClose = () => {
-    props.onClose?.();
+    onClose?.();
     setSubmitMessage(null);
     form.resetFields();
   };
 
   return (
     <Modal
-      open={props.isOpen}
+      open={isOpen}
       onCancel={handleClose}
       footer={null}
       closeIcon={null}
@@ -190,16 +196,16 @@ export default function StagesInsUpModal(props: GrowthStagesInsUpModalProps) {
     >
       {/* Header */}
       <div
-        className={`relative px-6 py-6 bg-gradient-to-br border-b ${props.isEditMode
-            ? "from-amber-50 via-orange-50/80 to-white border-amber-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 dark:border-slate-700"
-            : "from-emerald-50 via-lime-50/80 to-white border-emerald-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 dark:border-slate-700"
+        className={`relative px-6 py-6 bg-gradient-to-br border-b ${isEdit
+          ? "from-amber-50 via-orange-50/80 to-white border-amber-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 dark:border-slate-700"
+          : "from-emerald-50 via-lime-50/80 to-white border-emerald-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 dark:border-slate-700"
           }`}
       >
         <button
           onClick={handleClose}
-          className={`absolute top-5 left-5 h-9 w-9 rounded-xl bg-white dark:bg-slate-800 border transition-all flex items-center justify-center shadow-sm hover:shadow ${props.isEditMode
-              ? "hover:bg-amber-50 border-amber-200 hover:border-amber-300 text-amber-600 hover:text-amber-700 dark:border-slate-600 dark:hover:border-amber-700 dark:hover:bg-amber-900/20 dark:text-amber-500"
-              : "hover:bg-emerald-50 border-emerald-200 hover:border-emerald-300 text-emerald-600 hover:text-emerald-700 dark:border-slate-600 dark:hover:border-emerald-700 dark:hover:bg-emerald-900/20 dark:text-emerald-500"
+          className={`absolute top-5 left-5 h-9 w-9 rounded-xl bg-white dark:bg-slate-800 border transition-all flex items-center justify-center shadow-sm hover:shadow ${isEdit
+            ? "hover:bg-amber-50 border-amber-200 hover:border-amber-300 text-amber-600 hover:text-amber-700 dark:border-slate-600 dark:hover:border-amber-700 dark:hover:bg-amber-900/20 dark:text-amber-500"
+            : "hover:bg-emerald-50 border-emerald-200 hover:border-emerald-300 text-emerald-600 hover:text-emerald-700 dark:border-slate-600 dark:hover:border-emerald-700 dark:hover:bg-emerald-900/20 dark:text-emerald-500"
             }`}
           aria-label="بستن"
         >
@@ -209,31 +215,31 @@ export default function StagesInsUpModal(props: GrowthStagesInsUpModalProps) {
         <div className="flex items-center gap-4">
           <div className="relative">
             <div
-              className={`h-14 w-14 rounded-2xl bg-gradient-to-br shadow-lg flex items-center justify-center text-white ${props.isEditMode
-                  ? "from-amber-500 via-amber-600 to-orange-600"
-                  : "from-emerald-500 via-emerald-600 to-emerald-700"
+              className={`h-14 w-14 rounded-2xl bg-gradient-to-br shadow-lg flex items-center justify-center text-white ${isEdit
+                ? "from-amber-500 via-amber-600 to-orange-600"
+                : "from-emerald-500 via-emerald-600 to-emerald-700"
                 }`}
             >
-              {props.isEditMode ? <EditOutlined className="text-2xl" /> : <PlusOutlined className="text-2xl" />}
+              {isEdit ? <EditOutlined className="text-2xl" /> : <PlusOutlined className="text-2xl" />}
             </div>
             <div
-              className={`absolute -bottom-1 -right-1 h-5 w-5 rounded-full border-2 border-white dark:border-slate-800 ${props.isEditMode ? "bg-orange-400" : "bg-lime-400"
+              className={`absolute -bottom-1 -right-1 h-5 w-5 rounded-full border-2 border-white dark:border-slate-800 ${isEdit ? "bg-orange-400" : "bg-lime-400"
                 }`}
             ></div>
           </div>
           <div>
-            <h3 className={`font-bold text-2xl ${props.isEditMode ? "text-amber-900 dark:text-slate-100" : "text-emerald-900 dark:text-slate-100"}`}>
-              {props.isEditMode ? "ویرایش مرحله رشد" : "افزودن مرحله رشد جدید"}
+            <h3 className={`font-bold text-2xl ${isEdit ? "text-amber-900 dark:text-slate-100" : "text-emerald-900 dark:text-slate-100"}`}>
+              {isEdit ? "ویرایش مرحله رشد" : "افزودن مرحله رشد جدید"}
             </h3>
             <p
-              className={`text-sm mt-1 flex items-center gap-1.5 ${props.isEditMode ? "text-amber-600/80 dark:text-slate-400" : "text-emerald-600/80 dark:text-slate-400"
+              className={`text-sm mt-1 flex items-center gap-1.5 ${isEdit ? "text-amber-600/80 dark:text-slate-400" : "text-emerald-600/80 dark:text-slate-400"
                 }`}
             >
               <span
-                className={`h-1.5 w-1.5 rounded-full animate-pulse ${props.isEditMode ? "bg-amber-400" : "bg-emerald-400"
+                className={`h-1.5 w-1.5 rounded-full animate-pulse ${isEdit ? "bg-amber-400" : "bg-emerald-400"
                   }`}
               ></span>
-              {props.isEditMode ? "اطلاعات مرحله رشد را ویرایش کنید" : "اطلاعات مرحله رشد را با دقت وارد کنید"}
+              {isEdit ? "اطلاعات مرحله رشد را ویرایش کنید" : "اطلاعات مرحله رشد را با دقت وارد کنید"}
             </p>
           </div>
         </div>
@@ -260,7 +266,7 @@ export default function StagesInsUpModal(props: GrowthStagesInsUpModalProps) {
                 {field.type === "select" ? (
                   <Select
                     options={field.options}
-                    loading={varityLoading}
+                    loading={field.name === "VarietyID" ? varityLoading : false}
                     showSearch
                     allowClear
                     optionFilterProp="label"
@@ -276,9 +282,9 @@ export default function StagesInsUpModal(props: GrowthStagesInsUpModalProps) {
                     disabled={loading}
                     rows={3}
                     onChange={() => setSubmitMessage(null)}
-                    className={`rounded-xl border-2 border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder-slate-500 transition-all ${props.isEditMode
-                        ? "hover:border-amber-300 focus:border-amber-400 dark:hover:border-amber-700 dark:focus:border-amber-600"
-                        : "hover:border-emerald-300 focus:border-emerald-400 dark:hover:border-emerald-700 dark:focus:border-emerald-600"
+                    className={`rounded-xl border-2 border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder-slate-500 transition-all ${isEdit
+                      ? "hover:border-amber-300 focus:border-amber-400 dark:hover:border-amber-700 dark:focus:border-amber-600"
+                      : "hover:border-emerald-300 focus:border-emerald-400 dark:hover:border-emerald-700 dark:focus:border-emerald-600"
                       }`}
                     style={{ resize: "none" }}
                   />
@@ -289,9 +295,9 @@ export default function StagesInsUpModal(props: GrowthStagesInsUpModalProps) {
                     size="large"
                     controls={false}
                     onChange={() => setSubmitMessage(null)}
-                    className={`!w-full rounded-xl border-2 border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder-slate-500 transition-all shadow-sm hover:shadow ${props.isEditMode
-                        ? "hover:border-amber-300 focus:border-amber-400 dark:hover:border-amber-700 dark:focus:border-amber-600"
-                        : "hover:border-emerald-300 focus:border-emerald-400 dark:hover:border-emerald-700 dark:focus:border-emerald-600"
+                    className={`!w-full rounded-xl border-2 border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder-slate-500 transition-all shadow-sm hover:shadow ${isEdit
+                      ? "hover:border-amber-300 focus:border-amber-400 dark:hover:border-amber-700 dark:focus:border-amber-600"
+                      : "hover:border-emerald-300 focus:border-emerald-400 dark:hover:border-emerald-700 dark:focus:border-emerald-600"
                       }`}
                     style={{ width: "100%", height: "46px", fontSize: "14px" }}
                   />
@@ -301,9 +307,9 @@ export default function StagesInsUpModal(props: GrowthStagesInsUpModalProps) {
                     disabled={loading}
                     size="large"
                     onChange={() => setSubmitMessage(null)}
-                    className={`rounded-xl border-2 border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder-slate-500 transition-all shadow-sm hover:shadow ${props.isEditMode
-                        ? "hover:border-amber-300 focus:border-amber-400 dark:hover:border-amber-700 dark:focus:border-amber-600"
-                        : "hover:border-emerald-300 focus:border-emerald-400 dark:hover:border-emerald-700 dark:focus:border-emerald-600"
+                    className={`rounded-xl border-2 border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder-slate-500 transition-all shadow-sm hover:shadow ${isEdit
+                      ? "hover:border-amber-300 focus:border-amber-400 dark:hover:border-amber-700 dark:focus:border-amber-600"
+                      : "hover:border-emerald-300 focus:border-emerald-400 dark:hover:border-emerald-700 dark:focus:border-emerald-600"
                       }`}
                     style={{ height: "46px", fontSize: "14px" }}
                   />
@@ -316,19 +322,19 @@ export default function StagesInsUpModal(props: GrowthStagesInsUpModalProps) {
             label={
               <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
                 <span className="text-base">📝</span>
-                توضیحات
+                توضیحات (یادداشت)
               </span>
             }
-            name="Description"
+            name="note"
             className="mt-5"
           >
             <Input.TextArea
               placeholder="توضیحات اضافی"
               disabled={loading}
               rows={3}
-              className={`rounded-xl border-2 border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder-slate-500 transition-all ${props.isEditMode
-                  ? "hover:border-amber-300 focus:border-amber-400 dark:hover:border-amber-700 dark:focus:border-amber-600"
-                  : "hover:border-emerald-300 focus:border-emerald-400 dark:hover:border-emerald-700 dark:focus:border-emerald-600"
+              className={`rounded-xl border-2 border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder-slate-500 transition-all ${isEdit
+                ? "hover:border-amber-300 focus:border-amber-400 dark:hover:border-amber-700 dark:focus:border-amber-600"
+                : "hover:border-emerald-300 focus:border-emerald-400 dark:hover:border-emerald-700 dark:focus:border-emerald-600"
                 }`}
               style={{ resize: "none" }}
             />
@@ -338,8 +344,8 @@ export default function StagesInsUpModal(props: GrowthStagesInsUpModalProps) {
           {submitMessage && (
             <div
               className={`mt-5 p-4 rounded-xl border-2 flex items-start gap-3 animate-in fade-in slide-in-from-top-3 duration-300 shadow-sm ${submitMessage.status === "ok"
-                  ? "bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-900/30 dark:to-emerald-900/10 border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-300"
-                  : "bg-gradient-to-br from-rose-50 to-rose-100/50 dark:from-rose-900/30 dark:to-rose-900/10 border-rose-300 dark:border-rose-800 text-rose-900 dark:text-rose-300"
+                ? "bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-900/30 dark:to-emerald-900/10 border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-300"
+                : "bg-gradient-to-br from-rose-50 to-rose-100/50 dark:from-rose-900/30 dark:to-rose-900/10 border-rose-300 dark:border-rose-800 text-rose-900 dark:text-rose-300"
                 }`}
             >
               <div
@@ -371,10 +377,10 @@ export default function StagesInsUpModal(props: GrowthStagesInsUpModalProps) {
             <GreenhouseButton
               text={
                 loading
-                  ? props.isEditMode
+                  ? isEdit
                     ? "در حال ویرایش..."
                     : "در حال ثبت..."
-                  : props.isEditMode
+                  : isEdit
                     ? "ویرایش مرحله رشد"
                     : "ثبت مرحله رشد"
               }

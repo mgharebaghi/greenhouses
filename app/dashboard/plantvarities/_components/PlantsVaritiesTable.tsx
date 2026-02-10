@@ -1,6 +1,6 @@
 import Table from "@/app/dashboard/_components/UI/Table";
 import { PlantVarietyDTO } from "../page";
-import VarietiesInsUpModal from "./VarietiesInsUpModal";
+import VarietyFormModal from "./VarietyFormModal";
 import PlantVarietyDetailModal from "./PlantVarietyDetailModal";
 import { useState } from "react";
 import InsertionRow from "../../_components/UI/InsertionRow";
@@ -11,18 +11,13 @@ import { Button, Tooltip } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import { generateCsv, download, mkConfig } from "export-to-csv";
 import { plantVarietiesCSVData, headers } from "../data/csvFileData";
+import { Tbl_plantVariety } from "@/app/generated/prisma";
 
 type PlantVarietiesTableProps = {
   data: PlantVarietyDTO[];
   loading?: boolean;
   setMainData?: (data: PlantVarietyDTO[]) => void;
   setMainLoading?: (loading: boolean) => void;
-  setIsInsertModalOpen: (open: boolean) => void;
-};
-
-type editModalProps = {
-  isOpen: boolean;
-  record?: PlantVarietyDTO;
 };
 
 export default function PlantVaritiesTable({
@@ -30,9 +25,11 @@ export default function PlantVaritiesTable({
   loading,
   setMainData,
   setMainLoading,
-  setIsInsertModalOpen,
 }: PlantVarietiesTableProps) {
-  const [editModalOpen, setEditModalOpen] = useState<editModalProps | null>(null);
+  const [formModal, setFormModal] = useState<{ open: boolean; record: Tbl_plantVariety | null }>({
+    open: false,
+    record: null,
+  });
   const [deleteModalOpen, setDeleteModalOpen] = useState<DeleteModalProps | null>(null);
   const [deleteModalLoading, setDeleteModalLoading] = useState(false);
   const [deleteModalMsg, setDeleteModalMsg] = useState("");
@@ -61,40 +58,63 @@ export default function PlantVaritiesTable({
       title: "نام گونه",
       dataIndex: "VarietyName",
       key: "VarietyName",
+      width: 140,
+      align: "center" as const,
     },
     {
       title: "نام گیاه",
       dataIndex: "CommonName",
       key: "CommonName",
-      render: (_: any, record: PlantVarietyDTO) => record.Plants?.CommonName,
+      width: 140,
+      align: "center" as const,
+      render: (_: any, record: PlantVarietyDTO) => record.Tbl_Plants?.CommonName,
     },
-    // {
-    //   title: "شرکت توزیع کننده بذر",
-    //   dataIndex: "SeedCompany",
-    //   key: "SeedCompany",
-    // },
     {
-      title: "تعداد روز تا بلوغ",
+      title: "جوانه زنی",
+      dataIndex: "DaysToGermination",
+      key: "DaysToGermination",
+      width: 110,
+      align: "center" as const,
+      render: (value: number) => value ? `${value} روز` : "-",
+    },
+    {
+      title: "رویش",
+      dataIndex: "DaysToSprout",
+      key: "DaysToSprout",
+      width: 110,
+      align: "center" as const,
+      render: (value: number) => value ? `${value} روز` : "-",
+    },
+    {
+      title: "نشاء",
+      dataIndex: "DaysToSeedling",
+      key: "DaysToSeedling",
+      width: 110,
+      align: "center" as const,
+      render: (value: number) => value ? `${value} روز` : "-",
+    },
+    {
+      title: "بلوغ",
       dataIndex: "DaysToMaturity",
       key: "DaysToMaturity",
-    },
-    {
-      title: "محصول (کیلوگرم/متر مربع)",
-      dataIndex: "TypicalYieldKgPerM2",
-      key: "TypicalYieldKgPerM2",
+      width: 110,
+      align: "center" as const,
+      render: (value: number) => value ? `${value} روز` : "-",
     },
     {
       title: "عملیات",
       dataIndex: "actions",
       key: "actions",
+      width: 120,
+      align: "center" as const,
       render: (_: any, record: PlantVarietyDTO) => (
         <TableActions
-          onEdit={() => setEditModalOpen({ isOpen: true, record })}
+          onEdit={() => setFormModal({ open: true, record: record as unknown as Tbl_plantVariety })}
           onDelete={() =>
             setDeleteModalOpen({
               open: true,
               onClose: () => setDeleteModalOpen(null),
-              id: record.VarietyID,
+              id: record.ID,
               name: record.VarietyName || "",
               deleteLoading: deleteModalLoading,
               onDelete: () => handleDelete(record),
@@ -109,7 +129,7 @@ export default function PlantVaritiesTable({
   const handleDelete = async (record: PlantVarietyDTO) => {
     setDeleteModalLoading(true);
     setDeleteModalMsg("");
-    const res = await deletePlantVariety(record.VarietyID!);
+    const res = await deletePlantVariety(record.ID!);
     if (res) {
       setDeleteModalLoading(false);
       setDeleteModalOpen(null);
@@ -127,7 +147,7 @@ export default function PlantVaritiesTable({
     <>
       <InsertionRow
         text="افزودن گونه گیاهی"
-        insertOnclick={() => setIsInsertModalOpen(true)}
+        insertOnclick={() => setFormModal({ open: true, record: null })}
         csvOnclick={async () => {
           const csvData = await plantVarietiesCSVData(data as any);
           const options = mkConfig({ useKeysAsHeaders: false, columnHeaders: headers, filename: "plant-varieties" });
@@ -141,19 +161,18 @@ export default function PlantVaritiesTable({
       <Table
         columns={columns}
         dataSource={data}
-        rowKey="VarietyID"
+        rowKey="ID"
         loading={loading}
         pagination={{ pageSize: 5 }}
         scroll={{ x: 1000 }}
       />
 
-      <VarietiesInsUpModal
-        isOpen={editModalOpen?.isOpen || false}
-        onClose={() => setEditModalOpen(null)}
-        isEditMode
-        editData={editModalOpen?.record as any}
+      <VarietyFormModal
+        isOpen={formModal.open}
+        onClose={() => setFormModal({ open: false, record: null })}
         setMainLoading={setMainLoading}
         setMainData={setMainData as any}
+        record={formModal.record}
       />
 
       <DeleteModal

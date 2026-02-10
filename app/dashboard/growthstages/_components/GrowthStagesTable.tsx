@@ -1,9 +1,10 @@
-import type { PlantGrowthStages } from "@/app/generated/prisma";
-import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import type { Tbl_PlantGrowthStage } from "@/app/generated/prisma";
+import { DeleteOutlined, EditOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { Button } from "antd";
 import Table from "@/app/dashboard/_components/UI/Table";
 import { useState } from "react";
-import StagesInsUpModal, { GrowthStagesInsUpModalProps } from "./StagesInsUpModal";
+import GrowthStageFormModal from "./GrowthStageFormModal";
+import GrowthStageDetailModal from "./GrowthStageDetailModal";
 import { deleteGrowthStage, getGrowthStages } from "@/app/lib/services/growthstages";
 import DeleteModal, { DeleteModalProps } from "@/app/dashboard/_components/UI/DeleteModal";
 import InsertionRow from "../../_components/UI/InsertionRow";
@@ -13,50 +14,72 @@ import { growthStagesCSVData, headers } from "../data/csvFileData";
 
 type GrowthStagesTableProps = {
   loading?: boolean;
-  data?: PlantGrowthStages[];
-  setMainData?: (data: PlantGrowthStages[]) => void;
+  data?: Tbl_PlantGrowthStage[];
+  setMainData?: (data: Tbl_PlantGrowthStage[]) => void;
   setMainLoading?: (loading: boolean) => void;
 };
 
 export default function GrowthStagesTable(props: GrowthStagesTableProps) {
-  const [editModal, setEditModal] = useState<GrowthStagesInsUpModalProps | null>(null);
+  const [formModal, setFormModal] = useState<{ open: boolean; record: Tbl_PlantGrowthStage | null }>({
+    open: false,
+    record: null,
+  });
+  const [detailModal, setDetailModal] = useState<{ open: boolean; data: Tbl_PlantGrowthStage | null }>({
+    open: false,
+    data: null,
+  });
   const [deleteModal, setDeleteModal] = useState<DeleteModalProps | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   const columns = [
     {
+      title: "جزئیات",
+      key: "details",
+      width: 80,
+      align: "center" as const,
+      render: (_: any, record: Tbl_PlantGrowthStage) => (
+        <Button
+          type="text"
+          shape="circle"
+          className="text-slate-500 hover:text-blue-500 hover:bg-blue-50 dark:text-slate-400 dark:hover:text-blue-400 dark:hover:bg-blue-900/20"
+          icon={<InfoCircleOutlined />}
+          onClick={() => setDetailModal({ open: true, data: record })}
+        />
+      ),
+    },
+    {
       title: "گونه گیاهی",
       key: "varietyName",
-      render: (_: any, record: any) => record.PlantVarieties?.VarietyName,
+      width: 150,
+      align: "center" as const,
+      render: (_: any, record: any) => record.Tbl_plantVariety?.VarietyName,
     },
-    { title: "مرحله رشد", dataIndex: "StageOrder", key: "stageOrder" },
-    { title: "عنوان مرحله", dataIndex: "StageName", key: "stageName" },
-    { title: "علایم ورود به این مرحله", dataIndex: "EntryCriteria", key: "entryCriteria" },
-    { title: "تعداد روز مورد انتظار برای ورود به این مرحله", dataIndex: "StartDay", key: "startDay" },
-    { title: "علائم خروج از این مرحله", dataIndex: "ExitCriteria", key: "exitCriteria" },
-    { title: "تعداد روز مورد انتظار برای خروج از این مرحله", dataIndex: "EndDay", key: "endDay" },
+    { title: "مرحله رشد", dataIndex: "StageOrder", key: "stageOrder", width: 100, align: "center" as const },
+    { title: "عنوان مرحله", dataIndex: "StageName", key: "stageName", width: 120, align: "center" as const },
+    { title: "علایم ورود", dataIndex: "EntryCriteria", key: "entryCriteria", width: 150, align: "center" as const },
+    { title: "تا روز شروع", dataIndex: "StartDay", key: "startDay", width: 100, align: "center" as const },
+    { title: "علائم خروج", dataIndex: "ExitCriteria", key: "exitCriteria", width: 150, align: "center" as const },
+    { title: "تا روز پایان", dataIndex: "EndDay", key: "endDay", width: 100, align: "center" as const },
     {
-      title: "",
+      title: "عملیات",
       key: "actions",
-      render: (_: any, record: PlantGrowthStages) => (
+      width: 120,
+      align: "center" as const,
+      render: (_: any, record: Tbl_PlantGrowthStage) => (
         <TableActions
           onEdit={() =>
-            setEditModal({
-              isOpen: true,
-              editData: record,
-              isEditMode: true,
-              setMainData: props.setMainData,
-              setMainLoading: props.setMainLoading,
-              StageID: record.StageID,
+            setFormModal({
+              open: true,
+              record: record,
             })
           }
           onDelete={() => {
             setDeleteModal({
               open: true,
               onClose: () => setDeleteModal(null),
-              id: record.StageID,
+              id: record.ID,
               name: "مرحله " + record.StageName || "",
-              onDelete: () => handleDelete(record.StageID),
+              onDelete: () => handleDelete(record.ID),
             });
           }}
         />
@@ -71,7 +94,7 @@ export default function GrowthStagesTable(props: GrowthStagesTableProps) {
       setDeleteLoading(false);
       setDeleteModal(null);
       props.setMainLoading?.(true);
-      const newData: PlantGrowthStages[] = await getGrowthStages();
+      const newData: any = await getGrowthStages();
       props.setMainData?.(newData);
       props.setMainLoading?.(false);
     }
@@ -82,11 +105,9 @@ export default function GrowthStagesTable(props: GrowthStagesTableProps) {
       <InsertionRow
         text=" مرحله رشد گیاه"
         insertOnclick={() =>
-          setEditModal({
-            isOpen: true,
-            isEditMode: false,
-            setMainData: props.setMainData,
-            setMainLoading: props.setMainLoading,
+          setFormModal({
+            open: true,
+            record: null,
           })
         }
         csvOnclick={async () => {
@@ -102,19 +123,23 @@ export default function GrowthStagesTable(props: GrowthStagesTableProps) {
         columns={columns}
         dataSource={props.data || []}
         loading={props.loading}
-        rowKey="StageID"
-        scroll={{ x: 300 }}
+        rowKey="ID"
+        scroll={{ x: 1000 }}
         pagination={{ pageSize: 5 }}
       />
 
-      <StagesInsUpModal
-        isOpen={editModal?.isOpen || false}
-        onClose={() => setEditModal(null)}
-        editData={editModal?.editData}
-        isEditMode={editModal?.isEditMode || false}
+      <GrowthStageFormModal
+        isOpen={formModal.open}
+        onClose={() => setFormModal({ open: false, record: null })}
+        record={formModal.record}
         setMainLoading={props.setMainLoading}
-        setMainData={props.setMainData}
-        StageID={editModal?.editData?.StageID}
+        setMainData={props.setMainData as any}
+      />
+
+      <GrowthStageDetailModal
+        open={detailModal.open}
+        onClose={() => setDetailModal({ open: false, data: null })}
+        data={detailModal.data}
       />
 
       <DeleteModal

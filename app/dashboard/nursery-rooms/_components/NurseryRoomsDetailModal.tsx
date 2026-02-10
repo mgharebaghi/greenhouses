@@ -6,10 +6,6 @@ import {
     ThunderboltOutlined,
     SafetyCertificateOutlined,
 } from "@ant-design/icons";
-import dayjs from "dayjs";
-import jalaliday from "jalaliday";
-
-dayjs.extend(jalaliday);
 
 interface NurseryRoomsDetailModalProps {
     open: boolean;
@@ -22,7 +18,7 @@ export default function NurseryRoomsDetailModal({ open, onClose, data }: Nursery
 
     const formatDate = (date: string | Date | null | undefined) => {
         if (!date) return "—";
-        return dayjs(date).calendar("jalali").locale("fa").format("YYYY/MM/DD");
+        return new Date(date).toLocaleDateString("fa-IR");
     };
 
     return (

@@ -16,10 +16,6 @@ interface WarehousesDetailModalProps {
 export default function WarehousesDetailModal({ open, onClose, data }: WarehousesDetailModalProps) {
     if (!data) return null;
 
-    const managerName = data.Owner_Observer
-        ? `${data.Owner_Observer.FirstName} ${data.Owner_Observer.LastName}`
-        : "—";
-
     return (
         <DetailModal
             open={open}
@@ -29,7 +25,6 @@ export default function WarehousesDetailModal({ open, onClose, data }: Warehouse
             gradientFrom="emerald"
             gradientTo="cyan"
         >
-            {/* اطلاعات کلی */}
             <InfoCard
                 title="اطلاعات کلی"
                 icon={<DashboardOutlined />}
@@ -38,10 +33,10 @@ export default function WarehousesDetailModal({ open, onClose, data }: Warehouse
                     { label: "کد انبار", value: data.WarehouseCode },
                     { label: "نام انبار", value: data.WarehouseName },
                     { label: "موقعیت مکانی", value: data.WarehouseLocation },
+                    { label: "تاریخ ایجاد", value: data.WarehouseCreatedAt ? new Date(data.WarehouseCreatedAt).toLocaleDateString('fa-IR') : "---" },
                 ]}
             />
 
-            {/* شرایط و ظرفیت */}
             <InfoCard
                 title="شرایط و ظرفیت"
                 icon={<EnvironmentOutlined />}
@@ -53,13 +48,12 @@ export default function WarehousesDetailModal({ open, onClose, data }: Warehouse
                 ]}
             />
 
-            {/* مدیریت */}
             <InfoCard
                 title="مدیریت"
                 icon={<UserOutlined />}
                 color="#8b5cf6"
                 items={[
-                    { label: "مسئول انبار", value: managerName },
+                    { label: "مسئول انبار", value: data.WarehouseManagerName || "---" },
                 ]}
             />
         </DetailModal>

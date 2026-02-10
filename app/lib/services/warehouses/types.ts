@@ -5,7 +5,7 @@ export interface WarehouseInput {
     TemperatureRange?: string;
     HumidityRange?: string;
     Capacity?: number;
-    WarehouseManagerName?: number; // Owner_Observer ID
+    WarehouseManagerName?: string;
     WarehouseCreatedAt?: Date;
 }
 

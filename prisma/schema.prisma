@@ -182,7 +182,7 @@ model Tbl_Warehouses {
   TemperatureRange          String?                     @db.NVarChar(50)
   HumidityRange             String?                     @db.NVarChar(50)
   Capacity                  Int?
-  WarehouseManagerName      Int?
+  WarehouseManagerName      String?                     @db.NVarChar(150)
   WarehouseCreatedAt        DateTime?                   @db.Date
   Tbl_WarehousesTransaction Tbl_WarehousesTransaction[]
 }
@@ -204,10 +204,10 @@ model Users {
   ID           Int       @id @default(autoincrement())
   Username     String    @unique @db.NVarChar(150)
   PasswordHash String    @db.NVarChar(Max)
-  Email        String?   @db.NVarChar(150)
-  RoleID       Int?      @default(1)
-  IsActive     Boolean?  @default(true)
   CreatedAt    DateTime? @default(now())
+  Email        String?   @db.NVarChar(150)
+  IsActive     Boolean?  @default(true)
+  RoleID       Int?      @default(1)
   Session      Session[]
 }
 

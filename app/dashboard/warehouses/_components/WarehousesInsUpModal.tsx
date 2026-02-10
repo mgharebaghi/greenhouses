@@ -1,54 +1,66 @@
-"use client";
-
-import { Modal, Form, Input, Select, InputNumber } from "antd";
+import { Modal, Form, Input, InputNumber } from "antd";
 import { useEffect, useState } from "react";
 import { createWarehouse } from "@/app/lib/services/warehouses";
-import { getAllOwners } from "@/app/lib/services/owners"; // Assuming this exists
-import { CloseOutlined, ShopOutlined, CheckCircleOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
+import { updateWarehouse } from "@/app/lib/services/warehouses";
+import { CloseOutlined, ShopOutlined, CheckCircleOutlined, ExclamationCircleOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import GreenhouseButton from "@/app/components/UI/GreenhouseButton";
 
-interface WarehousesInsertModalProps {
+import DatePicker from "react-multi-date-picker";
+import DateObject from "react-date-object";
+import persian from "react-date-object/calendars/persian";
+import persian_fa from "react-date-object/locales/persian_fa";
+
+interface WarehousesInsUpModalProps {
     open: boolean;
     setOpen: (open: boolean) => void;
     setLoading: (loading: boolean) => void;
-    setData: (data: any) => void;
+    data?: any | null; // If data is provided, it's edit mode
     refreshData: () => void;
 }
 
-export default function WarehousesInsertModal({ open, setOpen, setLoading, setData, refreshData }: WarehousesInsertModalProps) {
+export default function WarehousesInsUpModal({ open, setOpen, setLoading, data, refreshData }: WarehousesInsUpModalProps) {
     const [form] = Form.useForm();
-    const [managers, setManagers] = useState<{ value: number; label: string }[]>([]);
     const [internalLoading, setInternalLoading] = useState(false);
     const [message, setMessage] = useState<{ status: "ok" | "error"; message: string } | null>(null);
 
+    const isEditMode = !!data;
+
     useEffect(() => {
         if (open) {
-            fetchManagers();
-        } else {
             setMessage(null);
-        }
-    }, [open]);
-
-    const fetchManagers = async () => {
-        try {
-            const res: any = await getAllOwners();
-            if (res) {
-                setManagers(res.map((p: any) => ({
-                    value: p.ID,
-                    label: `${p.FirstName} ${p.LastName}`
-                })));
+            if (isEditMode && data) {
+                form.setFieldsValue({
+                    WarehouseCode: data.WarehouseCode,
+                    WarehouseName: data.WarehouseName,
+                    WarehouseLocation: data.WarehouseLocation,
+                    TemperatureRange: data.TemperatureRange,
+                    HumidityRange: data.HumidityRange,
+                    Capacity: data.Capacity,
+                    WarehouseManagerName: data.WarehouseManagerName,
+                    WarehouseCreatedAt: data.WarehouseCreatedAt ? new DateObject(new Date(data.WarehouseCreatedAt)).convert(persian, persian_fa) : null,
+                });
+            } else {
+                form.resetFields();
             }
-        } catch (e) {
-            console.error("Error fetching owners", e);
         }
-    };
+    }, [open, data, isEditMode, form]);
 
     const handleFinish = async (values: any) => {
         setInternalLoading(true);
         setLoading(true);
         setMessage(null);
 
-        const res = await createWarehouse(values);
+        const dataToSubmit = {
+            ...values,
+            WarehouseCreatedAt: values.WarehouseCreatedAt instanceof DateObject ? values.WarehouseCreatedAt.toDate() : undefined,
+        };
+
+        let res;
+        if (isEditMode && data?.ID) {
+            res = await updateWarehouse(data.ID, dataToSubmit);
+        } else {
+            res = await createWarehouse(dataToSubmit);
+        }
 
         setLoading(false);
         setInternalLoading(false);
@@ -58,6 +70,9 @@ export default function WarehousesInsertModal({ open, setOpen, setLoading, setDa
             setTimeout(() => {
                 setOpen(false);
                 refreshData();
+                if (!isEditMode) {
+                    form.resetFields();
+                }
             }, 1000);
         } else {
             setMessage({ status: "error", message: res.message });
@@ -67,9 +82,32 @@ export default function WarehousesInsertModal({ open, setOpen, setLoading, setDa
     const handleClose = () => {
         setOpen(false);
         setMessage(null);
+        if (!isEditMode) {
+            form.resetFields();
+        }
     };
 
-    const inputStyleClass = "rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-emerald-300 dark:hover:border-emerald-700 focus:border-emerald-400 dark:focus:border-emerald-600 transition-all shadow-sm hover:shadow w-full dark:bg-slate-800 dark:text-white dark:placeholder-slate-500";
+    const inputStyleClass = `rounded-xl border-2 border-slate-200 dark:border-slate-700 transition-all shadow-sm hover:shadow w-full dark:bg-slate-800 dark:text-white dark:placeholder-slate-500 ${isEditMode
+        ? "hover:border-emerald-300 dark:hover:border-emerald-700 focus:border-emerald-400 dark:focus:border-emerald-600"
+        : "hover:border-emerald-300 dark:hover:border-emerald-700 focus:border-emerald-400 dark:focus:border-emerald-600"
+        }`;
+    // Reusing the same color scheme for now, but keeping the logic if we want to diverge later like planting modal
+
+    // Header colors
+    const headerGradient = isEditMode
+        ? "from-emerald-50 via-teal-50/80 to-white dark:from-slate-900 dark:via-slate-800 dark:to-slate-900" // You can change this to amber/orange if desired for edit
+        : "from-emerald-50 via-lime-50/80 to-white dark:from-slate-900 dark:via-slate-800 dark:to-slate-900";
+
+    const closeBtnClass = `absolute top-5 left-5 h-9 w-9 rounded-xl bg-white dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 border border-emerald-200 dark:border-slate-600 hover:border-emerald-300 dark:hover:border-emerald-700 transition-all flex items-center justify-center text-emerald-600 dark:text-emerald-500 hover:text-emerald-700 shadow-sm hover:shadow`;
+
+    const iconGradient = isEditMode
+        ? "from-emerald-500 via-emerald-600 to-emerald-700"
+        : "from-emerald-500 via-emerald-600 to-emerald-700";
+
+    const pulseColor = isEditMode ? "bg-emerald-400" : "bg-emerald-400";
+    const dotColor = isEditMode ? "bg-lime-400" : "bg-lime-400";
+
+
     const inputStyle = { height: "46px", fontSize: "14px" };
 
     return (
@@ -92,10 +130,10 @@ export default function WarehousesInsertModal({ open, setOpen, setLoading, setDa
             }}
         >
             {/* Header */}
-            <div className="relative px-6 py-6 bg-gradient-to-br from-emerald-50 via-lime-50/80 to-white dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 border-b border-emerald-100 dark:border-slate-700">
+            <div className={`relative px-6 py-6 bg-gradient-to-br border-b border-emerald-100 dark:border-slate-700 ${headerGradient}`}>
                 <button
                     onClick={handleClose}
-                    className="absolute top-5 left-5 h-9 w-9 rounded-xl bg-white dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 border border-emerald-200 dark:border-slate-600 hover:border-emerald-300 dark:hover:border-emerald-700 transition-all flex items-center justify-center text-emerald-600 dark:text-emerald-500 hover:text-emerald-700 shadow-sm hover:shadow"
+                    className={closeBtnClass}
                     aria-label="بستن"
                 >
                     <CloseOutlined className="text-sm" />
@@ -103,16 +141,18 @@ export default function WarehousesInsertModal({ open, setOpen, setLoading, setDa
 
                 <div className="flex items-center gap-4">
                     <div className="relative">
-                        <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-emerald-500 via-emerald-600 to-emerald-700 shadow-lg flex items-center justify-center text-white">
-                            <ShopOutlined className="text-2xl" />
+                        <div className={`h-14 w-14 rounded-2xl bg-gradient-to-br shadow-lg flex items-center justify-center text-white ${iconGradient}`}>
+                            {isEditMode ? <EditOutlined className="text-2xl" /> : <ShopOutlined className="text-2xl" />}
                         </div>
-                        <div className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-lime-400 border-2 border-white dark:border-slate-800"></div>
+                        <div className={`absolute -bottom-1 -right-1 h-5 w-5 rounded-full border-2 border-white dark:border-slate-800 ${dotColor}`}></div>
                     </div>
                     <div>
-                        <h3 className="font-bold text-2xl text-emerald-900 dark:text-slate-100">افزودن انبار جدید</h3>
+                        <h3 className="font-bold text-2xl text-emerald-900 dark:text-slate-100">
+                            {isEditMode ? "ویرایش انبار" : "افزودن انبار جدید"}
+                        </h3>
                         <p className="text-sm text-emerald-600/80 dark:text-slate-400 mt-1 flex items-center gap-1.5">
-                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                            اطلاعات انبار را با دقت وارد کنید
+                            <span className={`h-1.5 w-1.5 rounded-full animate-pulse ${pulseColor}`}></span>
+                            {isEditMode ? `ویرایش اطلاعات انبار: ${data?.WarehouseName}` : "اطلاعات انبار را با دقت وارد کنید"}
                         </p>
                     </div>
                 </div>
@@ -162,19 +202,22 @@ export default function WarehousesInsertModal({ open, setOpen, setLoading, setDa
                             />
                         </Form.Item>
 
+                        <Form.Item name="WarehouseManagerName" label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">مسئول انبار</span>} className="mb-0">
+                            <Input placeholder="مثال: آقای محمدی" size="large" className={inputStyleClass} style={inputStyle} />
+                        </Form.Item>
+
                         <Form.Item
-                            name="WarehouseManagerName"
-                            label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">مسئول انبار</span>}
+                            name="WarehouseCreatedAt"
+                            label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">تاریخ تاسیس</span>}
                             className="mb-0"
                         >
-                            <Select
-                                options={managers}
-                                placeholder="انتخاب کنید"
-                                showSearch
-                                optionFilterProp="label"
-                                size="large"
-                                className="w-full"
-                                style={{ height: "46px" }}
+                            <DatePicker
+                                calendar={persian}
+                                locale={persian_fa}
+                                calendarPosition="bottom-right"
+                                inputClass={`${inputStyleClass} !h-[46px] px-3`}
+                                containerClassName="w-full"
+                                placeholder="انتخاب تاریخ"
                             />
                         </Form.Item>
 
@@ -211,7 +254,7 @@ export default function WarehousesInsertModal({ open, setOpen, setLoading, setDa
                             type="button"
                         />
                         <GreenhouseButton
-                            text={internalLoading ? "در حال ثبت..." : "ثبت انبار"}
+                            text={internalLoading ? (isEditMode ? "در حال ویرایش..." : "در حال ثبت...") : (isEditMode ? "ویرایش انبار" : "ثبت انبار")}
                             variant="primary"
                             type="submit"
                             loading={internalLoading}

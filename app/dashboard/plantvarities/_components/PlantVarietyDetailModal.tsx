@@ -1,3 +1,4 @@
+
 "use client";
 import DetailModal, { InfoCard } from "../../_components/UI/DetailModal";
 import { PlantVarietyDTO } from "../page";
@@ -27,10 +28,9 @@ export default function PlantVarietyDetailModal({ open, onClose, data }: PlantVa
         color="#10b981"
         items={[
           { label: "نام گونه", value: data.VarietyName },
-          { label: "نام رایج", value: data.Plants?.CommonName },
-          { label: "نام علمی", value: data.Plants?.ScientificName },
-          { label: "خانواده", value: data.Plants?.Family },
-          // { label: "شرکت توزیع کننده بذر", value: data.SeedCompany },
+          { label: "نام رایج", value: data.Tbl_Plants?.CommonName },
+          { label: "نام علمی", value: data.Tbl_Plants?.ScientificName },
+          { label: "خانواده", value: data.Tbl_Plants?.PlantFamily },
         ]}
       />
 
@@ -44,7 +44,6 @@ export default function PlantVarietyDetailModal({ open, onClose, data }: PlantVa
           { label: "تعداد روز تا رویش", value: data.DaysToSprout ? `${data.DaysToSprout} روز` : "—" },
           { label: "تعداد روز تا نشاء", value: data.DaysToSeedling ? `${data.DaysToSeedling} روز` : "—" },
           { label: "تعداد روز تا بلوغ", value: data.DaysToMaturity ? `${data.DaysToMaturity} روز` : "—" },
-          { label: "چرخه رشد", value: data.GrowthCycleDays ? `${data.GrowthCycleDays} روز` : "—" },
         ]}
       />
 
@@ -77,10 +76,6 @@ export default function PlantVarietyDetailModal({ open, onClose, data }: PlantVa
         color="#8b5cf6"
         items={[
           { label: "نیاز نوری", value: data.LightRequirement },
-          {
-            label: "عملکرد معمول",
-            value: data.TypicalYieldKgPerM2 ? `${data.TypicalYieldKgPerM2} کیلوگرم/m²` : "—",
-          },
         ]}
       />
 

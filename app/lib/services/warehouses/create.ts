@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 
 export async function createWarehouse(data: WarehouseInput) {
     try {
-        await prisma.warehouses.create({
+        await prisma.tbl_Warehouses.create({
             data: {
                 WarehouseCode: data.WarehouseCode,
                 WarehouseName: data.WarehouseName,

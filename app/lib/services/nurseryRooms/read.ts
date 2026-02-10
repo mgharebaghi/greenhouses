@@ -4,9 +4,9 @@ import { prisma } from "@/app/lib/singletone";
 
 export async function getAllNurseryRooms() {
     try {
-        const nurseryRooms = await prisma.nurseryRoom.findMany({
+        const nurseryRooms = await prisma.tbl_NurseryRoom.findMany({
             orderBy: {
-                NurseryRoomID: "desc",
+                ID: "desc",
             },
         });
         const safeNurseryRooms = nurseryRooms.map((room) => ({
@@ -26,8 +26,8 @@ export async function getAllNurseryRooms() {
 
 export async function getNurseryRoomById(id: number) {
     try {
-        const nurseryRoom = await prisma.nurseryRoom.findUnique({
-            where: { NurseryRoomID: id },
+        const nurseryRoom = await prisma.tbl_NurseryRoom.findUnique({
+            where: { ID: id },
         });
         if (!nurseryRoom) return null;
 

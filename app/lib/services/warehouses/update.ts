@@ -6,8 +6,8 @@ import { revalidatePath } from "next/cache";
 
 export async function updateWarehouse(id: number, data: WarehouseUpdateInput) {
     try {
-        await prisma.warehouses.update({
-            where: { WarehouseID: id },
+        await prisma.tbl_Warehouses.update({
+            where: { ID: id },
             data: {
                 WarehouseCode: data.WarehouseCode,
                 WarehouseName: data.WarehouseName,

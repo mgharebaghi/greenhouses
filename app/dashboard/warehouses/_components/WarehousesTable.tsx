@@ -4,8 +4,7 @@ import Table from "@/app/dashboard/_components/UI/Table";
 import InsertionRow from "@/app/dashboard/_components/UI/InsertionRow";
 import TableActions from "@/app/dashboard/_components/UI/TableActions";
 import DeleteModal from "@/app/dashboard/_components/UI/DeleteModal";
-import WarehousesInsertModal from "./WarehousesInsertModal";
-import WarehousesEditModal from "./WarehousesEditModal";
+import WarehousesInsUpModal from "./WarehousesInsUpModal";
 import WarehousesDetailModal from "./WarehousesDetailModal";
 import { useState } from "react";
 import { deleteWarehouse } from "@/app/lib/services/warehouses";
@@ -22,8 +21,7 @@ interface WarehousesTableProps {
 
 export default function WarehousesTable({ data, loading, setLoading, setData, refreshData }: WarehousesTableProps) {
     const [deleteModal, setDeleteModal] = useState<any>(null);
-    const [insertModal, setInsertModal] = useState(false);
-    const [editModal, setEditModal] = useState<{ open: boolean, data: any | null }>({ open: false, data: null });
+    const [insUpModal, setInsUpModal] = useState<{ open: boolean, data: any | null }>({ open: false, data: null });
     const [detailModal, setDetailModal] = useState<{ open: boolean, data: any | null }>({ open: false, data: null });
 
     const columns = [
@@ -48,17 +46,22 @@ export default function WarehousesTable({ data, loading, setLoading, setData, re
         { title: "ظرفیت", dataIndex: "Capacity", key: "Capacity" },
         { title: "محدوده دما", dataIndex: "TemperatureRange", key: "TemperatureRange" },
         {
+            title: "تاریخ تاسیس",
+            key: "WarehouseCreatedAt",
+            render: (_: any, record: any) => record.WarehouseCreatedAt ? new Date(record.WarehouseCreatedAt).toLocaleDateString('fa-IR') : "-"
+        },
+        {
             title: "مسئول انبار",
-            key: "Manager",
-            render: (_: any, record: any) => record.Owner_Observer ? `${record.Owner_Observer.FirstName} ${record.Owner_Observer.LastName}` : "-"
+            dataIndex: "WarehouseManagerName",
+            key: "WarehouseManagerName",
         },
         {
             title: "عملیات",
             key: "actions",
             render: (_: any, record: any) => (
                 <TableActions
-                    onDelete={() => setDeleteModal({ open: true, id: record.WarehouseID, name: record.WarehouseName })}
-                    onEdit={() => setEditModal({ open: true, data: record })}
+                    onDelete={() => setDeleteModal({ open: true, id: record.ID, name: record.WarehouseName })}
+                    onEdit={() => setInsUpModal({ open: true, data: record })}
                 />
             )
         }
@@ -72,10 +75,10 @@ export default function WarehousesTable({ data, loading, setLoading, setData, re
     };
 
     return (
-        <div className="w-full">
+        <div className="w-full" >
             <InsertionRow
                 text="انبار"
-                insertOnclick={() => setInsertModal(true)}
+                insertOnclick={() => setInsUpModal({ open: true, data: null })}
                 data={data}
                 csvOnclick={() => { }}
             />
@@ -84,23 +87,15 @@ export default function WarehousesTable({ data, loading, setLoading, setData, re
                 columns={columns}
                 dataSource={data}
                 loading={loading}
-                rowKey="WarehouseID"
+                rowKey="ID"
                 pagination={{ pageSize: 5 }}
             />
 
-            <WarehousesInsertModal
-                open={insertModal}
-                setOpen={setInsertModal}
+            <WarehousesInsUpModal
+                open={insUpModal.open}
+                setOpen={(open) => setInsUpModal(prev => ({ ...prev, open }))}
                 setLoading={setLoading}
-                setData={setData}
-                refreshData={refreshData}
-            />
-
-            <WarehousesEditModal
-                open={editModal.open}
-                setOpen={(open) => setEditModal(prev => ({ ...prev, open }))}
-                setLoading={setLoading}
-                data={editModal.data}
+                data={insUpModal.data}
                 refreshData={refreshData}
             />
 
@@ -118,6 +113,6 @@ export default function WarehousesTable({ data, loading, setLoading, setData, re
                 onDelete={handleDelete}
                 deleteLoading={loading}
             />
-        </div>
+        </div >
     );
 }

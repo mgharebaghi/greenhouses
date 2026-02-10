@@ -1,12 +1,16 @@
 "use server";
-import { PlantGrowthStages } from "@/app/generated/prisma";
+import { Tbl_PlantGrowthStage } from "@/app/generated/prisma";
 import { prisma } from "@/app/lib/singletone";
 
-export async function updateGrowthStage(stageId: number, data: PlantGrowthStages) {
-  await prisma.plantGrowthStages.update({
-    where: { StageID: stageId },
-    data: data,
-  });
-
-  return true;
+export async function updateGrowthStage(id: number, data: any) {
+  try {
+    await prisma.tbl_PlantGrowthStage.update({
+      where: { ID: id },
+      data: data,
+    });
+    return true;
+  } catch (error) {
+    console.error("Error updating growth stage:", error);
+    return false;
+  }
 }

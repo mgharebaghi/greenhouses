@@ -4,12 +4,9 @@ import { prisma } from "@/app/lib/singletone";
 
 export async function getAllWarehouses() {
     try {
-        const warehouses = await prisma.warehouses.findMany({
-            include: {
-                Owner_Observer: true, // Warehouse Manager details
-            },
+        const warehouses = await prisma.tbl_Warehouses.findMany({
             orderBy: {
-                WarehouseID: "desc",
+                ID: "desc",
             },
         });
         return warehouses;
@@ -21,11 +18,8 @@ export async function getAllWarehouses() {
 
 export async function getWarehouseById(id: number) {
     try {
-        const warehouse = await prisma.warehouses.findUnique({
-            where: { WarehouseID: id },
-            include: {
-                Owner_Observer: true,
-            },
+        const warehouse = await prisma.tbl_Warehouses.findUnique({
+            where: { ID: id },
         });
         return warehouse;
     } catch (error) {

@@ -1,5 +1,5 @@
-import { getSeedPackageById } from "@/app/lib/services/seedPackage"; // We need to check if this creates a server/client boundary issue. Ideally fetch on server component.
-import Image from "next/image";
+import { getSeedPackageById } from "@/app/lib/services/seedPackage";
+import QRCodeCanvas from "@/app/components/UI/QRCodeCanvas";
 import { notFound } from "next/navigation";
 
 export default async function PublicSeedPackagePage({ params }: { params: Promise<{ id: string }> }) {
@@ -19,21 +19,25 @@ export default async function PublicSeedPackagePage({ params }: { params: Promis
                 </div>
 
                 <div className="p-6 flex flex-col items-center">
-                    {pkg.QRCode && (
-                        <div className="mb-6 p-2 border-2 border-dashed border-emerald-200 rounded-xl">
-                            <Image src={pkg.QRCode} alt="QR Code" width={150} height={150} className="rounded-lg" />
+                    {pkg.ID && (
+                        <div className="mb-6 p-2 border-2 border-dashed border-emerald-200 rounded-xl bg-white">
+                            <QRCodeCanvas value={`https://mygreenhouses.ir/public/scan/seed-package/${pkg.ID}`} size={150} />
                         </div>
                     )}
 
                     <div className="w-full space-y-4">
                         <InfoRow label="شماره سریال" value={pkg.SerialNumber} />
-                        <InfoRow label="نام گونه" value={pkg.SeedBatch?.PlantVarities?.VarietyName} />
-                        <InfoRow label="تولید کننده" value={pkg.SeedBatch?.Suppliers?.CompanyName || pkg.SeedBatch?.Suppliers?.FirstName} />
-                        <InfoRow label="تعداد بذر" value={`${pkg.SeedCount || '-'} عدد`} />
-                        <InfoRow label="وزن بسته" value={`${pkg.WeightGram || '-'} گرم`} />
+                        <InfoRow label="گونه گیاهی" value={pkg.VarietyName} />
+                        <InfoRow label="تولید کننده" value={pkg.ProducerName} />
+                        <InfoRow label="تعداد بذر" value={pkg.SeedCount ? `${pkg.SeedCount} عدد` : '-'} />
+                        <InfoRow label="وزن بسته" value={pkg.WeightGram ? `${pkg.WeightGram} گرم` : '-'} />
                         <InfoRow label="نوع بسته‌بندی" value={pkg.PackageType} />
-                        <InfoRow label="تاریخ تولید" value={pkg.SeedBatch?.ProductionDate ? new Date(pkg.SeedBatch.ProductionDate).toLocaleDateString('fa-IR') : '-'} />
-                        <InfoRow label="تاریخ انقضا" value={pkg.SeedBatch?.ExpirationDate ? new Date(pkg.SeedBatch.ExpirationDate).toLocaleDateString('fa-IR') : '-'} />
+                        <InfoRow label="تاریخ تولید" value={pkg.ProductionDate ? new Date(pkg.ProductionDate).toLocaleDateString('fa-IR') : '-'} />
+                        <InfoRow label="تاریخ بسته‌بندی" value={pkg.PackagingDate ? new Date(pkg.PackagingDate).toLocaleDateString('fa-IR') : '-'} />
+                        <InfoRow label="تاریخ انقضا" value={pkg.ExpirationDate ? new Date(pkg.ExpirationDate).toLocaleDateString('fa-IR') : '-'} />
+                        <InfoRow label="درجه کیفی" value={pkg.QualityGrade} />
+                        <InfoRow label="درصد جوانه زنی" value={pkg.GerminationRate ? `${pkg.GerminationRate}%` : '-'} />
+                        <InfoRow label="درصد خلوص" value={pkg.PurityPercent ? `${pkg.PurityPercent}%` : '-'} />
 
                         <div className={`mt-6 p-3 rounded-lg text-center font-bold text-sm ${pkg.IsCertified ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>
                             {pkg.IsCertified ? '✓ دارای گواهی اصالت و سلامت' : '⚠ وضعیت گواهی نامشخص'}
@@ -49,7 +53,7 @@ export default async function PublicSeedPackagePage({ params }: { params: Promis
     );
 }
 
-function InfoRow({ label, value }: { label: string, value: string | undefined }) {
+function InfoRow({ label, value }: { label: string, value: string | undefined | null }) {
     if (!value) return null;
     return (
         <div className="flex justify-between items-center border-b border-slate-100 pb-2 last:border-0">

@@ -1,8 +1,8 @@
 import { getGrowthStages } from "@/app/lib/services/growthstages";
-import type { PlantGrowthStages } from "@/app/generated/prisma";
+import type { Tbl_PlantGrowthStage } from "@/app/generated/prisma";
 
 export type GrowthStageRawArray = Awaited<ReturnType<typeof getGrowthStages>>;
-export type GrowthStageFlattened = PlantGrowthStages & {
+export type GrowthStageFlattened = Tbl_PlantGrowthStage & {
   VarietyName: string;
 };
 
@@ -10,7 +10,7 @@ export async function growthStagesCSVData(source?: GrowthStageRawArray): Promise
   const data = source ?? (await getGrowthStages());
   return data.map((item) => ({
     ...item,
-    VarietyName: (item as any).PlantVarieties?.VarietyName ?? "",
+    VarietyName: (item as any).Tbl_plantVariety?.VarietyName ?? "",
   }));
 }
 

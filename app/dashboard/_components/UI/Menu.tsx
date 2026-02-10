@@ -73,7 +73,6 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
       icon: <ExperimentOutlined />,
       title: "مدیریت بذر",
       submenu: [
-        { title: "تولید بذر", page: "/dashboard/seed-production", icon: <NodeIndexOutlined /> },
         { title: "بسته‌بندی بذر", page: "/dashboard/seed-package", icon: <InboxOutlined /> },
         { title: "انبارداری بذر", page: "/dashboard/seed-warehousing", icon: <DatabaseOutlined /> },
       ],

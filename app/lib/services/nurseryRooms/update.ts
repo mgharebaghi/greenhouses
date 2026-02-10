@@ -6,8 +6,8 @@ import { revalidatePath } from "next/cache";
 
 export async function updateNurseryRoom(id: number, data: NurseryRoomUpdateInput) {
     try {
-        await prisma.nurseryRoom.update({
-            where: { NurseryRoomID: id },
+        await prisma.tbl_NurseryRoom.update({
+            where: { ID: id },
             data: {
                 NurseryRoomCode: data.NurseryRoomCode,
                 NurseryRoomName: data.NurseryRoomName,
