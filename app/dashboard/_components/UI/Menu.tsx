@@ -59,14 +59,14 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
       icon: <FolderOutlined />,
       title: "اطلاعات پایه",
       submenu: [
-        { title: "اشخاص", page: "/dashboard/owners", icon: <UsergroupAddOutlined /> },
+        { title: "اشخاص", page: "/dashboard/people", icon: <UsergroupAddOutlined /> },
         { title: "تامین‌کنندگان", page: "/dashboard/suppliers", icon: <ShopOutlined /> },
         { title: "گلخانه‌ها", page: "/dashboard/greenhouse", icon: <GatewayOutlined /> },
         { title: "انواع گیاه", page: "/dashboard/plants", icon: <FileTextOutlined /> },
         { title: "گونه‌های گیاهی", page: "/dashboard/plantvarities", icon: <AppstoreOutlined /> },
         { title: "مراحل رشد", page: "/dashboard/growthstages", icon: <RiseOutlined /> },
         { title: "انبارها", page: "/dashboard/warehouses", icon: <ContainerOutlined /> },
-        { title: "اتاق‌های نشاء", page: "/dashboard/nursery-rooms", icon: <BorderOuterOutlined /> },
+        { title: "اتاق‌های ریکاوری", page: "/dashboard/nursery-rooms", icon: <BorderOuterOutlined /> },
       ],
     },
     {

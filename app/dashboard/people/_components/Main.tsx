@@ -1,22 +1,23 @@
 "use client";
 
-import { Owner_Observer } from "@/app/generated/prisma";
+import { Tbl_People } from "@/app/generated/prisma";
 import { useState } from "react";
 import OwnersTable from "./OwnersTable";
 import OwnersInsertModal from "./OwnerInsertModal";
 import OwnersEditModal, { OwnerEditModalProps } from "./OwnerEditModal";
+import { OwnerResponse } from "@/app/lib/services/owners";
 
 type OwnersDashboardProps = {
-  initialData: Owner_Observer[];
+  initialData: OwnerResponse;
 };
 
 export default function OwnersDashboard({ initialData }: OwnersDashboardProps) {
-  const [data, setData] = useState<Owner_Observer[]>(initialData);
+  const [data, setData] = useState<Tbl_People[]>(initialData.dta);
   const [loading, setLoading] = useState(false);
   const [insertModal, setInsertModal] = useState(false);
   const [editModal, setEditModal] = useState<OwnerEditModalProps>({ isOpen: false });
 
-  const onEdit = (record: Owner_Observer) => {
+  const onEdit = (record: Tbl_People) => {
     setEditModal({ isOpen: true, record });
   };
 

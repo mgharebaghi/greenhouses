@@ -1,4 +1,4 @@
-import { Owner_Observer } from "@/app/generated/prisma";
+import { Tbl_People } from "@/app/generated/prisma";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 // import { Table } from "antd";
 import InsertionRow from "../../_components/UI/InsertionRow";
@@ -11,12 +11,12 @@ import { generateCsv, download, mkConfig } from "export-to-csv";
 import { ownersCSVData, headers } from "../data/csvFileData";
 
 type OwnersProps = {
-  data: Owner_Observer[];
+  data: Tbl_People[];
   loading: boolean;
-  onEdit: (owner: Owner_Observer) => void;
+  onEdit: (owner: Tbl_People) => void;
   setInsertModal: (open: boolean) => void;
   setLoading: (loading: boolean) => void;
-  setData: (data: Owner_Observer[]) => void;
+  setData: (data: Tbl_People[]) => void;
 };
 
 export default function OwnersTable(props: OwnersProps) {
@@ -48,7 +48,7 @@ export default function OwnersTable(props: OwnersProps) {
     {
       title: "عملیات",
       key: "actions",
-      render: (_: any, record: Owner_Observer) => (
+      render: (_: any, record: Tbl_People) => (
         <TableActions
           onEdit={() => {
             props.onEdit(record);
@@ -90,8 +90,8 @@ export default function OwnersTable(props: OwnersProps) {
     }
 
     props.setLoading(true);
-    const newData: Owner_Observer[] = await getAllOwners();
-    props.setData(newData);
+    const newData: OwnerResponse = await getAllOwners();
+    props.setData(newData.dta);
     props.setLoading(false);
   };
 

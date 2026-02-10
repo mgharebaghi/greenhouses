@@ -1,9 +1,22 @@
 "use server";
 
-import { Owner_Observer } from "@/app/generated/prisma";
+import { Tbl_People } from "@/app/generated/prisma";
 import { prisma } from "@/app/lib/singletone";
-export async function getAllOwners(): Promise<Owner_Observer[]> {
-  return prisma.owner_Observer.findMany({
-    orderBy: { ID: "desc" },
+import { OwnerResponse } from "./types";
+export async function getAllOwners(): Promise<OwnerResponse> {
+  const peaples = prisma.tbl_People.findMany({
+    orderBy: { ID: "desc" }
   });
+
+  if (!peaples) {
+    return {
+      status: "error",
+      message: "جدول اشخاص خالی میباشد",
+    };
+  }
+  return {
+    status: "ok",
+    message: "مالکین با موفقیت دریافت شد",
+    dta: peaples,
+  };
 }

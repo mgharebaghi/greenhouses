@@ -1,4 +1,4 @@
-import { Owner_Observer } from "@/app/generated/prisma";
+import { Tbl_People } from "@/app/generated/prisma";
 import { getAllOwners, updateOwner } from "@/app/lib/services/owners";
 import { Modal, Form, Input } from "antd";
 import { useEffect, useState } from "react";
@@ -8,8 +8,8 @@ import GreenhouseButton from "@/app/components/UI/GreenhouseButton";
 export type OwnerEditModalProps = {
   isOpen: boolean;
   setIsOpen?: (open: boolean) => void;
-  record?: Owner_Observer;
-  setMainData?: (data: Owner_Observer[]) => void;
+  record?: Tbl_People;
+  setMainData?: (data: Tbl_People[]) => void;
   setMainLoading?: (loading: boolean) => void;
 };
 
@@ -48,7 +48,7 @@ export default function OwnersEditModal({
       setMessage("اطلاعات با موفقیت ویرایش شد");
       setMainLoading && setMainLoading(true);
       const mainData = await getAllOwners();
-      setMainData && setMainData(mainData);
+      setMainData && setMainData(mainData.dta);
       setMainLoading && setMainLoading(false);
       setTimeout(() => {
         setIsOpen && setIsOpen(false);
@@ -149,8 +149,8 @@ export default function OwnersEditModal({
             {message && (
               <div
                 className={`mt-5 p-4 rounded-xl border-2 flex items-start gap-3 animate-in fade-in slide-in-from-top-3 duration-300 shadow-sm ${message.includes("موفقیت")
-                    ? "bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-900/30 dark:to-emerald-900/10 border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-300"
-                    : "bg-gradient-to-br from-rose-50 to-rose-100/50 dark:from-rose-900/30 dark:to-rose-900/10 border-rose-300 dark:border-rose-800 text-rose-900 dark:text-rose-300"
+                  ? "bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-900/30 dark:to-emerald-900/10 border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-300"
+                  : "bg-gradient-to-br from-rose-50 to-rose-100/50 dark:from-rose-900/30 dark:to-rose-900/10 border-rose-300 dark:border-rose-800 text-rose-900 dark:text-rose-300"
                   }`}
               >
                 <div

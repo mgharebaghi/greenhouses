@@ -238,7 +238,7 @@ export default function NurseryPlantingInsertModal({
                         <div className="flex flex-col gap-2">
                             <Form.Item
                                 name="NurseryRoomID"
-                                label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">انتخاب اتاق نشاء <span className="text-rose-500">*</span></span>}
+                                label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">انتخاب اتاق ریکاوری <span className="text-rose-500">*</span></span>}
                                 rules={[{ required: true, message: 'لطفا اتاق نشاء را انتخاب کنید' }]}
                                 className="mb-0"
                             >

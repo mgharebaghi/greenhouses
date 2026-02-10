@@ -1,4 +1,4 @@
-import { Owner_Observer } from "@/app/generated/prisma";
+import { Tbl_People } from "@/app/generated/prisma";
 import { createOwner, OwnerResponse } from "@/app/lib/services/owners";
 import { getAllOwners } from "@/app/lib/services/owners/read";
 import { Modal, Form, Input } from "antd";
@@ -9,7 +9,7 @@ import GreenhouseButton from "@/app/components/UI/GreenhouseButton";
 type OwnerInsertModalProps = {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
-  setMainData: (data: Owner_Observer[]) => void;
+  setMainData: (data: Tbl_People[]) => void;
   setMainLoading: (loading: boolean) => void;
 };
 
@@ -25,7 +25,7 @@ export default function OwnersInsertModal({ isOpen, setIsOpen, setMainData, setM
     { name: "Profesion", label: "تخصص", required: true, placeholder: "تخصص را وارد کنید", icon: "💼" },
   ];
 
-  const handleSubmit = async (values: Owner_Observer) => {
+  const handleSubmit = async (values: Tbl_People) => {
     setMessage(null);
     setLoading(true);
     const res: OwnerResponse = await createOwner(values);
@@ -34,7 +34,7 @@ export default function OwnersInsertModal({ isOpen, setIsOpen, setMainData, setM
       setMessage(res);
       setMainLoading(true);
       const mainData = await getAllOwners();
-      setMainData(mainData);
+      setMainData(mainData.dta);
       setMainLoading(false);
       form.resetFields();
       setTimeout(() => {
@@ -135,8 +135,8 @@ export default function OwnersInsertModal({ isOpen, setIsOpen, setMainData, setM
           {message && (
             <div
               className={`mt-5 p-4 rounded-xl border-2 flex items-start gap-3 animate-in fade-in slide-in-from-top-3 duration-300 shadow-sm ${message.status === "ok"
-                  ? "bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-900/30 dark:to-emerald-900/10 border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-300"
-                  : "bg-gradient-to-br from-rose-50 to-rose-100/50 dark:from-rose-900/30 dark:to-rose-900/10 border-rose-300 dark:border-rose-800 text-rose-900 dark:text-rose-300"
+                ? "bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-900/30 dark:to-emerald-900/10 border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-300"
+                : "bg-gradient-to-br from-rose-50 to-rose-100/50 dark:from-rose-900/30 dark:to-rose-900/10 border-rose-300 dark:border-rose-800 text-rose-900 dark:text-rose-300"
                 }`}
             >
               <div
