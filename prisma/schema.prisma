@@ -199,3 +199,21 @@ model Tbl_WarehousesTransaction {
   Tbl_SeedPackage Tbl_SeedPackage? @relation(fields: [SeedPackageID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_WarehousesTransaction_Tbl_SeedPackage")
   Tbl_Warehouses  Tbl_Warehouses?  @relation(fields: [WarehouseID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_WarehousesTransaction_Tbl_Warehouses")
 }
+
+model Users {
+  ID           Int       @id @default(autoincrement())
+  Username     String    @unique @db.NVarChar(150)
+  PasswordHash String    @db.NVarChar(Max)
+  Session      Session[]
+}
+
+model Session {
+  ID         Int      @id @default(autoincrement())
+  PublicID   String   @unique @db.NVarChar(150)
+  SecretHash String   @db.NVarChar(Max)
+  UserId     Int
+  CreatedAt  DateTime @default(now())
+  ExpiresAt  DateTime
+  User       Users    @relation(fields: [UserId], references: [ID], onDelete: Cascade)
+}
+
