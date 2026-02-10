@@ -66,7 +66,7 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
         { title: "گونه‌های گیاهی", page: "/dashboard/plantvarities", icon: <AppstoreOutlined /> },
         { title: "مراحل رشد", page: "/dashboard/growthstages", icon: <RiseOutlined /> },
         { title: "انبارها", page: "/dashboard/warehouses", icon: <ContainerOutlined /> },
-        { title: "اتاق‌های نشاء", page: "/dashboard/nursery-rooms", icon: <BorderOuterOutlined /> },
+        { title: "اتاق‌های ریکاوری", page: "/dashboard/nursery-rooms", icon: <BorderOuterOutlined /> },
       ],
     },
     {
