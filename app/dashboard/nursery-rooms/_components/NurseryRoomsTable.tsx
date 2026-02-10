@@ -78,7 +78,7 @@ export default function NurseryRoomsTable({ data, loading, setLoading, setData, 
     return (
         <div className="w-full">
             <InsertionRow
-                text="اتاق نشاء"
+                text="اتاق ریکاوری"
                 insertOnclick={() => setInsertModal(true)}
                 data={data}
                 csvOnclick={() => { }}
@@ -102,7 +102,7 @@ export default function NurseryRoomsTable({ data, loading, setLoading, setData, 
 
             <NurseryRoomsEditModal
                 open={editModal.open}
-                setOpen={(open) => setEditModal(prev => ({ ...prev, open }))}
+                setOpen={(open:  any) => setEditModal(prev => ({ ...prev, open }))}
                 setLoading={setLoading}
                 data={editModal.data}
                 refreshData={refreshData}
