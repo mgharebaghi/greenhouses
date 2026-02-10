@@ -1,4 +1,4 @@
-import { Plants } from "@/app/generated/prisma";
+import { Tbl_Plants } from "@/app/generated/prisma";
 import { getPlants } from "@/app/lib/services/plants";
 import { deletePlant } from "@/app/lib/services/plants/delete";
 import { Button, Divider, Modal } from "antd";
@@ -7,8 +7,8 @@ import { useState } from "react";
 export type PlantsDeleteModalProps = {
   isOpen: boolean;
   onClose?: () => void;
-  plant?: Plants;
-  setMainData?: (data: Plants[]) => void;
+  plant?: Tbl_Plants;
+  setMainData?: (data: Tbl_Plants[]) => void;
   setMainLoading?: (loading: boolean) => void;
 };
 
@@ -23,7 +23,7 @@ export default function PlantsDeleteModal({
 
   const handleDelete = async () => {
     setLoading(true);
-    const res = await deletePlant(plant?.PlantID!);
+    const res = await deletePlant(plant?.ID!);
     if (res) {
       setLoading(false);
       onClose?.();
