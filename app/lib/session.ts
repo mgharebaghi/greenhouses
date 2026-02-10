@@ -62,13 +62,13 @@ export async function ReadSession(): Promise<Session | null> {
   if (!isValid) return { status: "error", code: 403 };
 
   const user = await prisma.users.findUnique({
-    where: { UserID: session.UserId || 0 },
-    select: { UserID: true, Username: true },
+    where: { ID: session.UserId || 0 },
+    select: { ID: true, Username: true },
   });
 
   if (!user) return { status: "error", code: 404 };
 
-  return { status: "ok", code: 200, id: user.UserID, username: user.Username };
+  return { status: "ok", code: 200, id: user.ID, username: user.Username };
 }
 
 export async function DeleteSession() {

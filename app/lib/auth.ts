@@ -34,7 +34,7 @@ export async function signIn(data: { username: string; password: string; remembe
     return { status: "error", message: "کلمه عبور صحیح نمی باشد!" };
   }
 
-  const { token, ttlDays } = await CreateSession({ userId: user.UserID, remember: data.remember });
+  const { token, ttlDays } = await CreateSession({ userId: user.ID, remember: data.remember });
 
   // Set cookies (this is just an example, adapt it to your framework)
   const cookieStore = cookies();

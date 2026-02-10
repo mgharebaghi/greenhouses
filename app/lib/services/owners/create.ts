@@ -1,14 +1,14 @@
 "use server";
-import { Owner_Observer } from "@/app/generated/prisma";
+import { Tbl_People } from "@/app/generated/prisma";
 import { OwnerResponse } from "./types";
 import { prisma } from "@/app/lib/singletone";
 
-export async function createOwner(data: Owner_Observer): Promise<OwnerResponse> {
+export async function createOwner(data: Tbl_People): Promise<OwnerResponse> {
   if (!data.FirstName || !data.LastName || !data.PhoneNumber || !data.Profesion) {
     return { status: "error", message: "لطفاً تمام فیلدها را پر کنید." };
   }
 
-  const insert = await prisma.owner_Observer.create({
+  const insert = await prisma.tbl_People.create({
     data: {
       FirstName: data.FirstName,
       LastName: data.LastName,

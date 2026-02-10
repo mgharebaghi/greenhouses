@@ -9,7 +9,7 @@ export type OwnersDeleteResponse = {
 
 export async function deleteOwner(ownerId: number): Promise<OwnersDeleteResponse> {
   try {
-    const deletation = await prisma.owner_Observer.delete({
+    const deletation = await prisma.tbl_People.delete({
       where: { ID: ownerId },
     });
 

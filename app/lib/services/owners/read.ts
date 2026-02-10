@@ -4,7 +4,7 @@ import { Tbl_People } from "@/app/generated/prisma";
 import { prisma } from "@/app/lib/singletone";
 import { OwnerResponse } from "./types";
 export async function getAllOwners(): Promise<OwnerResponse> {
-  const peaples = prisma.tbl_People.findMany({
+  const peaples = await prisma.tbl_People.findMany({
     orderBy: { ID: "desc" }
   });
 

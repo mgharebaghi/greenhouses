@@ -204,6 +204,10 @@ model Users {
   ID           Int       @id @default(autoincrement())
   Username     String    @unique @db.NVarChar(150)
   PasswordHash String    @db.NVarChar(Max)
+  Email        String?   @db.NVarChar(150)
+  RoleID       Int?      @default(1)
+  IsActive     Boolean?  @default(true)
+  CreatedAt    DateTime? @default(now())
   Session      Session[]
 }
 
@@ -216,4 +220,3 @@ model Session {
   ExpiresAt  DateTime
   User       Users    @relation(fields: [UserId], references: [ID], onDelete: Cascade)
 }
-
