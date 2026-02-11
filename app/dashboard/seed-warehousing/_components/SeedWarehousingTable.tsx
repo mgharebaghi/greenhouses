@@ -80,8 +80,8 @@ export default function SeedWarehousingTable({
         },
         {
             title: "شماره تراکنش",
-            dataIndex: "TransactionID",
-            key: "TransactionID",
+            dataIndex: "ID",
+            key: "ID",
         },
         {
             title: "نوع",
@@ -101,14 +101,14 @@ export default function SeedWarehousingTable({
             key: "SeedPackage",
             width: 150,
             render: (_: any, record: any) => (
-                <span>{record.SeedPackage?.SerialNumber} <span className="text-xs text-slate-400">({record.SeedPackage?.PackageType})</span></span>
+                <span>{record.Tbl_SeedPackage?.SerialNumber} <span className="text-xs text-slate-400">({record.Tbl_SeedPackage?.PackageType})</span></span>
             )
         },
         {
             title: "انبار",
             key: "Warehouse",
             width: 150,
-            render: (_: any, record: any) => record.Warehouses?.WarehouseName || "-"
+            render: (_: any, record: any) => record.Tbl_Warehouses?.WarehouseName || "-"
         },
         {
             title: "تاریخ",
@@ -123,7 +123,7 @@ export default function SeedWarehousingTable({
             render: (_: any, record: any) => (
                 <TableActions
                     onEdit={() => setEditModal({ open: true, data: record })}
-                    onDelete={() => setDeleteModal({ open: true, id: record.TransactionID, name: `تراکنش ${record.TransactionID}` })}
+                    onDelete={() => setDeleteModal({ open: true, id: record.ID, name: `تراکنش ${record.ID}` })}
                 />
             ),
         },
@@ -141,7 +141,7 @@ export default function SeedWarehousingTable({
             <Table
                 dataSource={data}
                 columns={columns}
-                rowKey="TransactionID"
+                rowKey="ID"
                 loading={loading}
                 pagination={{ pageSize: 10 }}
             />

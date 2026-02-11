@@ -143,7 +143,7 @@ export default function SeedWarehousingAddModal({
                                 style={{ height: "46px" }}
                                 options={seedPackages.map((pkg) => ({
                                     label: `${pkg.SerialNumber} - ${pkg.PackageType}`,
-                                    value: pkg.SeedPackageID,
+                                    value: pkg.ID,
                                 }))}
                             />
                         </Form.Item>
@@ -161,7 +161,7 @@ export default function SeedWarehousingAddModal({
                                 style={{ height: "46px" }}
                                 options={warehouses.map((wh) => ({
                                     label: wh.WarehouseName,
-                                    value: wh.WarehouseID,
+                                    value: wh.ID,
                                 }))}
                             />
                         </Form.Item>

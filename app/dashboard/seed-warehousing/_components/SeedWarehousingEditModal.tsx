@@ -58,7 +58,7 @@ export default function SeedWarehousingEditModal({
                 PackageQuantity: Number(values.PackageQuantity),
             };
 
-            const result = await updateSeedWarehousing(data.TransactionID, payload);
+            const result = await updateSeedWarehousing(data.ID, payload);
 
             if (result.success) {
                 setMessage({ status: "ok", message: "تراکنش انبار با موفقیت ویرایش شد" });
@@ -151,7 +151,7 @@ export default function SeedWarehousingEditModal({
                                 style={{ height: "46px" }}
                                 options={seedPackages.map((pkg) => ({
                                     label: `${pkg.SerialNumber} - ${pkg.PackageType}`,
-                                    value: pkg.SeedPackageID,
+                                    value: pkg.ID,
                                 }))}
                             />
                         </Form.Item>
@@ -169,7 +169,7 @@ export default function SeedWarehousingEditModal({
                                 style={{ height: "46px" }}
                                 options={warehouses.map((wh) => ({
                                     label: wh.WarehouseName,
-                                    value: wh.WarehouseID,
+                                    value: wh.ID,
                                 }))}
                             />
                         </Form.Item>

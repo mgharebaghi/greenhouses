@@ -77,26 +77,6 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
         { title: "انبارداری بذر", page: "/dashboard/seed-warehousing", icon: <DatabaseOutlined /> },
       ],
     },
-
-
-    {
-      icon: <BarChartOutlined />,
-      title: "پایش و رشد",
-      submenu: [
-        { title: "اطلاعات کاشت", page: "/dashboard/planting", icon: <FieldTimeOutlined /> },
-
-      ],
-    },
-    {
-      icon: <CloudOutlined />,
-      title: "اقلیم و آب‌وهوا",
-      submenu: [{ title: "ثبت داده‌های اقلیمی", page: "/dashboard/climatedaily", icon: <SunOutlined /> }],
-    },
-    {
-      icon: <ApiOutlined />,
-      title: "سیستم آبیاری",
-      page: "/dashboard/irrigation",
-    },
   ];
 
   // Accordion behavior

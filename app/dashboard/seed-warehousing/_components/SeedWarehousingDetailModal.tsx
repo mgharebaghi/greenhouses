@@ -51,7 +51,7 @@ export default function SeedWarehousingDetailModal({
                         icon={<InfoCircleOutlined />}
                         color="#10b981"
                         items={[
-                            { label: "شماره ثبت", value: data.TransactionID },
+                            { label: "شماره ثبت", value: data.ID },
                             { label: "نوع تراکنش", value: <Tag color={trxType.color}>{trxType.text}</Tag> },
                             { label: "تاریخ تراکنش", value: formatDate(data.TransactionDate) },
                             { label: "تعداد بسته", value: data.PackageQuantity },
@@ -64,9 +64,9 @@ export default function SeedWarehousingDetailModal({
                         icon={<ContainerOutlined />}
                         color="#3b82f6"
                         items={[
-                            { label: "نام انبار", value: data.Warehouses?.WarehouseName || "—" },
-                            { label: "محل انبار", value: data.Warehouses?.WarehouseLocation || "—" },
-                            { label: "مدیر انبار", value: data.Warehouses?.Owner_Observer?.LastName || "—" },
+                            { label: "نام انبار", value: data.Tbl_Warehouses?.WarehouseName || "—" },
+                            { label: "محل انبار", value: data.Tbl_Warehouses?.WarehouseLocation || "—" },
+                            { label: "مدیر انبار", value: data.Tbl_Warehouses?.WarehouseManagerName || "—" },
                         ]}
                     />
 
@@ -76,9 +76,9 @@ export default function SeedWarehousingDetailModal({
                         icon={<InboxOutlined />}
                         color="#f59e0b"
                         items={[
-                            { label: "شماره سریال", value: data.SeedPackage?.SerialNumber || "—" },
-                            { label: "نوع بسته", value: data.SeedPackage?.PackageType || "—" },
-                            { label: "وزن (گرم)", value: data.SeedPackage?.WeightGram || "—" },
+                            { label: "شماره سریال", value: data.Tbl_SeedPackage?.SerialNumber || "—" },
+                            { label: "نوع بسته", value: data.Tbl_SeedPackage?.PackageType || "—" },
+                            { label: "وزن (گرم)", value: data.Tbl_SeedPackage?.WeightGram || "—" },
                         ]}
                     />
 
