@@ -3,17 +3,11 @@
 import { Drawer } from "antd";
 import {
   HomeOutlined,
-  EnvironmentOutlined,
   LogoutOutlined,
-  CloudOutlined,
-  ApiOutlined,
   DownOutlined,
   FolderOutlined,
-  BarChartOutlined,
   ExperimentOutlined,
   CalendarOutlined,
-  UserOutlined,
-  SafetyCertificateOutlined,
   RightOutlined,
   UsergroupAddOutlined,
   ShopOutlined,
@@ -24,18 +18,14 @@ import {
   ContainerOutlined,
   InboxOutlined,
   DatabaseOutlined,
-  LineChartOutlined,
-  SunOutlined,
-  FieldTimeOutlined,
   BorderOuterOutlined,
-  NodeIndexOutlined
 } from "@ant-design/icons";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import NProgress from "nprogress";
 import { removeAuth } from "@/app/lib/auth";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 type MenuItem = {
   icon: React.ReactNode;
