@@ -22,7 +22,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/dashboard/plantvarities": "اطلاعات گونه گیاهی",
   "/dashboard/growthstages": "مراحل رشد گیاه",
   "/dashboard/planting": "اطلاعات کاشت",
-  "/dashboard/growthdaily": "پایش رشد گیاه",
+
   "/dashboard/climatedaily": "ثبت اطلاعات اقلیمی",
   "/dashboard/irrigation": "آبیاری",
   "/dashboard/seed-production": "تولید بذر",
@@ -30,10 +30,9 @@ const PAGE_TITLES: Record<string, string> = {
   "/dashboard/seed-warehousing": "انبارداری بذر",
   "/dashboard/warehouses": "مدیریت انبارها",
   "/dashboard/nursery-rooms": "مدیریت اتاق های نشاء",
-  "/dashboard/nursery/planting": "کاشت نشاء",
-  "/dashboard/nursery/monitoring": "پایش نشاء",
-  "/dashboard/grafting/rootstock": "اطلاعات گیاه پایه",
-  "/dashboard/grafting/grafted-seedling": "نشاء پیوندی",
+
+
+
 };
 
 export default function DashboardShell({ children }: { children: React.ReactNode }) {

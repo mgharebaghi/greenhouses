@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/app/lib/singletone";
-import { deleteZones } from "../zones/delete";
+// import { deleteZones } from "../zones/delete";
 
 export type GreenHouseDeleteResponse = {
   status: "ok" | "error";
@@ -10,7 +10,7 @@ export type GreenHouseDeleteResponse = {
 
 export async function deleteGreenHouse(id: number) {
   try {
-    await deleteZones(id);
+    // await deleteZones(id); // Module deleted
 
     await prisma.tbl_Greenhouses.delete({
       where: { ID: id },

@@ -9,8 +9,8 @@ export async function updateSeedWarehousing(id: number, data: any) {
             ? new Date(data.TransactionDate)
             : undefined;
 
-        const updatedTrx = await prisma.warehousesTransactions.update({
-            where: { TransactionID: id },
+        const updatedTrx = await prisma.tbl_WarehousesTransaction.update({
+            where: { ID: id },
             data: {
                 SeedPackageID: data.SeedPackageID ? Number(data.SeedPackageID) : undefined,
                 WarehouseID: data.WarehouseID ? Number(data.WarehouseID) : undefined,

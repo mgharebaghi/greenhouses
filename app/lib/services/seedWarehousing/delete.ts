@@ -5,8 +5,8 @@ import { revalidatePath } from "next/cache";
 
 export async function deleteSeedWarehousing(id: number) {
     try {
-        await prisma.warehousesTransactions.delete({
-            where: { TransactionID: id },
+        await prisma.tbl_WarehousesTransaction.delete({
+            where: { ID: id },
         });
 
         revalidatePath("/dashboard/seed-warehousing");

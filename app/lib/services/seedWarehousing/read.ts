@@ -10,22 +10,13 @@ function serializeTransaction(trx: any) {
 
 export async function getAllSeedWarehousing() {
     try {
-        const transactions = await prisma.warehousesTransactions.findMany({
+        const transactions = await prisma.tbl_WarehousesTransaction.findMany({
             include: {
-                SeedPackage: {
-                    include: {
-                        // Include seed batch details to show crop variety etc if needed
-                        SeedBatch: {
-                            include: {
-                                PlantVarities: true
-                            }
-                        }
-                    }
-                },
-                Warehouses: true
+                Tbl_SeedPackage: true,
+                Tbl_Warehouses: true
             },
             orderBy: {
-                TransactionID: "desc",
+                ID: "desc",
             },
         });
         return transactions.map(serializeTransaction);
@@ -37,11 +28,11 @@ export async function getAllSeedWarehousing() {
 
 export async function getSeedWarehousingById(id: number) {
     try {
-        const trx = await prisma.warehousesTransactions.findUnique({
-            where: { TransactionID: id },
+        const trx = await prisma.tbl_WarehousesTransaction.findUnique({
+            where: { ID: id },
             include: {
-                SeedPackage: true,
-                Warehouses: true
+                Tbl_SeedPackage: true,
+                Tbl_Warehouses: true
             }
         });
         return serializeTransaction(trx);

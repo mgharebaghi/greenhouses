@@ -77,29 +77,14 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
         { title: "انبارداری بذر", page: "/dashboard/seed-warehousing", icon: <DatabaseOutlined /> },
       ],
     },
-    {
-      icon: <AppstoreOutlined />,
-      title: "نشاء کاری",
-      submenu: [
-        { title: "کاشت نشاء", page: "/dashboard/nursery/planting", icon: <NodeIndexOutlined /> },
-        { title: "پایش نشاء", page: "/dashboard/nursery/monitoring", icon: <LineChartOutlined /> },
-      ],
-    },
-    {
-      icon: <GatewayOutlined />,
-      title: "عملیات پیوند",
-      submenu: [
-        { title: "اطلاعات گیاه پایه", page: "/dashboard/grafting/rootstock", icon: <FileTextOutlined /> },
-        { title: "پیوند زنی", page: "/dashboard/grafting/operation", icon: <ExperimentOutlined /> },
-        { title: "نشاء پیوندی", page: "/dashboard/grafting/grafted-seedling", icon: <ExperimentOutlined /> },
-      ],
-    },
+
+
     {
       icon: <BarChartOutlined />,
       title: "پایش و رشد",
       submenu: [
         { title: "اطلاعات کاشت", page: "/dashboard/planting", icon: <FieldTimeOutlined /> },
-        { title: "پایش روزانه رشد", page: "/dashboard/growthdaily", icon: <LineChartOutlined /> },
+
       ],
     },
     {

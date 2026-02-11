@@ -9,7 +9,7 @@ export async function createSeedWarehousing(data: any) {
             ? new Date(data.TransactionDate)
             : new Date();
 
-        const newTrx = await prisma.warehousesTransactions.create({
+        const newTrx = await prisma.tbl_WarehousesTransaction.create({
             data: {
                 SeedPackageID: Number(data.SeedPackageID),
                 WarehouseID: Number(data.WarehouseID),
