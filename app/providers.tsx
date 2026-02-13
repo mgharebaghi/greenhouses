@@ -4,7 +4,7 @@ import faIR from "antd/locale/fa_IR";
 import { Suspense, useEffect, useState } from "react";
 import { ConfigProvider, theme as themeNumeric } from "antd";
 import { ThemeProvider, useTheme } from "next-themes";
-import NavigationProgressBar from "./components/NavigationProgressBar";
+import NavigationProgressBar from "@/shared/components/NavigationProgressBar";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (

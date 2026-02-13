@@ -1,7 +1,7 @@
-import { getAllSeedWarehousing } from "@/app/lib/services/seedWarehousing";
-import { getAllSeedPackages } from "@/app/lib/services/seedPackage/read";
-import { getAllWarehouses } from "@/app/lib/services/warehouses/read";
-import SeedWarehousingTable from "./_components/SeedWarehousingTable";
+import { getAllSeedWarehousing } from "@/features/seedWarehousing/services";
+import { getAllSeedPackages } from "@/features/seedPackage/services/read";
+import { getAllWarehouses } from "@/features/warehouses/services/read";
+import SeedWarehousingTable from "@/features/seedWarehousing/components/SeedWarehousingTable";
 
 import type { Metadata } from "next";
 

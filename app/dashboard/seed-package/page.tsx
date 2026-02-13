@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import SeedPackageClientPage from "./_components/SeedPackageClientPage";
+import SeedPackageClientPage from "@/features/seedPackage/components/SeedPackageClientPage";
 
 export const metadata: Metadata = {
     title: "مدیریت بسته‌بندی بذر",

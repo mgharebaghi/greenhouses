@@ -1,0 +1,18 @@
+"use server";
+
+import { prisma } from "@/lib/singletone";
+import { revalidatePath } from "next/cache";
+
+export async function deleteSeedWarehousing(id: number) {
+    try {
+        await prisma.tbl_WarehousesTransaction.delete({
+            where: { ID: id },
+        });
+
+        revalidatePath("/dashboard/seed-warehousing");
+        return { success: true };
+    } catch (error) {
+        console.error("Error deleting seed warehousing transaction:", error);
+        return { success: false, error: "Failed to delete transaction" };
+    }
+}

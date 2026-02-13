@@ -1,5 +1,5 @@
-import { allGreenHouses } from "@/app/lib/services/greenhouse";
-import GreenHouses from "../greenhouse/_components/Main";
+import { allGreenHouses } from "@/features/greenhouse/services";
+import GreenHouses from "@/features/greenhouse/components/Main";
 import { Tbl_Greenhouses } from "@/app/generated/prisma/client";
 
 import type { Metadata } from "next";

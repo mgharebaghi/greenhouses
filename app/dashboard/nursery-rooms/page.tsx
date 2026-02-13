@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import NurseryRoomsClientPage from "./_components/NurseryRoomsClientPage";
+import NurseryRoomsClientPage from "@/features/nurseryRooms/components/NurseryRoomsClientPage";
 
 export const metadata: Metadata = {
     title: "مدیریت اتاق‌های نشاء",

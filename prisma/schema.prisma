@@ -52,12 +52,16 @@ model Tbl_NurseryRoom {
 
 model Tbl_People {
   ID              Int               @id(map: "PK_Tbl_People") @default(autoincrement())
+  PersonCode      String?           @db.NVarChar(6)
+  PostID          Int?
   FirstName       String?           @db.NVarChar(150)
   LastName        String?           @db.NVarChar(150)
+  NationalCode    String?           @db.NVarChar(10)
   PhoneNumber     String?           @db.NVarChar(150)
   EmailAddress    String?           @db.NVarChar(50)
   Profesion       String?           @db.NVarChar(150)
   Tbl_Greenhouses Tbl_Greenhouses[]
+  Tbl_PeoplePosts Tbl_PeoplePosts?  @relation(fields: [PostID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_People_Tbl_PeoplePosts")
 }
 
 model Tbl_PlantGrowthStage {
@@ -219,4 +223,11 @@ model Session {
   CreatedAt  DateTime @default(now())
   ExpiresAt  DateTime
   User       Users    @relation(fields: [UserId], references: [ID], onDelete: Cascade)
+}
+
+model Tbl_PeoplePosts {
+  ID         Int          @id(map: "PK_Tbl_PeoplePosts") @default(autoincrement())
+  PostNumber Int?
+  PostName   String?      @db.NVarChar(100)
+  Tbl_People Tbl_People[]
 }

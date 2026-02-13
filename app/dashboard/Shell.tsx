@@ -4,13 +4,13 @@ import "@ant-design/v5-patch-for-react-19";
 import { Layout } from "antd";
 import { Content } from "antd/es/layout/layout";
 import { useState } from "react";
-import DashboardMenu from "./_components/UI/Menu";
-import GreenhouseButton from "../components/UI/GreenhouseButton";
+import DashboardMenu from "@/shared/components/Menu";
+import GreenhouseButton from "@/shared/components/GreenhouseButton";
 import { MenuOutlined, EnvironmentOutlined, UserOutlined } from "@ant-design/icons";
 
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import ThemeToggle from "../components/UI/ThemeToggle";
+import ThemeToggle from "@/shared/components/ThemeToggle";
 
 // Mapping of paths to titles
 const PAGE_TITLES: Record<string, string> = {

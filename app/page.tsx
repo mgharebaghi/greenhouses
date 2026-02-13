@@ -1,5 +1,5 @@
-import Login from "./components/auth/LoginForm";
-import { requireAuth } from "./lib/auth";
+import Login from "@/shared/components/auth/LoginForm";
+import { requireAuth } from "@/lib/auth";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {

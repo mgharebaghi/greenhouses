@@ -1,9 +1,9 @@
 import { Tbl_People } from "@/app/generated/prisma";
-import { getAllOwners } from "@/app/lib/services/owners/read";
-import OwnersDashboard from "./_components/Main";
+import { getAllOwners } from "@/features/owners/services/read";
+import OwnersDashboard from "@/features/owners/components/Main";
 
 import type { Metadata } from "next";
-import { OwnerResponse } from "@/app/lib/services/owners";
+import { OwnerResponse } from "@/features/owners/services";
 
 export const metadata: Metadata = {
   title: "اطلاعات اشخاص",

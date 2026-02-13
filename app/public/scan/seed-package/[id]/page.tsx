@@ -1,5 +1,5 @@
-import { getSeedPackageById } from "@/app/lib/services/seedPackage";
-import QRCodeCanvas from "@/app/components/UI/QRCodeCanvas";
+import { getSeedPackageById } from "@/features/seedPackage/services";
+import QRCodeCanvas from "@/shared/components/QRCodeCanvas";
 import { notFound } from "next/navigation";
 
 export default async function PublicSeedPackagePage({ params }: { params: Promise<{ id: string }> }) {

@@ -1,5 +1,5 @@
-import { getPlants } from "@/app/lib/services/plants";
-import PlantsDashboard from "./_components/Main";
+import { getPlants } from "@/features/plants/services";
+import PlantsDashboard from "@/features/plants/components/Main";
 
 import type { Metadata } from "next";
 

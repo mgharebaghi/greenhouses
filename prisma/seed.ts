@@ -1,6 +1,6 @@
 import "dotenv/config";
 import bcrypt from "bcryptjs";
-import { prisma } from "../app/lib/singletone";
+import { prisma } from "../lib/singletone";
 
 async function main() {
   // 1) خواندن env
