@@ -48,7 +48,7 @@ export default function GrowthStagesTable(props: GrowthStagesTableProps) {
       ),
     },
     {
-      title: "گونه گیاهی",
+      title: "واریته",
       key: "varietyName",
       width: 150,
       align: "center" as const,

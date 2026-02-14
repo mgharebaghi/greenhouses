@@ -67,7 +67,7 @@ export default function SeedPackagePrintModal({ open, setOpen, data }: SeedPacka
                             <PrintRow label="شماره سریال" value={data.SerialNumber} />
                             <PrintRow label="تامین کننده" value={data.Tbl_suppliers ? (data.Tbl_suppliers.Legal ? data.Tbl_suppliers.CompanyName : `${data.Tbl_suppliers.FirstName} ${data.Tbl_suppliers.LastName}`) : (data.ProducerCompany || "—")} />
                             <PrintRow label="شرکت تولیدی" value={data.ProducerCompany} />
-                            <PrintRow label="گونه گیاهی" value={data.Tbl_plantVariety?.VarietyName} />
+                            <PrintRow label="واریته" value={data.Tbl_plantVariety?.VarietyName} />
                             <PrintRow label="نوع بسته" value={data.PackageType} />
                             <PrintRow label="شماره بسته" value={data.PackageNumber} />
                             <PrintRow label="وزن / تعداد" value={`${data.WeightGram ? data.WeightGram + ' گرم' : ''} ${data.SeedCount ? '(' + data.SeedCount.toLocaleString() + ' عدد)' : ''}`} />

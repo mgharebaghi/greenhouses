@@ -27,7 +27,7 @@ export default async function PublicSeedPackagePage({ params }: { params: Promis
 
                     <div className="w-full space-y-4">
                         <InfoRow label="شماره سریال" value={pkg.SerialNumber} />
-                        <InfoRow label="گونه گیاهی" value={pkg.VarietyName} />
+                        <InfoRow label="واریته" value={pkg.VarietyName} />
                         <InfoRow label="تولید کننده" value={pkg.ProducerName} />
                         <InfoRow label="تعداد بذر" value={pkg.SeedCount ? `${pkg.SeedCount} عدد` : '-'} />
                         <InfoRow label="وزن بسته" value={pkg.WeightGram ? `${pkg.WeightGram} گرم` : '-'} />

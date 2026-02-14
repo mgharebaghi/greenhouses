@@ -27,8 +27,8 @@ export default function OrdersFormModal({ open, setOpen, setLoading, data, refre
     const [internalLoading, setInternalLoading] = useState(false);
     const [message, setMessage] = useState<{ status: "ok" | "error"; message: string } | null>(null);
 
-    const [people, setPeople] = useState<{ value: number; label: string }[]>([]);
-    const [suppliers, setSuppliers] = useState<{ value: number; label: string }[]>([]);
+    const [people, setPeople] = useState<{ value: number; label: string; nationalCode?: string }[]>([]);
+    const [suppliers, setSuppliers] = useState<{ value: number; label: string; licenseNumber?: string }[]>([]);
     const [seedPackages, setSeedPackages] = useState<any[]>([]);
 
     // Derived states for auto-fill logic
@@ -36,6 +36,11 @@ export default function OrdersFormModal({ open, setOpen, setLoading, data, refre
     const [scionDetails, setScionDetails] = useState<{ plantTitle: string; variety: string; producer: string } | null>(null);
 
     const isEditMode = !!data;
+
+    // Selected item extra info states
+    const [selectedCustomer, setSelectedCustomer] = useState<string | null>(null);
+    const [selectedManager, setSelectedManager] = useState<string | null>(null);
+    const [selectedSupplier, setSelectedSupplier] = useState<string | null>(null);
 
     useEffect(() => {
         if (open) {
@@ -54,14 +59,22 @@ export default function OrdersFormModal({ open, setOpen, setLoading, data, refre
                     ScionID: data.ScionID,
                 });
 
-                // Trigger auto-fill logic manually for edit mode
-                // We need to wait for seedPackages to be fetched or store them in state to find match.
-                // Since fetchOptions is async, we might not have them immediately. 
-                // We'll rely on seedPackages state update to handle this if needed, 
-                // OR we can just lookup if we have the full data object already passed in 'data' prop 
-                // (if it includes relations).
+                // Set initial extra info for edit mode
+                // Note: We need the lists to be loaded to find the matching codes.
+                // Since fetchOptions is async, we doing it here might be too early if relying on 'people' state.
+                // However, we can use the 'data' prop if it has relations populated.
 
-                // Assuming 'data' includes relations as per read service:
+                if (data.Tbl_People_Tbl_Orders_CustomerIDToTbl_People) {
+                    setSelectedCustomer(data.Tbl_People_Tbl_Orders_CustomerIDToTbl_People.NationalCode);
+                }
+                if (data.Tbl_People_Tbl_Orders_ProjectManagerToTbl_People) {
+                    setSelectedManager(data.Tbl_People_Tbl_Orders_ProjectManagerToTbl_People.NationalCode);
+                }
+                if (data.Tbl_suppliers) {
+                    setSelectedSupplier(data.Tbl_suppliers.LicenseNumber);
+                }
+
+                // Trigger auto-fill logic manually for edit mode
                 if (data.Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage) {
                     const pkg = data.Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage;
                     setRootstockDetails({
@@ -83,6 +96,9 @@ export default function OrdersFormModal({ open, setOpen, setLoading, data, refre
                 form.resetFields();
                 setRootstockDetails(null);
                 setScionDetails(null);
+                setSelectedCustomer(null);
+                setSelectedManager(null);
+                setSelectedSupplier(null);
             }
         }
     }, [open, data, isEditMode, form]);
@@ -97,20 +113,36 @@ export default function OrdersFormModal({ open, setOpen, setLoading, data, refre
         if (ownersRes.status === "ok" && Array.isArray(ownersRes.dta)) {
             setPeople(ownersRes.dta.map((p: any) => ({
                 value: p.ID,
-                label: `${p.FirstName} ${p.LastName}`
+                label: `${p.FirstName} ${p.LastName}`,
+                nationalCode: p.NationalCode
             })));
         }
 
         if (suppliersData) {
             setSuppliers(suppliersData.map((s: any) => ({
                 value: s.ID,
-                label: s.CompanyName || `${s.FirstName} ${s.LastName}`
+                label: s.CompanyName || `${s.FirstName} ${s.LastName}`,
+                licenseNumber: s.LicenseNumber
             })));
         }
 
         if (seedsData) {
             setSeedPackages(seedsData);
         }
+    };
+
+    const handlePersonChange = (value: number, type: 'customer' | 'manager') => {
+        const person = people.find(p => p.value === value);
+        if (type === 'customer') {
+            setSelectedCustomer(person?.nationalCode || null);
+        } else {
+            setSelectedManager(person?.nationalCode || null);
+        }
+    };
+
+    const handleSupplierChange = (value: number) => {
+        const supplier = suppliers.find(s => s.value === value);
+        setSelectedSupplier(supplier?.licenseNumber || null);
     };
 
     const handleRootstockChange = (value: number) => {
@@ -187,6 +219,9 @@ export default function OrdersFormModal({ open, setOpen, setLoading, data, refre
         setMessage(null);
         if (!isEditMode) {
             form.resetFields();
+            setSelectedCustomer(null);
+            setSelectedManager(null);
+            setSelectedSupplier(null);
         }
     };
 
@@ -212,6 +247,19 @@ export default function OrdersFormModal({ open, setOpen, setLoading, data, refre
     const iconGradient = isEditMode
         ? "from-amber-500 via-amber-600 to-orange-600"
         : "from-emerald-500 via-emerald-600 to-emerald-700";
+
+    const renderInfoCard = (label: string, value: string | null | undefined) => {
+        if (!value) return null;
+        return (
+            <div className="mt-2 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-lg px-3 py-1.5 flex items-center justify-between shadow-sm animate-fadeIn">
+                <div className="flex items-center gap-2">
+                    <CheckCircleOutlined className="text-blue-500 text-xs" />
+                    <span className="text-xs text-blue-600 font-bold">{label}</span>
+                </div>
+                <span className="text-sm font-mono font-bold text-slate-700 tracking-wider bg-white/50 px-2 rounded">{value}</span>
+            </div>
+        );
+    };
 
     const renderSeedSection = (title: string, formName: string, details: any, onChange: (val: number) => void) => (
         <div className="border-2 border-slate-200 dark:border-slate-700 rounded-2xl p-5 mb-6 bg-white dark:bg-slate-900 relative overflow-hidden">
@@ -310,15 +358,51 @@ export default function OrdersFormModal({ open, setOpen, setLoading, data, refre
                         <Form.Item name="OrderCode" label={<span className="font-semibold">کد سفارش</span>} rules={[{ required: true }]}>
                             <Input placeholder="ORD-XXXX" className={inputStyleClass} style={inputStyle} />
                         </Form.Item>
-                        <Form.Item name="CustomerID" label={<span className="font-semibold">نام مشتری</span>} rules={[{ required: true }]}>
-                            <Select options={people} placeholder="انتخاب کنید" showSearch optionFilterProp="label" size="large" className="w-full" style={{ height: "46px" }} />
-                        </Form.Item>
-                        <Form.Item name="ProjectManager" label={<span className="font-semibold">مدیر پروژه</span>} rules={[{ required: true }]}>
-                            <Select options={people} placeholder="انتخاب کنید" showSearch optionFilterProp="label" size="large" className="w-full" style={{ height: "46px" }} />
-                        </Form.Item>
-                        <Form.Item name="SupplierID" label={<span className="font-semibold">نام مجری (تامین کننده)</span>} rules={[{ required: true }]}>
-                            <Select options={suppliers} placeholder="انتخاب کنید" showSearch optionFilterProp="label" size="large" className="w-full" style={{ height: "46px" }} />
-                        </Form.Item>
+                        <div className="flex flex-col">
+                            <Form.Item name="CustomerID" label={<span className="font-semibold">نام مشتری</span>} rules={[{ required: true }]} className="mb-0">
+                                <Select
+                                    options={people}
+                                    onChange={(val) => handlePersonChange(val, 'customer')}
+                                    placeholder="انتخاب کنید"
+                                    showSearch
+                                    optionFilterProp="label"
+                                    size="large"
+                                    className="w-full"
+                                    style={{ height: "46px" }}
+                                />
+                            </Form.Item>
+                            {renderInfoCard("کد ملی مشتری", selectedCustomer)}
+                        </div>
+                        <div className="flex flex-col">
+                            <Form.Item name="ProjectManager" label={<span className="font-semibold">مدیر پروژه</span>} rules={[{ required: true }]} className="mb-0">
+                                <Select
+                                    options={people}
+                                    onChange={(val) => handlePersonChange(val, 'manager')}
+                                    placeholder="انتخاب کنید"
+                                    showSearch
+                                    optionFilterProp="label"
+                                    size="large"
+                                    className="w-full"
+                                    style={{ height: "46px" }}
+                                />
+                            </Form.Item>
+                            {renderInfoCard("کد ملی مدیر", selectedManager)}
+                        </div>
+                        <div className="flex flex-col">
+                            <Form.Item name="SupplierID" label={<span className="font-semibold">نام مجری</span>} rules={[{ required: true }]} className="mb-0">
+                                <Select
+                                    options={suppliers}
+                                    onChange={handleSupplierChange}
+                                    placeholder="انتخاب کنید"
+                                    showSearch
+                                    optionFilterProp="label"
+                                    size="large"
+                                    className="w-full"
+                                    style={{ height: "46px" }}
+                                />
+                            </Form.Item>
+                            {renderInfoCard("شناسه", selectedSupplier)}
+                        </div>
                         <Form.Item name="OrderCount" label={<span className="font-semibold">تعداد سفارش</span>} rules={[{ required: true }]}>
                             <InputNumber className={inputStyleClass} style={{ ...inputStyle, width: "100%", paddingTop: "4px" }} placeholder="0" controls={false} />
                         </Form.Item>

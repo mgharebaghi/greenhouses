@@ -85,7 +85,7 @@ export default function OrdersTable({ data, loading, setLoading, setData, refres
             }
         },
         {
-            title: "نام مجری (تامین کننده)",
+            title: "نام مجری ",
             key: "Supplier",
             render: (_: any, record: any) => {
                 const s = record.Tbl_suppliers;

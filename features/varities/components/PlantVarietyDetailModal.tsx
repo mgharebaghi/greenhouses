@@ -16,7 +16,7 @@ export default function PlantVarietyDetailModal({ open, onClose, data }: PlantVa
     <DetailModal
       open={open}
       onClose={onClose}
-      title="جزئیات گونه گیاهی"
+      title="جزئیات واریته"
       icon={<span className="text-2xl">🌿</span>}
       gradientFrom="green"
       gradientTo="emerald"
@@ -27,7 +27,7 @@ export default function PlantVarietyDetailModal({ open, onClose, data }: PlantVa
         icon={<span className="text-xl">🌱</span>}
         color="#10b981"
         items={[
-          { label: "نام گونه", value: data.VarietyName },
+          { label: "واریته", value: data.VarietyName },
           { label: "نام رایج", value: data.Tbl_Plants?.CommonName },
           { label: "نام علمی", value: data.Tbl_Plants?.ScientificName },
           { label: "خانواده", value: data.Tbl_Plants?.PlantFamily },

@@ -217,7 +217,7 @@ export default function SeedPackageInsUpModal({ open, setOpen, setLoading, data,
 
                         <Form.Item
                             name="ProducerCompany"
-                            label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">شرکت تولیدی</span>}
+                            label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">شرکت تولید کننده</span>}
                             className="mb-0"
                         >
                             <Input placeholder="نام شرکت" size="large" className={inputStyleClass} style={inputStyle} />
@@ -225,7 +225,7 @@ export default function SeedPackageInsUpModal({ open, setOpen, setLoading, data,
 
                         <Form.Item
                             name="CropVariety"
-                            label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">گونه گیاهی</span>}
+                            label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">واریته</span>}
                             className="mb-0"
                         >
                             <Select

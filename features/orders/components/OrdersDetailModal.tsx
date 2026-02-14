@@ -85,7 +85,7 @@ export default function OrdersDetailModal({ open, onClose, data }: OrdersDetailM
                                     : "—"
                             },
                             {
-                                label: "تامین کننده",
+                                label: "نام مجری",
                                 value: data.Tbl_suppliers
                                     ? (data.Tbl_suppliers.Legal ? data.Tbl_suppliers.CompanyName : `${data.Tbl_suppliers.FirstName} ${data.Tbl_suppliers.LastName}`)
                                     : "—"

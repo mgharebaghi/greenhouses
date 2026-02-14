@@ -52,7 +52,7 @@ export default function SeedPackageDetailModal({ open, onClose, data }: SeedPack
                                 : "—"
                         },
                         { label: "شرکت تولیدی", value: data.ProducerCompany },
-                        { label: "گونه گیاهی", value: data.Tbl_plantVariety?.VarietyName || "—" },
+                        { label: "واریته", value: data.Tbl_plantVariety?.VarietyName || "—" },
                         { label: "نوع بسته", value: data.PackageType },
                     ]}
                 />

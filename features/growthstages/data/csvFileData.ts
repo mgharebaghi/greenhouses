@@ -15,7 +15,7 @@ export async function growthStagesCSVData(source?: GrowthStageRawArray): Promise
 }
 
 export const headers = [
-  { displayLabel: "گونه گیاهی", key: "VarietyName" },
+  { displayLabel: "واریته", key: "VarietyName" },
   { displayLabel: "مرحله رشد", key: "StageOrder" },
   { displayLabel: "عنوان مرحله", key: "StageName" },
   { displayLabel: "علایم ورود به این مرحله", key: "EntryCriteria" },

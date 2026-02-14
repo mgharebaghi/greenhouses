@@ -55,7 +55,7 @@ export default function PlantVaritiesTable({
       ),
     },
     {
-      title: "نام گونه",
+      title: "واریته",
       dataIndex: "VarietyName",
       key: "VarietyName",
       width: 140,
@@ -146,7 +146,7 @@ export default function PlantVaritiesTable({
   return (
     <>
       <InsertionRow
-        text="افزودن گونه گیاهی"
+        text="افزودن واریته"
         insertOnclick={() => setFormModal({ open: true, record: null })}
         csvOnclick={async () => {
           const csvData = await plantVarietiesCSVData(data as any);

@@ -17,7 +17,7 @@ export const seedPackageSchema = z.object({
     ID: z.number().optional(),
     SupplierID: z.number().nullable().optional(),
     ProducerCompany: z.string().optional().nullable(),
-    CropVariety: z.number().min(1, "گونه گیاهی الزامی است"),
+    CropVariety: z.number().min(1, "واریته الزامی است"),
     GerminationRate: z.number().min(0, "درصد باید مثبت باشد").max(100, "درصد نمی‌تواند بیش از ۱۰۰ باشد").optional().nullable(),
     PurityPercent: z.number().min(0).max(100).optional().nullable(),
     PackageNumber: z.number().optional().nullable(),

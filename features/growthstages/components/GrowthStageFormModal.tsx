@@ -82,8 +82,8 @@ export default function GrowthStageFormModal({ isOpen, onClose, setMainLoading, 
   const fields = [
     {
       name: "VarietyID",
-      label: "گونه گیاهی",
-      placeholder: "گونه گیاهی را انتخاب کنید",
+      label: "واریته - رقم",
+      placeholder: "واریته را انتخاب کنید",
       type: "select",
       required: true,
       options: varityOptions,

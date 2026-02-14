@@ -61,7 +61,7 @@ export default function VarietyFormModal({ isOpen, onClose, setMainLoading, setM
   };
 
   const fields = [
-    { name: "VarietyName", label: "نام گونه", placeholder: "نام گونه را وارد کنید", type: "text", required: true, icon: "🌾" },
+    { name: "VarietyName", label: "واریته", placeholder: "واریته را وارد کنید", type: "text", required: true, icon: "🌾" },
     { name: "PlantID", label: "نام گیاه", placeholder: "گیاه را انتخاب کنید", type: "select", required: true, options: plantOptions, icon: "🌱" },
     { name: "DaysToGermination", label: "روز تا جوانه زنی", placeholder: "روز", type: "number", required: false, icon: "🌱" },
     { name: "DaysToSprout", label: "روز تا رویش", placeholder: "روز", type: "number", required: false, icon: "🌿" },
@@ -84,7 +84,7 @@ export default function VarietyFormModal({ isOpen, onClose, setMainLoading, setM
     if (ok) {
       setMessage({
         status: "ok",
-        text: isEdit ? "اطلاعات گونه با موفقیت ویرایش شد" : "گونه جدید با موفقیت افزوده شد",
+        text: isEdit ? "اطلاعات واریته با موفقیت ویرایش شد" : "واریته جدید با موفقیت افزوده شد",
       });
       setMainLoading?.(true);
       const newData = await getPlantVarieties();
@@ -166,11 +166,11 @@ export default function VarietyFormModal({ isOpen, onClose, setMainLoading, setM
           </div>
           <div>
             <h3 className={`font-bold text-2xl ${theme.textMain}`}>
-              {isEdit ? "ویرایش گونه گیاهی" : "افزودن گونه گیاهی"}
+              {isEdit ? "ویرایش واریته" : "افزودن واریته"}
             </h3>
             <p className={`text-sm mt-1 flex items-center gap-1.5 ${theme.textSub}`}>
               <span className={`h-1.5 w-1.5 rounded-full animate-pulse bg-${theme.accent}-400`}></span>
-              {isEdit ? "اطلاعات گونه را ویرایش کنید" : "اطلاعات گونه جدید را وارد کنید"}
+              {isEdit ? "اطلاعات واریته را ویرایش کنید" : "اطلاعات واریته جدید را وارد کنید"}
             </p>
           </div>
         </div>

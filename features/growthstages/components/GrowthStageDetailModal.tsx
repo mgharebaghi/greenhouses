@@ -25,7 +25,7 @@ export default function GrowthStageDetailModal({ open, onClose, data }: GrowthSt
                 icon={<span className="text-xl">📋</span>}
                 color="#10b981"
                 items={[
-                    { label: "گونه گیاهی", value: (data as any).Tbl_plantVariety?.VarietyName || "---" },
+                    { label: "واریته - رقم", value: (data as any).Tbl_plantVariety?.VarietyName || "---" },
                     { label: "مرحله رشد (نام)", value: data.StageName || "---" },
                     { label: "نوبت/ترتیب مرحله", value: data.StageOrder ? `مرحله ${data.StageOrder}` : "---" },
                 ]}

@@ -19,7 +19,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/dashboard/suppliers": "اطلاعات تامین کنندگان",
   "/dashboard/greenhouse": "اطلاعات گلخانه ها",
   "/dashboard/plants": "اطلاعات پایه گیاهی",
-  "/dashboard/plantvarities": "اطلاعات گونه گیاهی",
+  "/dashboard/plantvarities": "اطلاعات واریته",
   "/dashboard/growthstages": "مراحل رشد گیاه",
   "/dashboard/planting": "اطلاعات کاشت",
 

@@ -5,7 +5,7 @@ import type { PlantVarietyDTO } from "@/features/varities/types/types";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "اطلاعات گونه گیاهی",
+  title: "اطلاعات واریته گیاهی",
 };
 
 export default async function PlantVaritiesPage() {

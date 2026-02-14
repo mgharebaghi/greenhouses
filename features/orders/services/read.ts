@@ -31,13 +31,13 @@ export async function getAllOrders() {
         const orders = await prisma.tbl_Orders.findMany({
             include: {
                 Tbl_People_Tbl_Orders_CustomerIDToTbl_People: {
-                    select: { FirstName: true, LastName: true }
+                    select: { FirstName: true, LastName: true, NationalCode: true }
                 },
                 Tbl_People_Tbl_Orders_ProjectManagerToTbl_People: {
-                    select: { FirstName: true, LastName: true }
+                    select: { FirstName: true, LastName: true, NationalCode: true }
                 },
                 Tbl_suppliers: {
-                    select: { CompanyName: true, FirstName: true, LastName: true, Legal: true }
+                    select: { CompanyName: true, FirstName: true, LastName: true, Legal: true, LicenseNumber: true }
                 },
                 Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage: {
                     include: {
@@ -85,13 +85,13 @@ export async function getOrderById(id: number) {
             where: { ID: id },
             include: {
                 Tbl_People_Tbl_Orders_CustomerIDToTbl_People: {
-                    select: { FirstName: true, LastName: true }
+                    select: { FirstName: true, LastName: true, NationalCode: true }
                 },
                 Tbl_People_Tbl_Orders_ProjectManagerToTbl_People: {
-                    select: { FirstName: true, LastName: true }
+                    select: { FirstName: true, LastName: true, NationalCode: true }
                 },
                 Tbl_suppliers: {
-                    select: { CompanyName: true, FirstName: true, LastName: true, Legal: true }
+                    select: { CompanyName: true, FirstName: true, LastName: true, Legal: true, LicenseNumber: true }
                 },
                 Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage: {
                     include: {
