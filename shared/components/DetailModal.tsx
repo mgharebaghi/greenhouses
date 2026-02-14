@@ -10,6 +10,7 @@ interface DetailModalProps {
   gradientFrom: string;
   gradientTo: string;
   children: ReactNode;
+  width?: string | number;
 }
 
 interface InfoCardProps {
@@ -105,9 +106,11 @@ export default function DetailModal({
   gradientFrom,
   gradientTo, // Kept for API compatibility, but logic mainly uses gradientFrom as the key
   children,
+  width,
 }: DetailModalProps) {
   // Fallback to 'emerald' or use the provided 'gradientFrom' as key
   const theme = themeConfig[gradientFrom] || themeConfig['emerald'];
+  const modalWidth = width || "clamp(360px, 95vw, 1100px)";
 
   return (
     <Modal
@@ -117,7 +120,7 @@ export default function DetailModal({
       footer={null}
       centered
       closeIcon={null}
-      width="clamp(360px, 95vw, 1100px)"
+      width={modalWidth}
       styles={{
         content: {
           padding: 0,
@@ -130,6 +133,9 @@ export default function DetailModal({
           maxHeight: "calc(90vh - 80px)",
           overflowY: "auto",
         },
+        mask: {
+          backdropFilter: "blur(4px)",
+        }
       }}
     >
       {/* Header */}
@@ -158,7 +164,7 @@ export default function DetailModal({
 
       {/* Body */}
       <div className="px-6 py-6 bg-slate-50/50 dark:bg-slate-950">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">{children}</div>
+        {children}
       </div>
     </Modal>
   );

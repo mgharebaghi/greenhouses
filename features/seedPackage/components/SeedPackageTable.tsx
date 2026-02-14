@@ -4,16 +4,13 @@ import Table from "@/shared/components/Table";
 import InsertionRow from "@/shared/components/InsertionRow";
 import TableActions from "@/shared/components/TableActions";
 import DeleteModal from "@/shared/components/DeleteModal";
-import QRCodeModal from "@/shared/components/QRCodeModal";
 import SeedPackageInsUpModal from "./SeedPackageFormModal";
 import SeedPackageDetailModal from "./SeedPackageDetailModal";
 import SeedPackagePrintModal from "./SeedPackagePrintModal";
 import { useState } from "react";
-import Image from "next/image";
-import { deleteSeedPackage } from "@/features/seedPackage/services";
+import { deleteSeedPackage, getAllSeedPackages } from "@/features/seedPackage/services";
 import { Button, Tooltip } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
-import QRCodeCanvas from "@/shared/components/QRCodeCanvas";
 import { generateCsv, download, mkConfig } from "export-to-csv";
 import { seedPackageCSVData, headers } from "../data/csvFileData";
 
@@ -26,7 +23,6 @@ interface SeedPackageTableProps {
 
 export default function SeedPackageTable({ data, loading, setLoading, setData }: SeedPackageTableProps) {
     const [deleteModal, setDeleteModal] = useState<any>(null);
-    const [qrModal, setQrModal] = useState<{ open: boolean, code: string | null, id: number | null }>({ open: false, code: null, id: null });
     const [insUpModal, setInsUpModal] = useState<{ open: boolean, data: any | null }>({ open: false, data: null });
     const [detailModal, setDetailModal] = useState<{ open: boolean, data: any | null }>({ open: false, data: null });
     const [printModal, setPrintModal] = useState<{ open: boolean, data: any | null }>({ open: false, data: null });
@@ -47,26 +43,22 @@ export default function SeedPackageTable({ data, loading, setLoading, setData }:
                 </Tooltip>
             ),
         },
+        { title: "شماره سریال بسته", dataIndex: "SerialNumber", key: "SerialNumber" },
         {
-            title: "QR Code",
-            key: "QRCode",
-            render: (_: any, record: any) => (
-                <div
-                    className="cursor-pointer hover:opacity-80 transition-opacity border rounded-md p-1 bg-white w-fit"
-                    onClick={() => setQrModal({ open: true, code: record.QRCode, id: record.ID })}
-                >
-                    {record.ID ? (
-                        <QRCodeCanvas value={`https://mygreenhouses.ir/public/scan/seed-package/${record.ID}`} size={40} />
-                    ) : (
-                        <div className="w-10 h-10 bg-slate-100 flex items-center justify-center text-xs text-slate-400">N/A</div>
-                    )}
-                </div>
-            )
+            title: "تامین کننده",
+            key: "Supplier",
+            render: (_: any, record: any) => {
+                const s = record.Tbl_suppliers;
+                if (!s) return record.ProducerCompany || "—";
+                return s.Legal ? s.CompanyName : `${s.FirstName} ${s.LastName}`;
+            }
         },
-        { title: "سریال", dataIndex: "SerialNumber", key: "SerialNumber" },
-        { title: "تولید کننده", dataIndex: "ProducerName", key: "ProducerName" },
-        { title: "گونه", dataIndex: "VarietyName", key: "VarietyName" },
-        { title: "تعداد", dataIndex: "SeedCount", key: "SeedCount", render: (val: any) => val ? val : "—" },
+        {
+            title: "گونه",
+            key: "VarietyName",
+            render: (_: any, record: any) => record.Tbl_plantVariety?.VarietyName || "—"
+        },
+        { title: "تعداد", dataIndex: "SeedCount", key: "SeedCount", render: (val: any) => val ? val.toLocaleString() : "—" },
         { title: "وزن (g)", dataIndex: "WeightGram", key: "WeightGram", render: (val: any) => val ? val : "—" },
         {
             title: "تاریخ تولید",
@@ -86,14 +78,19 @@ export default function SeedPackageTable({ data, loading, setLoading, setData }:
         }
     ];
 
+    const refreshData = async () => {
+        setLoading(true);
+        const res = await getAllSeedPackages();
+        setData(res);
+        setLoading(false);
+    };
+
     const handleDelete = async (id: number) => {
         setLoading(true);
         await deleteSeedPackage(id);
         setDeleteModal(null);
-        window.location.reload();
+        await refreshData();
     };
-
-    const qrLink = qrModal.id ? `https://mygreenhouses.ir/public/scan/seed-package/${qrModal.id}` : "#";
 
     return (
         <div className="w-full">
@@ -122,7 +119,7 @@ export default function SeedPackageTable({ data, loading, setLoading, setData }:
                 setOpen={(open) => setInsUpModal(prev => ({ ...prev, open }))}
                 setLoading={setLoading}
                 data={insUpModal.data}
-                refreshData={() => window.location.reload()}
+                refreshData={refreshData}
             />
 
             <SeedPackageDetailModal
@@ -144,14 +141,6 @@ export default function SeedPackageTable({ data, loading, setLoading, setData }:
                 name={deleteModal?.name}
                 onDelete={handleDelete}
                 deleteLoading={loading}
-            />
-
-            <QRCodeModal
-                visible={qrModal.open}
-                onClose={() => setQrModal({ ...qrModal, open: false })}
-                url={qrLink}
-                title="شناسنامه دیجیتال بذر"
-                serial={data.find(d => d.ID === qrModal.id)?.SerialNumber}
             />
         </div>
     );

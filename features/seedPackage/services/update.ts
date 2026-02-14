@@ -1,33 +1,20 @@
 "use server";
 
 import { prisma } from "@/lib/singletone";
-import { SeedPackageUpdateInput } from "./types";
+import { SeedPackageUpdateInput } from "../types";
 import { revalidatePath } from "next/cache";
 
 export async function updateSeedPackage(id: number, data: SeedPackageUpdateInput) {
     try {
-        let qrBuffer: Buffer | undefined;
-
-        if (data.QRCode && typeof data.QRCode === 'string') {
-            // Check if it's a data URL or raw base64
-            if (data.QRCode.startsWith('data:')) {
-                const base64Data = data.QRCode.split(';base64,').pop();
-                if (base64Data) {
-                    qrBuffer = Buffer.from(base64Data, 'base64');
-                }
-            } else {
-                // assume base64
-                qrBuffer = Buffer.from(data.QRCode, 'base64');
-            }
-        }
-
         await prisma.tbl_SeedPackage.update({
             where: { ID: id },
             data: {
-                ProducerID: data.ProducerID,
+                SupplierID: data.SupplierID,
+                ProducerCompany: data.ProducerCompany,
                 CropVariety: data.CropVariety,
                 GerminationRate: data.GerminationRate,
                 PurityPercent: data.PurityPercent,
+                PackageNumber: data.PackageNumber,
                 ProductionDate: data.ProductionDate ? new Date(data.ProductionDate) : undefined,
                 ExpirationDate: data.ExpirationDate ? new Date(data.ExpirationDate) : undefined,
                 QualityGrade: data.QualityGrade,
@@ -36,8 +23,6 @@ export async function updateSeedPackage(id: number, data: SeedPackageUpdateInput
                 SeedCount: data.SeedCount,
                 WeightGram: data.WeightGram,
                 PackagingDate: data.PackagingDate ? new Date(data.PackagingDate) : undefined,
-                PackagingLine: data.PackagingLine,
-                QRCode: qrBuffer as any, // If null or undefined, it might overwrite if not handled, but usually Prisma ignores undefined. If user wants to remove, they pass null. 
                 IsCertified: data.IsCertified,
             },
         });

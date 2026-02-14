@@ -1,8 +1,10 @@
 export interface SeedPackageInput {
-    ProducerID?: number | null;
+    SupplierID?: number | null;
+    ProducerCompany?: string | null;
     CropVariety?: number | null;
     GerminationRate?: number | null;
     PurityPercent?: number | null;
+    PackageNumber?: number | null;
     ProductionDate?: Date | string | null;
     ExpirationDate?: Date | string | null;
     QualityGrade?: string | null;
@@ -11,8 +13,6 @@ export interface SeedPackageInput {
     SeedCount?: number | null;
     WeightGram?: number | null;
     PackagingDate?: Date | string | null;
-    PackagingLine?: string | null;
-    QRCode?: string | null; // Note: We might allow passing base64 string or handling it separately
     IsCertified?: boolean | null;
 }
 

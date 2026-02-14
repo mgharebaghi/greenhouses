@@ -19,6 +19,7 @@ import {
   InboxOutlined,
   DatabaseOutlined,
   BorderOuterOutlined,
+  ShoppingCartOutlined,
 } from "@ant-design/icons";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
@@ -66,6 +67,11 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
         { title: "بسته‌بندی بذر", page: "/dashboard/seed-package", icon: <InboxOutlined /> },
         { title: "انبارداری بذر", page: "/dashboard/seed-warehousing", icon: <DatabaseOutlined /> },
       ],
+    },
+    {
+      icon: <ShoppingCartOutlined />,
+      title: "ثبت سفارش",
+      page: "/dashboard/orders",
     },
   ];
 

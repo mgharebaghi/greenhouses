@@ -4,8 +4,6 @@ import { Modal, Button } from "antd";
 import { PrinterOutlined, CloseOutlined } from "@ant-design/icons";
 import { useRef } from "react";
 import { useReactToPrint } from "react-to-print";
-import Image from "next/image";
-import QRCodeCanvas from "@/shared/components/QRCodeCanvas";
 
 interface SeedPackagePrintModalProps {
     open: boolean;
@@ -62,23 +60,19 @@ export default function SeedPackagePrintModal({ open, setOpen, data }: SeedPacka
                                 <h1 className="text-2xl font-black text-emerald-900 mb-1 font-Iransans">شناسنامه بذر</h1>
                                 <p className="text-emerald-700 text-sm font-semibold"> فکور پیوند آریا</p>
                             </div>
-                            {data.ID && (
-                                <div className="border-2 border-emerald-900 p-1 bg-white rounded-lg">
-                                    <QRCodeCanvas value={`https://mygreenhouses.ir/public/scan/seed-package/${data.ID}`} size={96} />
-                                </div>
-                            )}
                         </div>
 
                         {/* Content Grid */}
                         <div className="grid grid-cols-2 gap-x-8 gap-y-4 mb-6">
                             <PrintRow label="شماره سریال" value={data.SerialNumber} />
-                            <PrintRow label="تولید کننده" value={data.ProducerName} />
-                            <PrintRow label="گونه گیاهی" value={data.VarietyName} />
+                            <PrintRow label="تامین کننده" value={data.Tbl_suppliers ? (data.Tbl_suppliers.Legal ? data.Tbl_suppliers.CompanyName : `${data.Tbl_suppliers.FirstName} ${data.Tbl_suppliers.LastName}`) : (data.ProducerCompany || "—")} />
+                            <PrintRow label="شرکت تولیدی" value={data.ProducerCompany} />
+                            <PrintRow label="گونه گیاهی" value={data.Tbl_plantVariety?.VarietyName} />
                             <PrintRow label="نوع بسته" value={data.PackageType} />
-                            <PrintRow label="وزن / تعداد" value={`${data.WeightGram ? data.WeightGram + ' گرم' : ''} ${data.SeedCount ? '(' + data.SeedCount + ' عدد)' : ''}`} />
-                            <PrintRow label="تاریخ بسته‌بندی" value={new Date(data.PackagingDate).toLocaleDateString('fa-IR')} />
+                            <PrintRow label="شماره بسته" value={data.PackageNumber} />
+                            <PrintRow label="وزن / تعداد" value={`${data.WeightGram ? data.WeightGram + ' گرم' : ''} ${data.SeedCount ? '(' + data.SeedCount.toLocaleString() + ' عدد)' : ''}`} />
+                            <PrintRow label="تاریخ بسته‌بندی" value={data.PackagingDate ? new Date(data.PackagingDate).toLocaleDateString('fa-IR') : "—"} />
                             <PrintRow label="درجه کیفی" value={data.QualityGrade} />
-                            <PrintRow label="خط بسته‌بندی" value={data.PackagingLine} />
                             <PrintRow label="درصد جوانه زنی" value={data.GerminationRate ? data.GerminationRate + '%' : ''} />
                             <PrintRow label="درصد خلوص" value={data.PurityPercent ? data.PurityPercent + '%' : ''} />
                             <PrintRow label="تاریخ تولید" value={data.ProductionDate ? new Date(data.ProductionDate).toLocaleDateString('fa-IR') : ''} />

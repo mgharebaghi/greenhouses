@@ -36,7 +36,8 @@ export default function SeedPackageInsUpModal({ open, setOpen, setLoading, data,
             setMessage(null);
             if (isEditMode && data) {
                 form.setFieldsValue({
-                    ProducerID: data.ProducerID,
+                    SupplierID: data.SupplierID,
+                    ProducerCompany: data.ProducerCompany,
                     CropVariety: data.CropVariety,
                     GerminationRate: data.GerminationRate,
                     PurityPercent: data.PurityPercent,
@@ -48,10 +49,8 @@ export default function SeedPackageInsUpModal({ open, setOpen, setLoading, data,
                     SeedCount: data.SeedCount,
                     WeightGram: data.WeightGram,
                     PackagingDate: data.PackagingDate ? new DateObject(new Date(data.PackagingDate)).convert(persian, persian_fa) : null,
-                    PackagingLine: data.PackagingLine,
+                    PackageNumber: data.PackageNumber,
                     IsCertified: data.IsCertified,
-                    // QRCode not populated in form usually, unless we want to allow editing the raw string?
-                    // Leaving it out for now as per plan.
                 });
             } else {
                 form.resetFields();
@@ -200,8 +199,8 @@ export default function SeedPackageInsUpModal({ open, setOpen, setLoading, data,
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
 
                         <Form.Item
-                            name="ProducerID"
-                            label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">تولید کننده</span>}
+                            name="SupplierID"
+                            label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">تأمین کننده</span>}
                             className="mb-0"
                         >
                             <Select
@@ -214,6 +213,14 @@ export default function SeedPackageInsUpModal({ open, setOpen, setLoading, data,
                                 style={{ height: "46px" }}
                                 loading={suppliers.length === 0}
                             />
+                        </Form.Item>
+
+                        <Form.Item
+                            name="ProducerCompany"
+                            label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">شرکت تولیدی</span>}
+                            className="mb-0"
+                        >
+                            <Input placeholder="نام شرکت" size="large" className={inputStyleClass} style={inputStyle} />
                         </Form.Item>
 
                         <Form.Item
@@ -243,6 +250,14 @@ export default function SeedPackageInsUpModal({ open, setOpen, setLoading, data,
                         </Form.Item>
 
                         <Form.Item
+                            name="PackageNumber"
+                            label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">تعداد بسته ها</span>}
+                            className="mb-0"
+                        >
+                            <InputNumber className={inputStyleClass} style={{ ...inputStyle, width: "100%", paddingTop: "4px" }} placeholder="عدد" controls={false} />
+                        </Form.Item>
+
+                        <Form.Item
                             name="PackageType"
                             label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">نوع بسته‌بندی</span>}
                             className="mb-0"
@@ -250,15 +265,15 @@ export default function SeedPackageInsUpModal({ open, setOpen, setLoading, data,
                             <Input placeholder="مثال: پاکت, قوطی..." size="large" className={inputStyleClass} style={inputStyle} />
                         </Form.Item>
 
-                        <Form.Item name="SeedCount" label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">تعداد بذر</span>} className="mb-0">
+                        <Form.Item name="SeedCount" label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">تعداد بذر در هر بسته</span>} className="mb-0">
                             <InputNumber className={inputStyleClass} style={{ ...inputStyle, width: "100%", paddingTop: "4px" }} placeholder="عدد" controls={false} />
                         </Form.Item>
 
-                        <Form.Item name="WeightGram" label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">وزن (گرم)</span>} className="mb-0">
+                        <Form.Item name="WeightGram" label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">وزن هر بسته (گرم)</span>} className="mb-0">
                             <InputNumber className={inputStyleClass} style={{ ...inputStyle, width: "100%", paddingTop: "4px" }} placeholder="گرم" controls={false} />
                         </Form.Item>
 
-                        <Form.Item name="GerminationRate" label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">درصد جوانه زنی (%)</span>} className="mb-0">
+                        <Form.Item name="GerminationRate" label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">نرخ جوانه زنی</span>} className="mb-0">
                             <InputNumber className={inputStyleClass} style={{ ...inputStyle, width: "100%", paddingTop: "4px" }} placeholder="%" controls={false} max={100} min={0} />
                         </Form.Item>
 
@@ -268,10 +283,6 @@ export default function SeedPackageInsUpModal({ open, setOpen, setLoading, data,
 
                         <Form.Item name="QualityGrade" label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">درجه کیفی</span>} className="mb-0">
                             <Input placeholder="مثال: A, B, Grade 1" size="large" className={inputStyleClass} style={inputStyle} />
-                        </Form.Item>
-
-                        <Form.Item name="PackagingLine" label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">خط بسته‌بندی</span>} className="mb-0">
-                            <Input size="large" className={inputStyleClass} style={inputStyle} />
                         </Form.Item>
 
                         <Form.Item name="ProductionDate" label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">تاریخ تولید</span>} className="mb-0">
@@ -307,7 +318,7 @@ export default function SeedPackageInsUpModal({ open, setOpen, setLoading, data,
                             />
                         </Form.Item>
 
-                        <Form.Item name="IsCertified" label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">گواهی شده؟</span>} valuePropName="checked" className="mb-0 flex flex-col justify-end pb-3">
+                        <Form.Item name="IsCertified" label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">گواهی تضمین کیفیت دارد؟</span>} valuePropName="checked" className="mb-0 flex flex-col justify-end pb-3">
                             <Switch />
                         </Form.Item>
 

@@ -7,16 +7,20 @@ interface QRCodeCanvasProps {
     value: string;
     size?: number;
     className?: string; // Allow passing className
+    style?: React.CSSProperties;
+    level?: 'L' | 'M' | 'Q' | 'H';
+    margin?: number;
 }
 
-const QRCodeCanvas = ({ value, size = 128, className }: QRCodeCanvasProps) => {
+const QRCodeCanvas = ({ value, size = 128, className, style, level = 'M', margin = 0 }: QRCodeCanvasProps) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
         if (canvasRef.current && value) {
             QRCode.toCanvas(canvasRef.current, value, {
                 width: size,
-                margin: 0,
+                margin: margin,
+                errorCorrectionLevel: level,
                 color: {
                     dark: '#000000',
                     light: '#ffffff',
@@ -25,9 +29,9 @@ const QRCodeCanvas = ({ value, size = 128, className }: QRCodeCanvasProps) => {
                 if (error) console.error("Error generating QR code:", error);
             });
         }
-    }, [value, size]);
+    }, [value, size, level, margin]);
 
-    return <canvas ref={canvasRef} className={className} />;
+    return <canvas ref={canvasRef} className={className} style={style} />;
 };
 
 export default QRCodeCanvas;
