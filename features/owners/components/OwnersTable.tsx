@@ -132,7 +132,7 @@ export default function OwnersTable(props: OwnersProps) {
           props.openInsertModal();
         }}
         csvOnclick={async () => {
-          const csvData = await ownersCSVData(props.data as any);
+          const csvData = await ownersCSVData(props.data);
           const options = mkConfig({ useKeysAsHeaders: false, columnHeaders: headers, filename: "owners" });
           const csv = generateCsv(options)(csvData);
           download(options)(csv);

@@ -17,6 +17,7 @@ import GreenhouseButton from "@/shared/components/GreenhouseButton";
 import DatePicker from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
+import { PeopleReadDTO } from "@/features/owners/schema";
 
 export type SelectOptions = {
     value: number | string | boolean;
@@ -91,7 +92,7 @@ export default function GreenHouseFormModal({
         setOwnersLoading(true);
         const res: OwnerResponse = await getAllOwners();
         if (res.status === "ok" && res.dta) {
-            setOwners(res.dta.map((owner: Tbl_People) => ({ value: owner.ID, label: owner.FirstName + " " + owner.LastName })));
+            setOwners(res.dta.map((owner: PeopleReadDTO) => ({ value: owner.ID, label: owner.FirstName + " " + owner.LastName })));
         }
         setOwnersLoading(false);
     };

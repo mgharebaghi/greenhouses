@@ -1,15 +1,29 @@
 import { getAllOwners, OwnerResponse } from "@/features/owners/services";
 import type { Tbl_People } from "@/app/generated/prisma";
+import { PeopleReadDTO } from "../schema";
 
 export type OwnerRawArray = Awaited<ReturnType<typeof getAllOwners>>;
-export type OwnerFlattened = Tbl_People;
+export type OwnerFlattened = {
+  FirstName: string | null;
+  LastName: string | null;
+  EmailAddress: string | null;
+  PhoneNumber: string | null;
+  Profesion: string | null;
+  PersonCode: string | null;
+  PostName: string | null;
+};
 
-export async function ownersCSVData(source?: Tbl_People[]): Promise<OwnerFlattened[]> {
-  if (source) {
-    return source.map((item: Tbl_People) => ({ ...item }));
-  }
-  const data: OwnerResponse = await getAllOwners();
-  return data.dta?.map((item: Tbl_People) => ({ ...item })) ?? [];
+export async function ownersCSVData(source?: PeopleReadDTO[]): Promise<OwnerFlattened[]> {
+  const data = source ?? (await getAllOwners()).dta ?? [];
+  return data.map((item: PeopleReadDTO) => ({
+    FirstName: item.FirstName,
+    LastName: item.LastName,
+    EmailAddress: item.EmailAddress,
+    PhoneNumber: item.PhoneNumber,
+    Profesion: item.Profesion,
+    PersonCode: item.PersonCode,
+    PostName: item.PostName,
+  }));
 }
 
 export const headers = [

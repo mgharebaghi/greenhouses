@@ -20,8 +20,8 @@ export const databaseItemsSchema = z.object({
 export const peopleReadDTO = databaseItemsSchema.transform((item) => {
     return {
         ...item,
-        PostName: item.Tbl_PeoplePosts?.PostName,
-        PostID: item.Tbl_PeoplePosts?.ID,
+        PostName: item.Tbl_PeoplePosts?.PostName ?? null,
+        PostID: item.Tbl_PeoplePosts?.ID ?? null,
     };
 });
 
