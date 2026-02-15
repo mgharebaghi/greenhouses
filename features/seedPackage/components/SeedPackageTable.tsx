@@ -54,7 +54,7 @@ export default function SeedPackageTable({ data, loading, setLoading, setData }:
             }
         },
         {
-            title: "گونه",
+            title: "واریته - رقم",
             key: "VarietyName",
             render: (_: any, record: any) => record.Tbl_plantVariety?.VarietyName || "—"
         },

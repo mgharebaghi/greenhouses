@@ -13,39 +13,50 @@ interface OrdersQRModalProps {
     data: any | null; // Partial or full order data
 }
 
-const CERTIFICATE_SIZES = [
-    { label: "A4", value: "A4" },
-    { label: "A5", value: "A5" },
-    { label: "A6", value: "A6" },
+const LABEL_SIZES = [
+    // Square Sizes
+    { label: "۱۰ × ۱۰ میلی‌متر (مربعی کوچک)", value: "10mm 10mm" },
+    { label: "۱۵ × ۱۵ میلی‌متر (مربعی)", value: "15mm 15mm" },
+    { label: "۲۰ × ۲۰ میلی‌متر (مربعی)", value: "20mm 20mm" },
+    { label: "۲۵ × ۲۵ میلی‌متر (مربعی استاندارد)", value: "25mm 25mm" },
+    { label: "۳۰ × ۳۰ میلی‌متر (مربعی متوسط)", value: "30mm 30mm" },
+    { label: "۳۵ × ۳۵ میلی‌متر", value: "35mm 35mm" },
+    { label: "۴۰ × ۴۰ میلی‌متر (مربعی بزرگ)", value: "40mm 40mm" },
+    { label: "۵۰ × ۵۰ میلی‌متر", value: "50mm 50mm" },
+    // Standard Small Labels
+    { label: "۲۰ × ۱۰ میلی‌متر", value: "20mm 10mm" },
+    { label: "۲۵ × ۱۵ میلی‌متر", value: "25mm 15mm" },
+    { label: "۳۰ × ۲۰ میلی‌متر", value: "30mm 20mm" },
+    { label: "۳۵ × ۲۵ میلی‌متر", value: "35mm 25mm" },
+    // Standard Medium Labels
+    { label: "۴۰ × ۲۰ میلی‌متر", value: "40mm 20mm" },
+    { label: "۴۰ × ۳۰ میلی‌متر", value: "40mm 30mm" },
+    { label: "۴۰ × ۶۰ میلی‌متر", value: "40mm 60mm" },
+    { label: "۴۵ × ۳۰ میلی‌متر", value: "45mm 30mm" },
+    { label: "۵۰ × ۲۵ میلی‌متر", value: "50mm 25mm" },
+    { label: "۵۰ × ۳۰ میلی‌متر", value: "50mm 30mm" },
+    { label: "۵۰ × ۴۰ میلی‌متر", value: "50mm 40mm" },
+    { label: "۵۵ × ۳۰ میلی‌متر", value: "55mm 30mm" },
+    { label: "۶۰ × ۳۰ میلی‌متر", value: "60mm 30mm" },
+    { label: "۶۰ × ۴۰ میلی‌متر", value: "60mm 40mm" },
+    // Large Labels
+    { label: "۷۰ × ۴۰ میلی‌متر", value: "70mm 40mm" },
+    { label: "۷۰ × ۵۰ میلی‌متر", value: "70mm 50mm" },
+    { label: "۸۰ × ۵۰ میلی‌متر", value: "80mm 50mm" },
+    { label: "۱۰۰ × ۵۰ میلی‌متر", value: "100mm 50mm" },
+    { label: "۱۰۰ × ۸۰ میلی‌متر (بزرگ)", value: "100mm 80mm" },
+    { label: "۱۰۰ × ۱۵۰ میلی‌متر (لیبل پستی)", value: "100mm 150mm" },
 ];
 
-const LABEL_SIZES = [
-    // Square / Small
-    { label: "10 x 10 mm", value: "10mm 10mm" },
-    { label: "15 x 15 mm", value: "15mm 15mm" },
-    { label: "20 x 10 mm", value: "20mm 10mm" },
-    { label: "20 x 20 mm", value: "20mm 20mm" },
-    { label: "25 x 15 mm", value: "25mm 15mm" },
-    // Medium
-    { label: "30 x 20 mm", value: "30mm 20mm" },
-    { label: "30 x 30 mm", value: "30mm 30mm" },
-    { label: "35 x 25 mm", value: "35mm 25mm" },
-    { label: "40 x 20 mm", value: "40mm 20mm" },
-    { label: "40 x 30 mm", value: "40mm 30mm" },
-    { label: "40 x 40 mm", value: "40mm 40mm" },
-    { label: "45 x 30 mm", value: "45mm 30mm" },
-    { label: "50 x 30 mm", value: "50mm 30mm" },
-    { label: "50 x 40 mm", value: "50mm 40mm" },
-    { label: "50 x 50 mm", value: "50mm 50mm" },
-    // Large
-    { label: "60 x 40 mm", value: "60mm 40mm" },
-    { label: "70 x 50 mm", value: "70mm 50mm" },
-    { label: "80 x 50 mm", value: "80mm 50mm" },
-    { label: "80 x 60 mm", value: "80mm 60mm" },
-    { label: "100 x 50 mm", value: "100mm 50mm" },
-    { label: "100 x 80 mm", value: "100mm 80mm" },
-    { label: "100 x 100 mm", value: "100mm 100mm" },
-    { label: "100 x 150 mm (Shipping)", value: "100mm 150mm" },
+const QR_LABLE_SIZE = [
+    { label: "۱۰ × ۱۰ میلی‌متر", value: "10mm" },
+    { label: "۲۰ × ۲۰ میلی‌متر", value: "20mm" },
+    { label: "۳۰ × ۳۰ میلی‌متر", value: "30mm" },
+    { label: "۴۰ × ۴۰ میلی‌متر", value: "40mm" },
+    { label: "۵۰ × ۵۰ میلی‌متر", value: "50mm" },
+    { label: "۶۰ × ۶۰ میلی‌متر", value: "60mm" },
+    // گزینه تمام صفحه برای کسانی که حالت قبل را می‌خواهند
+    { label: "تمام صفحه (Full)", value: "100%" },
 ];
 
 export default function OrdersQRModal({ open, setOpen, data }: OrdersQRModalProps) {
@@ -53,6 +64,7 @@ export default function OrdersQRModal({ open, setOpen, data }: OrdersQRModalProp
     const [loading, setLoading] = useState(false);
     const [certificateSize, setCertificateSize] = useState("A5");
     const [labelSize, setLabelSize] = useState("40mm 40mm");
+    const [qrSize, setQrSize] = useState("20mm");
 
     const certificateRef = useRef<HTMLDivElement>(null);
     const labelRef = useRef<HTMLDivElement>(null);
@@ -127,7 +139,7 @@ export default function OrdersQRModal({ open, setOpen, data }: OrdersQRModalProp
             }}
         >
             <div className="flex flex-col items-center p-8 bg-white min-h-[600px]">
-                <h3 className="text-xl font-extrabold text-slate-800 mb-8 mt-2">شناسنامه دیجیتال سفارش</h3>
+                <h3 className="text-xl font-extrabold text-slate-800 mb-8 mt-2">گواهی دیجیتال سفارش</h3>
 
                 {/* QR Display with Download */}
                 <div className="relative group mb-8">
@@ -145,259 +157,278 @@ export default function OrdersQRModal({ open, setOpen, data }: OrdersQRModalProp
                 </div>
 
                 {/* Data Display */}
-                <div className="w-full bg-slate-50/80 border border-slate-100 rounded-2xl p-5 text-sm mb-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-                        <div className="flex justify-between items-center border-b border-dashed border-slate-300/70 pb-2">
-                            <span className="text-slate-500 font-medium">کد سفارش:</span>
-                            <span className="font-bold text-slate-800 dir-ltr">{fullData?.OrderCode || "—"}</span>
+                <div className="w-full bg-slate-50/50 border border-slate-100 rounded-3xl p-6 mb-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5">
+                        <div className="flex flex-col gap-1 border-b border-slate-200 pb-2">
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">کد سفارش</span>
+                            <span className="text-sm font-bold text-slate-800 dir-ltr">{fullData?.OrderCode || "—"}</span>
                         </div>
-                        <div className="flex justify-between items-center border-b border-dashed border-slate-300/70 pb-2">
-                            <span className="text-slate-500 font-medium">تاریخ سفارش:</span>
-                            <span className="font-bold text-slate-800">
+                        <div className="flex flex-col gap-1 border-b border-slate-200 pb-2">
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">تاریخ سفارش</span>
+                            <span className="text-sm font-bold text-slate-800">
                                 {fullData?.OrderDate ? new Date(fullData.OrderDate).toLocaleDateString("fa-IR") : "—"}
                             </span>
                         </div>
-                        <div className="flex justify-between items-center border-b border-dashed border-slate-300/70 pb-2">
-                            <span className="text-slate-500 font-medium">مشتری:</span>
-                            <span className="font-bold text-slate-800 truncate max-w-[120px]" title={fullData?.Tbl_People_Tbl_Orders_CustomerIDToTbl_People ? `${fullData.Tbl_People_Tbl_Orders_CustomerIDToTbl_People.FirstName} ${fullData.Tbl_People_Tbl_Orders_CustomerIDToTbl_People.LastName}` : ""}>
+                        <div className="flex flex-col gap-1 border-b border-slate-200 pb-2">
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">مشتری</span>
+                            <span className="text-sm font-bold text-slate-800 truncate" title={fullData?.Tbl_People_Tbl_Orders_CustomerIDToTbl_People ? `${fullData.Tbl_People_Tbl_Orders_CustomerIDToTbl_People.FirstName} ${fullData.Tbl_People_Tbl_Orders_CustomerIDToTbl_People.LastName}` : ""}>
                                 {fullData?.Tbl_People_Tbl_Orders_CustomerIDToTbl_People ? `${fullData.Tbl_People_Tbl_Orders_CustomerIDToTbl_People.FirstName} ${fullData.Tbl_People_Tbl_Orders_CustomerIDToTbl_People.LastName}` : "—"}
                             </span>
                         </div>
-                        <div className="flex justify-between items-center border-b border-dashed border-slate-300/70 pb-2">
-                            <span className="text-slate-500 font-medium">مدیر پروژه:</span>
-                            <span className="font-bold text-slate-800 truncate max-w-[120px]" title={fullData?.Tbl_People_Tbl_Orders_ProjectManagerToTbl_People ? `${fullData.Tbl_People_Tbl_Orders_ProjectManagerToTbl_People.FirstName} ${fullData.Tbl_People_Tbl_Orders_ProjectManagerToTbl_People.LastName}` : ""}>
+                        <div className="flex flex-col gap-1 border-b border-slate-200 pb-2">
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">مدیر پروژه</span>
+                            <span className="text-sm font-bold text-slate-800 truncate" title={fullData?.Tbl_People_Tbl_Orders_ProjectManagerToTbl_People ? `${fullData.Tbl_People_Tbl_Orders_ProjectManagerToTbl_People.FirstName} ${fullData.Tbl_People_Tbl_Orders_ProjectManagerToTbl_People.LastName}` : ""}>
                                 {fullData?.Tbl_People_Tbl_Orders_ProjectManagerToTbl_People ? `${fullData.Tbl_People_Tbl_Orders_ProjectManagerToTbl_People.FirstName} ${fullData.Tbl_People_Tbl_Orders_ProjectManagerToTbl_People.LastName}` : "—"}
                             </span>
                         </div>
 
-                        <div className="col-span-1 md:col-span-2 flex justify-between items-center border-b border-dashed border-slate-300/70 pb-2 pt-1">
-                            <span className="text-slate-500 font-medium">بذر پایه:</span>
-                            <span className="font-bold text-slate-800 text-end">
-                                {fullData?.Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage?.Tbl_plantVariety?.VarietyName || "—"}
-                            </span>
-                        </div>
-                        <div className="col-span-1 md:col-span-2 flex justify-between items-center pt-1">
-                            <span className="text-slate-500 font-medium">بذر پیوندک:</span>
-                            <span className="font-bold text-slate-800 text-end">
-                                {fullData?.Tbl_SeedPackage_Tbl_Orders_ScionIDToTbl_SeedPackage?.Tbl_plantVariety?.VarietyName || "—"}
-                            </span>
+                        <div className="col-span-1 md:col-span-2 flex items-center justify-between bg-white/60 rounded-xl p-3 border border-slate-100">
+                            <div className="flex flex-col gap-0.5">
+                                <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">بذر پایه (Rootstock)</span>
+                                <span className="text-sm font-bold text-slate-800">
+                                    {fullData?.Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage?.Tbl_plantVariety?.VarietyName || "—"}
+                                </span>
+                            </div>
+                            <div className="w-px h-8 bg-slate-200 mx-2 hidden md:block"></div>
+                            <div className="flex flex-col gap-0.5 md:text-left">
+                                <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">بذر پیوندک (Scion)</span>
+                                <span className="text-sm font-bold text-slate-800">
+                                    {fullData?.Tbl_SeedPackage_Tbl_Orders_ScionIDToTbl_SeedPackage?.Tbl_plantVariety?.VarietyName || "—"}
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="flex flex-col gap-6 w-full">
+                <div className="flex flex-col gap-6 w-full mb-2">
                     {/* Certificate Row */}
                     <div className="flex flex-col gap-1">
                         <div className="flex gap-2">
-                            <Select
-                                value={certificateSize}
-                                onChange={setCertificateSize}
-                                options={CERTIFICATE_SIZES}
-                                className="w-24"
-                                popupMatchSelectWidth={false}
-                            />
                             <Button
                                 type="primary"
-                                icon={<FileTextOutlined />}
+                                icon={<FileTextOutlined className="text-lg" />}
                                 onClick={() => handlePrintCertificate && handlePrintCertificate()}
-                                className="flex-1 h-8 text-sm font-bold bg-emerald-500 hover:!bg-emerald-600 shadow-emerald-200 shadow-lg rounded-lg border-none"
+                                className="w-full h-14 text-base font-black bg-emerald-600 hover:!bg-emerald-500 shadow-xl shadow-emerald-100 rounded-2xl border-none flex items-center justify-center gap-3 transition-all hover:-translate-y-0.5 active:translate-y-0"
                                 loading={loading}
                             >
-                                چاپ شناسنامه
+                                چاپ گواهی دیجیتال (Full Page)
                             </Button>
                         </div>
-                        <span className="text-[10px] text-slate-400 px-1">
-                            انتخاب سایز کاغذ برای چاپ شناسنامه کامل (A4, A5, A6)
-                        </span>
                     </div>
 
                     {/* Label Row */}
-                    <div className="flex flex-col gap-1">
-                        <div className="flex gap-2">
-                            <Select
-                                value={labelSize}
-                                onChange={setLabelSize}
-                                options={LABEL_SIZES}
-                                className="w-32"
-                                popupMatchSelectWidth={false}
-                                showSearch
-                                filterOption={(input, option) =>
-                                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                                }
-                            />
-                            <Button
-                                icon={<QrcodeOutlined />}
-                                onClick={() => handlePrintLabel && handlePrintLabel()}
-                                className="flex-1 h-8 text-sm font-bold text-slate-600 border-2 border-slate-200 hover:border-slate-300 hover:text-slate-800 rounded-lg"
-                                loading={loading}
-                            >
-                                چاپ برچسب (QR)
-                            </Button>
+                    <div className="bg-slate-50/50 border border-slate-100 rounded-3xl p-6 shadow-sm">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
+                            <div className="flex flex-col gap-2">
+                                <div className="flex items-center gap-2 text-slate-500 mb-1">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+                                    <label className="text-[11px] font-black uppercase tracking-wider">سایز کاغذ (برچسب)</label>
+                                </div>
+                                <Select
+                                    value={labelSize}
+                                    onChange={setLabelSize}
+                                    options={LABEL_SIZES}
+                                    className="w-full dir-rtl"
+                                    popupClassName="dir-rtl font-iransans"
+                                    size="large"
+                                    popupMatchSelectWidth={false}
+                                    showSearch
+                                    placeholder="سایز کاغذ را انتخاب کنید"
+                                    filterOption={(input, option) =>
+                                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                                    }
+                                />
+                            </div>
+                            <div className="flex flex-col gap-2">
+                                <div className="flex items-center gap-2 text-slate-500 mb-1">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                                    <label className="text-[11px] font-black uppercase tracking-wider">سایز کد QR</label>
+                                </div>
+                                <Select
+                                    value={qrSize}
+                                    onChange={setQrSize}
+                                    options={QR_LABLE_SIZE}
+                                    className="w-full dir-rtl"
+                                    popupClassName="dir-rtl font-iransans"
+                                    size="large"
+                                    popupMatchSelectWidth={false}
+                                    showSearch
+                                    placeholder="سایز QR را انتخاب کنید"
+                                    filterOption={(input, option) =>
+                                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                                    }
+                                />
+                            </div>
                         </div>
-                        <span className="text-[10px] text-slate-400 px-1">
-                            انتخاب سایز برچسب فیزیکی (لیبل). اندازه QR به صورت خودکار تنظیم می‌شود.
-                        </span>
+
+                        <Button
+                            icon={<QrcodeOutlined className="text-lg" />}
+                            onClick={() => handlePrintLabel && handlePrintLabel()}
+                            className="w-full h-12 text-sm font-bold bg-slate-800 text-white border-none hover:!bg-slate-700 hover:!text-white shadow-lg shadow-slate-200 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+                            loading={loading}
+                        >
+                            چاپ برچسب (QR Code)
+                        </Button>
                     </div>
-                </div>
 
-                {/* Compact Guide */}
-                <div className="mt-8 w-full">
-                    <div className="bg-amber-50 border border-amber-100 rounded-lg p-3 text-[11px] leading-5 text-amber-900 flex gap-2 items-start">
-                        <InfoCircleOutlined className="mt-0.5 text-amber-600 shrink-0 text-base" />
-                        <div>
-                            <span className="font-bold text-amber-700 block mb-1 text-xs">نکته مهم برای چاپ صحیح:</span>
-                            <ul className="list-disc list-inside marker:text-amber-400 space-y-1 opacity-90">
-                                <li>در پنجره پرینت (System Dialog)، گزینه <b className="font-mono">Paper Size</b> را دقیقاً هم‌اندازه برچسب انتخابی (مثلاً 10x10) تنظیم کنید.</li>
-                                <li>اگر سایز مورد نظر وجود نداشت، باید <b className="font-mono">User Defined Size</b> بسازید.</li>
-                                <li>گزینه <b className="font-mono">Headers & Footers</b> را خاموش و <b className="font-mono">Margins</b> را روی <b className="font-mono">None</b> بگذارید.</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Hidden Print Components */}
-            <div className="hidden">
-                {/* 1. Full Certificate (Premium Redesign) */}
-                <div ref={certificateRef} className="print-certificate dir-rtl font-iransans" style={{ direction: "rtl", fontFamily: "tahoma" }}>
-                    <div className="cert-container flex flex-col justify-between h-full bg-white relative overflow-hidden">
-
-                        {/* Decorative Background Elements */}
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-slate-50 rounded-bl-[100px] -z-10 opacity-60"></div>
-                        <div className="absolute bottom-0 left-0 w-48 h-48 bg-emerald-50 rounded-tr-[80px] -z-10 opacity-60"></div>
-
-                        {/* Double Borders */}
-                        <div className="absolute inset-4 border-2 border-slate-900 pointer-events-none"></div>
-                        <div className="absolute inset-5 border border-slate-300 pointer-events-none"></div>
-
-                        {/* --- Header Section --- */}
-                        <div className="relative z-10 p-12 pb-6 border-b-2 border-slate-900 flex justify-between items-center bg-white/80">
+                    {/* Compact Guide */}
+                    {/* <div className="mt-8 w-full">
+                        <div className="bg-amber-50 border border-amber-100 rounded-lg p-3 text-[11px] leading-5 text-amber-900 flex gap-2 items-start">
+                            <InfoCircleOutlined className="mt-0.5 text-amber-600 shrink-0 text-base" />
                             <div>
-                                <h1 className="text-4xl font-black text-slate-900 mb-2">شناسنامه سفارش</h1>
-                                <p className="text-xl text-emerald-800 font-bold">فکور پیوند آریا</p>
-                                <div className="h-1 w-32 bg-emerald-600 mt-3 rounded-full"></div>
-                            </div>
-                            <div className="flex flex-col items-center gap-2">
-                                <div className="p-2 bg-white border-4 border-white shadow-xl rounded-xl">
-                                    <QRCodeCanvas value={qrUrl} size={110} level="M" />
-                                </div>
-                                <span className="text-xs font-bold text-slate-500 font-mono tracking-widest uppercase">{fullData?.OrderCode}</span>
+                                <span className="font-bold text-amber-700 block mb-1 text-xs">نکته مهم برای چاپ صحیح:</span>
+                                <ul className="list-disc list-inside marker:text-amber-400 space-y-1 opacity-90">
+                                    <li>در پنجره پرینت (System Dialog)، گزینه <b className="font-mono">Paper Size</b> را دقیقاً هم‌اندازه برچسب انتخابی (مثلاً 10x10) تنظیم کنید.</li>
+                                    <li>اگر سایز مورد نظر وجود نداشت، باید <b className="font-mono">User Defined Size</b> بسازید.</li>
+                                    <li>گزینه <b className="font-mono">Headers & Footers</b> را خاموش و <b className="font-mono">Margins</b> را روی <b className="font-mono">None</b> بگذارید.</li>
+                                </ul>
                             </div>
                         </div>
+                    </div> */}
+                </div>
 
-                        {/* --- Main Content Section --- */}
-                        <div className="flex-1 p-12 pt-8 relative z-10 overflow-hidden">
+                {/* Hidden Print Components */}
+                <div className="hidden">
+                    {/* 1. Full Certificate (Premium Redesign) */}
+                    <div ref={certificateRef} className="print-certificate dir-rtl font-iransans" style={{ direction: "rtl", fontFamily: "tahoma" }}>
+                        <div className="cert-container flex flex-col justify-between h-full bg-white relative overflow-hidden">
 
-                            {/* Order Info Row */}
-                            <div className="grid grid-cols-2 gap-x-12 gap-y-6 mb-12">
-                                <div className="border-r-4 border-emerald-500 pr-4">
-                                    <span className="text-xs text-slate-500 font-bold block mb-1">کد رهگیری سفارش:</span>
-                                    <span className="text-2xl font-black text-slate-800 font-mono tracking-tighter">{fullData?.OrderCode || "—"}</span>
+                            {/* Decorative Background Elements */}
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-slate-50 rounded-bl-[100px] -z-10 opacity-60"></div>
+                            <div className="absolute bottom-0 left-0 w-48 h-48 bg-emerald-50 rounded-tr-[80px] -z-10 opacity-60"></div>
+
+                            {/* Double Borders */}
+                            <div className="absolute inset-4 border-2 border-slate-900 pointer-events-none"></div>
+                            <div className="absolute inset-5 border border-slate-300 pointer-events-none"></div>
+
+                            {/* --- Header Section --- */}
+                            <div className="relative z-10 p-12 pb-6 border-b-2 border-slate-900 flex justify-between items-center bg-white/80">
+                                <div>
+                                    <h1 className="text-4xl font-black text-slate-900 mb-2">گواهی سفارش</h1>
+                                    <p className="text-xl text-emerald-800 font-bold">فکور پیوند آریا</p>
+                                    <div className="h-1 w-32 bg-emerald-600 mt-3 rounded-full"></div>
                                 </div>
-                                <div className="border-r-4 border-slate-400 pr-4">
-                                    <span className="text-xs text-slate-500 font-bold block mb-1">تاریخ صدور شناسنامه:</span>
-                                    <span className="text-2xl font-black text-slate-800">
-                                        {fullData?.OrderDate ? new Date(fullData.OrderDate).toLocaleDateString("fa-IR") : "—"}
-                                    </span>
-                                </div>
-                                <div className="border-r-4 border-slate-400 pr-4">
-                                    <span className="text-xs text-slate-500 font-bold block mb-1">نام سفارش دهنده (مشتری):</span>
-                                    <span className="text-2xl font-black text-slate-800">
-                                        {fullData?.Tbl_People_Tbl_Orders_CustomerIDToTbl_People ? `${fullData.Tbl_People_Tbl_Orders_CustomerIDToTbl_People.FirstName} ${fullData.Tbl_People_Tbl_Orders_CustomerIDToTbl_People.LastName}` : "—"}
-                                    </span>
-                                </div>
-                                <div className="border-r-4 border-slate-400 pr-4">
-                                    <span className="text-xs text-slate-500 font-bold block mb-1">مدیر فنی پروژه:</span>
-                                    <span className="text-2xl font-black text-slate-800">
-                                        {fullData?.Tbl_People_Tbl_Orders_ProjectManagerToTbl_People ? `${fullData.Tbl_People_Tbl_Orders_ProjectManagerToTbl_People.FirstName} ${fullData.Tbl_People_Tbl_Orders_ProjectManagerToTbl_People.LastName}` : "—"}
-                                    </span>
+                                <div className="flex flex-col items-center gap-2">
+                                    <div className="p-2 bg-white border-4 border-white shadow-xl rounded-xl">
+                                        <QRCodeCanvas value={qrUrl} size={110} level="M" />
+                                    </div>
+                                    <span className="text-xs font-bold text-slate-500 font-mono tracking-widest uppercase">{fullData?.OrderCode}</span>
                                 </div>
                             </div>
 
-                            {/* Section: Seed Details */}
-                            <div className="grid grid-cols-1 gap-8 mt-4">
-                                {/* Rootstock Details */}
-                                <div className="bg-slate-50/50 rounded-2xl p-8 border border-slate-200 relative group overflow-hidden">
-                                    <div className="absolute top-0 right-0 w-2 h-full bg-emerald-500"></div>
-                                    <h2 className="text-xl font-black text-emerald-900 mb-6 flex items-center gap-2">
-                                        <span className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-sm">۱</span>
-                                        مشخصات بذر پایه (Rootstock)
-                                    </h2>
-                                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
-                                        <div>
-                                            <span className="text-xs text-slate-400 font-bold block">نام گیاه و واریته:</span>
-                                            <span className="text-lg font-bold text-slate-800">
-                                                {fullData?.Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage?.Tbl_plantVariety?.Tbl_Plants?.CommonName || ""} - {fullData?.Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage?.Tbl_plantVariety?.VarietyName || "—"}
-                                            </span>
-                                        </div>
-                                        <div>
-                                            <span className="text-xs text-slate-400 font-bold block">تولیدکننده / تامین‌کننده:</span>
-                                            <span className="text-lg font-bold text-slate-800">
-                                                {fullData?.Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage?.Tbl_suppliers ? (fullData.Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage.Tbl_suppliers.CompanyName || `${fullData.Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage.Tbl_suppliers.FirstName} ${fullData.Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage.Tbl_suppliers.LastName}`) : "—"}
-                                            </span>
-                                        </div>
-                                        <div>
-                                            <span className="text-xs text-slate-400 font-bold block">کد بسته: </span>
-                                            <span className="text-lg font-bold text-slate-800 dir-ltr inline-block">
-                                                {fullData?.Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage?.SerialNumber || "—"}
-                                            </span>
-                                        </div>
+                            {/* --- Main Content Section --- */}
+                            <div className="flex-1 p-12 pt-8 relative z-10 overflow-hidden">
+
+                                {/* Order Info Row */}
+                                <div className="grid grid-cols-2 gap-x-12 gap-y-6 mb-12">
+                                    <div className="border-r-4 border-emerald-500 pr-4">
+                                        <span className="text-xs text-slate-500 font-bold block mb-1">کد رهگیری سفارش:</span>
+                                        <span className="text-2xl font-black text-slate-800 font-mono tracking-tighter">{fullData?.OrderCode || "—"}</span>
+                                    </div>
+                                    <div className="border-r-4 border-slate-400 pr-4">
+                                        <span className="text-xs text-slate-500 font-bold block mb-1">تاریخ صدور گواهی:</span>
+                                        <span className="text-2xl font-black text-slate-800">
+                                            {fullData?.OrderDate ? new Date(fullData.OrderDate).toLocaleDateString("fa-IR") : "—"}
+                                        </span>
+                                    </div>
+                                    <div className="border-r-4 border-slate-400 pr-4">
+                                        <span className="text-xs text-slate-500 font-bold block mb-1">نام سفارش دهنده (مشتری):</span>
+                                        <span className="text-2xl font-black text-slate-800">
+                                            {fullData?.Tbl_People_Tbl_Orders_CustomerIDToTbl_People ? `${fullData.Tbl_People_Tbl_Orders_CustomerIDToTbl_People.FirstName} ${fullData.Tbl_People_Tbl_Orders_CustomerIDToTbl_People.LastName}` : "—"}
+                                        </span>
+                                    </div>
+                                    <div className="border-r-4 border-slate-400 pr-4">
+                                        <span className="text-xs text-slate-500 font-bold block mb-1">مدیر فنی پروژه:</span>
+                                        <span className="text-2xl font-black text-slate-800">
+                                            {fullData?.Tbl_People_Tbl_Orders_ProjectManagerToTbl_People ? `${fullData.Tbl_People_Tbl_Orders_ProjectManagerToTbl_People.FirstName} ${fullData.Tbl_People_Tbl_Orders_ProjectManagerToTbl_People.LastName}` : "—"}
+                                        </span>
                                     </div>
                                 </div>
 
-                                {/* Scion Details */}
-                                <div className="bg-slate-50/50 rounded-2xl p-8 border border-slate-200 relative group overflow-hidden">
-                                    <div className="absolute top-0 right-0 w-2 h-full bg-blue-500"></div>
-                                    <h2 className="text-xl font-black text-blue-900 mb-6 flex items-center gap-2">
-                                        <span className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center text-sm">۲</span>
-                                        مشخصات بذر پیوندک (Scion)
-                                    </h2>
-                                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
-                                        <div>
-                                            <span className="text-xs text-slate-400 font-bold block">نام گیاه و واریته:</span>
-                                            <span className="text-lg font-bold text-slate-800">
-                                                {fullData?.Tbl_SeedPackage_Tbl_Orders_ScionIDToTbl_SeedPackage?.Tbl_plantVariety?.Tbl_Plants?.CommonName || ""} - {fullData?.Tbl_SeedPackage_Tbl_Orders_ScionIDToTbl_SeedPackage?.Tbl_plantVariety?.VarietyName || "—"}
-                                            </span>
+                                {/* Section: Seed Details */}
+                                <div className="grid grid-cols-1 gap-8 mt-4">
+                                    {/* Rootstock Details */}
+                                    <div className="bg-slate-50/50 rounded-2xl p-8 border border-slate-200 relative group overflow-hidden">
+                                        <div className="absolute top-0 right-0 w-2 h-full bg-emerald-500"></div>
+                                        <h2 className="text-xl font-black text-emerald-900 mb-6 flex items-center gap-2">
+                                            <span className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-sm">۱</span>
+                                            مشخصات بذر پایه (Rootstock)
+                                        </h2>
+                                        <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
+                                            <div>
+                                                <span className="text-xs text-slate-400 font-bold block">نام گیاه و واریته:</span>
+                                                <span className="text-lg font-bold text-slate-800">
+                                                    {fullData?.Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage?.Tbl_plantVariety?.Tbl_Plants?.CommonName || ""} - {fullData?.Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage?.Tbl_plantVariety?.VarietyName || "—"}
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span className="text-xs text-slate-400 font-bold block">تولیدکننده / تامین‌کننده:</span>
+                                                <span className="text-lg font-bold text-slate-800">
+                                                    {fullData?.Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage?.Tbl_suppliers ? (fullData.Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage.Tbl_suppliers.CompanyName || `${fullData.Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage.Tbl_suppliers.FirstName} ${fullData.Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage.Tbl_suppliers.LastName}`) : "—"}
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span className="text-xs text-slate-400 font-bold block">کد بسته: </span>
+                                                <span className="text-lg font-bold text-slate-800 dir-ltr inline-block">
+                                                    {fullData?.Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage?.SerialNumber || "—"}
+                                                </span>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <span className="text-xs text-slate-400 font-bold block">تولیدکننده / تامین‌کننده:</span>
-                                            <span className="text-lg font-bold text-slate-800">
-                                                {fullData?.Tbl_SeedPackage_Tbl_Orders_ScionIDToTbl_SeedPackage?.Tbl_suppliers ? (fullData.Tbl_SeedPackage_Tbl_Orders_ScionIDToTbl_SeedPackage.Tbl_suppliers.CompanyName || `${fullData.Tbl_SeedPackage_Tbl_Orders_ScionIDToTbl_SeedPackage.Tbl_suppliers.FirstName} ${fullData.Tbl_SeedPackage_Tbl_Orders_ScionIDToTbl_SeedPackage.Tbl_suppliers.LastName}`) : "—"}
-                                            </span>
-                                        </div>
-                                        <div>
-                                            <span className="text-xs text-slate-400 font-bold block">کد بسته:</span>
-                                            <span className="text-lg font-bold text-slate-800 dir-ltr inline-block">
-                                                {fullData?.Tbl_SeedPackage_Tbl_Orders_ScionIDToTbl_SeedPackage?.SerialNumber || "—"}
-                                            </span>
+                                    </div>
+
+                                    {/* Scion Details */}
+                                    <div className="bg-slate-50/50 rounded-2xl p-8 border border-slate-200 relative group overflow-hidden">
+                                        <div className="absolute top-0 right-0 w-2 h-full bg-blue-500"></div>
+                                        <h2 className="text-xl font-black text-blue-900 mb-6 flex items-center gap-2">
+                                            <span className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center text-sm">۲</span>
+                                            مشخصات بذر پیوندک (Scion)
+                                        </h2>
+                                        <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
+                                            <div>
+                                                <span className="text-xs text-slate-400 font-bold block">نام گیاه و واریته:</span>
+                                                <span className="text-lg font-bold text-slate-800">
+                                                    {fullData?.Tbl_SeedPackage_Tbl_Orders_ScionIDToTbl_SeedPackage?.Tbl_plantVariety?.Tbl_Plants?.CommonName || ""} - {fullData?.Tbl_SeedPackage_Tbl_Orders_ScionIDToTbl_SeedPackage?.Tbl_plantVariety?.VarietyName || "—"}
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span className="text-xs text-slate-400 font-bold block">تولیدکننده / تامین‌کننده:</span>
+                                                <span className="text-lg font-bold text-slate-800">
+                                                    {fullData?.Tbl_SeedPackage_Tbl_Orders_ScionIDToTbl_SeedPackage?.Tbl_suppliers ? (fullData.Tbl_SeedPackage_Tbl_Orders_ScionIDToTbl_SeedPackage.Tbl_suppliers.CompanyName || `${fullData.Tbl_SeedPackage_Tbl_Orders_ScionIDToTbl_SeedPackage.Tbl_suppliers.FirstName} ${fullData.Tbl_SeedPackage_Tbl_Orders_ScionIDToTbl_SeedPackage.Tbl_suppliers.LastName}`) : "—"}
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span className="text-xs text-slate-400 font-bold block">کد بسته:</span>
+                                                <span className="text-lg font-bold text-slate-800 dir-ltr inline-block">
+                                                    {fullData?.Tbl_SeedPackage_Tbl_Orders_ScionIDToTbl_SeedPackage?.SerialNumber || "—"}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        {/* --- Footer Section --- */}
-                        <div className="relative z-10 p-12 pt-6 border-t-2 border-slate-900 bg-white/80 flex justify-between items-end">
-                            <div className="max-w-md">
-                                <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mb-2 italic">Official Document - Greenhouse Management System</p>
-                                <p className="text-sm text-slate-600 leading-relaxed">
-                                    این سند به منظور تایید اصالت فرآیند پیوند و مشخصات گیاهی سفارش فوق صادر گردیده است.
-                                    برای پیگیری دیجیتال و مشاهده سوابق کامل تولید، کد QR فوق را اسکن نمایید.
-                                </p>
-                            </div>
-                            <div className="flex flex-col items-center gap-4">
-                                <div className="w-48 h-20 border-b-2 border-slate-300 border-dashed relative">
-                                    <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none -rotate-12">
-                                        <span className="text-2xl font-black border-4 border-slate-900 p-2 rounded-xl">APPROVED</span>
-                                    </div>
+                            {/* --- Footer Section --- */}
+                            <div className="relative z-10 p-12 pt-6 border-t-2 border-slate-900 bg-white/80 flex justify-between items-end">
+                                <div className="max-w-md">
+                                    <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mb-2 italic">Official Document - Greenhouse Management System</p>
+                                    <p className="text-sm text-slate-600 leading-relaxed">
+                                        این سند به منظور تایید اصالت فرآیند پیوند و مشخصات گیاهی سفارش فوق صادر گردیده است.
+                                        برای پیگیری دیجیتال و مشاهده سوابق کامل تولید، کد QR فوق را اسکن نمایید.
+                                    </p>
                                 </div>
-                                <span className="text-sm font-black text-slate-600">مهر و امضای مدیریت مجموعه</span>
+                                <div className="flex flex-col items-center gap-4">
+                                    <div className="w-48 h-20 border-b-2 border-slate-300 border-dashed relative">
+                                        <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none -rotate-12">
+                                            <span className="text-2xl font-black border-4 border-slate-900 p-2 rounded-xl">APPROVED</span>
+                                        </div>
+                                    </div>
+                                    <span className="text-sm font-black text-slate-600">مهر و امضای مدیریت مجموعه</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <style type="text/css" media="print">
-                        {`
+                        <style type="text/css" media="print">
+                            {`
                         @media print { 
                             @page { 
                                 size: ${certificateSize}; 
@@ -423,30 +454,47 @@ export default function OrdersQRModal({ open, setOpen, data }: OrdersQRModalProp
                             }
                         }
                         `}
-                    </style>
-                </div>
-
-                {/* 2. Small Label (Dynamic Size) */}
-                <div ref={labelRef} className="print-label flex items-center justify-center bg-white" style={{ width: "100%", height: "100%", overflow: "hidden" }}>
-                    <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                        <QRCodeCanvas
-                            value={qrUrl}
-                            size={printQrSize} // Dynamically calculated high resolution
-                            level="L" // Lowest correction = Largest modules = Best for scanning small sizes
-                            margin={0} // No margin to maximize module size
-                            style={{
-                                width: "auto",
-                                height: "auto",
-                                maxWidth: "100%",
-                                maxHeight: "100%",
-                                objectFit: "contain",
-                                imageRendering: "pixelated" // Critical for sharp edges on thermal printers
-                            }}
-                        />
+                        </style>
                     </div>
-                    {/* Fixed CSS to prevent multi-page print */}
-                    <style type="text/css" media="print">
-                        {`
+
+                    {/* 2. Small Label (Dynamic Size) */}
+                    <div ref={labelRef} className="print-label flex flex-col items-center justify-center bg-white" style={{ width: "100%", height: "100%", overflow: "hidden", padding: "1mm" }}>
+                        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 0 }}>
+                                <QRCodeCanvas
+                                    value={qrUrl}
+                                    size={512} // Dynamically calculated high resolution
+                                    level="L" // Lowest correction = Largest modules = Best for scanning small sizes
+                                    margin={0} // No margin to maximize module size
+                                    style={{
+                                        width: qrSize,
+                                        height: qrSize,
+                                        maxWidth: "100%",
+                                        maxHeight: "100%",
+                                        objectFit: "contain",
+                                        imageRendering: "pixelated" // Critical for sharp edges on thermal printers
+                                    }}
+                                />
+                            </div>
+                            {/* کد سفارش زیر QR */}
+                            {fullData?.OrderCode && (
+                                <div style={{
+                                    textAlign: "center",
+                                    fontWeight: "900",
+                                    color: "#1e293b",
+                                    lineHeight: "1.2",
+                                    marginTop: "0.5mm", // فاصله خیلی کم و ثابت
+                                    width: "100%",
+                                    fontSize: "8pt",
+                                    whiteSpace: "nowrap"
+                                }}>
+                                    {fullData.OrderCode}
+                                </div>
+                            )}
+                        </div>
+                        {/* Fixed CSS to prevent multi-page print */}
+                        <style type="text/css" media="print">
+                            {`
                         @page { 
                             size: ${labelSize}; 
                             margin: 0; 
@@ -471,18 +519,19 @@ export default function OrdersQRModal({ open, setOpen, data }: OrdersQRModalProp
                             }
                         }
                         `}
-                    </style>
+                        </style>
+                    </div>
                 </div>
             </div>
         </Modal>
     );
 }
 
-function PrintRow({ label, value }: { label: string; value: any }) {
-    return (
-        <div className="flex border-b border-dotted border-gray-400 pb-1 mb-1">
-            <span className="font-bold ml-2">{label}:</span>
-            <span>{value || "—"}</span>
-        </div>
-    );
-}
+// function PrintRow({ label, value }: { label: string; value: any }) {
+//     return (
+//         <div className="flex border-b border-dotted border-gray-400 pb-1 mb-1">
+//             <span className="font-bold ml-2">{label}:</span>
+//             <span>{value || "—"}</span>
+//         </div>
+//     );
+// }
