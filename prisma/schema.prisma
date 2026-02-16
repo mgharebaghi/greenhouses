@@ -35,35 +35,35 @@ model Tbl_Greenhouses {
 }
 
 model Tbl_NurseryRoom {
-  ID                   Int                @id(map: "PK_Tbl_NurseryRoom") @default(autoincrement())
-  NurseryRoomCode      String?            @db.NVarChar(50)
-  NurseryRoomName      String?            @db.NVarChar(100)
-  TemperatureMin       Decimal?           @db.Decimal(5, 2)
-  TemperatureMax       Decimal?           @db.Decimal(5, 2)
-  HumidityMin          Decimal?           @db.Decimal(5, 2)
-  HumidityMax          Decimal?           @db.Decimal(5, 2)
-  LightType            String?            @db.NVarChar(50)
-  LightHoursPerDay     Decimal?           @db.Decimal(4, 1)
-  CO2Range             String?            @db.NVarChar(50)
-  StrelizationMethod   String?            @db.NVarChar(200)
-  NurseryRoomCreatedAt DateTime?          @db.Date
-  Tbl_SeedPlanting     Tbl_SeedPlanting[]
+  ID                   Int       @id(map: "PK_Tbl_NurseryRoom") @default(autoincrement())
+  NurseryRoomCode      String?   @db.NVarChar(50)
+  NurseryRoomName      String?   @db.NVarChar(100)
+  TemperatureMin       Decimal?  @db.Decimal(5, 2)
+  TemperatureMax       Decimal?  @db.Decimal(5, 2)
+  HumidityMin          Decimal?  @db.Decimal(5, 2)
+  HumidityMax          Decimal?  @db.Decimal(5, 2)
+  LightType            String?   @db.NVarChar(50)
+  LightHoursPerDay     Decimal?  @db.Decimal(4, 1)
+  CO2Range             String?   @db.NVarChar(50)
+  StrelizationMethod   String?   @db.NVarChar(200)
+  NurseryRoomCreatedAt DateTime? @db.Date
 }
 
 model Tbl_People {
-  ID                                               Int               @id(map: "PK_Tbl_People") @default(autoincrement())
-  PersonCode                                       String?           @db.NVarChar(6)
+  ID                                               Int                @id(map: "PK_Tbl_People") @default(autoincrement())
+  PersonCode                                       String?            @db.NVarChar(6)
   PostID                                           Int?
-  FirstName                                        String?           @db.NVarChar(150)
-  LastName                                         String?           @db.NVarChar(150)
-  NationalCode                                     String?           @db.NVarChar(10)
-  PhoneNumber                                      String?           @db.NVarChar(150)
-  EmailAddress                                     String?           @db.NVarChar(50)
-  Profesion                                        String?           @db.NVarChar(150)
+  FirstName                                        String?            @db.NVarChar(150)
+  LastName                                         String?            @db.NVarChar(150)
+  NationalCode                                     String?            @db.NVarChar(10)
+  PhoneNumber                                      String?            @db.NVarChar(150)
+  EmailAddress                                     String?            @db.NVarChar(50)
+  Profesion                                        String?            @db.NVarChar(150)
   Tbl_Greenhouses                                  Tbl_Greenhouses[]
-  Tbl_Orders_Tbl_Orders_ProjectManagerToTbl_People Tbl_Orders[]      @relation("Tbl_Orders_ProjectManagerToTbl_People")
-  Tbl_Orders_Tbl_Orders_CustomerIDToTbl_People     Tbl_Orders[]      @relation("Tbl_Orders_CustomerIDToTbl_People")
-  Tbl_PeoplePosts                                  Tbl_PeoplePosts?  @relation(fields: [PostID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_People_Tbl_PeoplePosts")
+  Tbl_Orders_Tbl_Orders_ProjectManagerToTbl_People Tbl_Orders[]       @relation("Tbl_Orders_ProjectManagerToTbl_People")
+  Tbl_Orders_Tbl_Orders_CustomerIDToTbl_People     Tbl_Orders[]       @relation("Tbl_Orders_CustomerIDToTbl_People")
+  Tbl_PeoplePosts                                  Tbl_PeoplePosts?   @relation(fields: [PostID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_People_Tbl_PeoplePosts")
+  Tbl_SeedPlanting                                 Tbl_SeedPlanting[]
 }
 
 model Tbl_PlantGrowthStage {
@@ -146,25 +146,27 @@ model Tbl_SeedPackage {
   Tbl_Orders_Tbl_Orders_RootstockIDToTbl_SeedPackage Tbl_Orders[]                @relation("Tbl_Orders_RootstockIDToTbl_SeedPackage")
   Tbl_plantVariety                                   Tbl_plantVariety?           @relation(fields: [CropVariety], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_SeedPackage_Tbl_plantVariety")
   Tbl_suppliers                                      Tbl_suppliers?              @relation(fields: [SupplierID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_SeedPackage_Tbl_suppliers")
-  Tbl_SeedPlanting                                   Tbl_SeedPlanting[]
   Tbl_WarehousesTransaction                          Tbl_WarehousesTransaction[]
 }
 
 model Tbl_SeedPlanting {
-  ID                   Int              @id(map: "PK_Tbl_SeedPlanting") @default(autoincrement())
-  SeedPackageID        Int?
-  GreenhouseID         Int?
-  NurseryRoomID        Int?
-  PlantingDate         DateTime?        @db.Date
-  EmergenceDate        DateTime?        @db.Date
-  CurrentStage         String?          @db.NVarChar(50)
-  HealthStatus         String?          @db.NVarChar(50)
-  GrowthRate           Decimal?         @db.Decimal(5, 2)
-  DiseaseObserved      String?          @db.NVarChar(200)
-  ReadyForGraftingDate DateTime?        @db.Date
-  Tbl_Greenhouses      Tbl_Greenhouses? @relation(fields: [GreenhouseID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_SeedPlanting_Tbl_Greenhouses")
-  Tbl_NurseryRoom      Tbl_NurseryRoom? @relation(fields: [NurseryRoomID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_SeedPlanting_Tbl_NurseryRoom")
-  Tbl_SeedPackage      Tbl_SeedPackage? @relation(fields: [SeedPackageID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_SeedPlanting_Tbl_SeedPackage")
+  ID                 Int              @id(map: "PK_Tbl_SeedPlanting") @default(autoincrement())
+  OrderID            Int?
+  GreenhouseID       Int?
+  SeedType           Boolean?
+  PlantingDate       DateTime?        @db.Date
+  SeedPlantingNumber Int?
+  TrayNumber         Int?
+  CellPerTrayNumber  Int?
+  CellHeight         Int?
+  TrayMaterial       String?          @db.NVarChar(50)
+  PlantingBed        String?          @db.NVarChar(50)
+  PlantingBedRatio   Float?
+  GerminationDate    DateTime?        @db.Date
+  TechnicianID       Int?
+  Tbl_Greenhouses    Tbl_Greenhouses? @relation(fields: [GreenhouseID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_SeedPlanting_Tbl_Greenhouses")
+  Tbl_Orders         Tbl_Orders?      @relation(fields: [OrderID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_SeedPlanting_Tbl_Orders")
+  Tbl_People         Tbl_People?      @relation(fields: [TechnicianID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_SeedPlanting_Tbl_People")
 }
 
 model Tbl_suppliers {
@@ -240,19 +242,20 @@ model Tbl_PeoplePosts {
 }
 
 model Tbl_Orders {
-  ID                                                      Int              @id(map: "PK_Tbl_Orders") @default(autoincrement())
-  OrderCode                                               String?          @db.NVarChar(10)
+  ID                                                      Int                @id(map: "PK_Tbl_Orders") @default(autoincrement())
+  OrderCode                                               String?            @db.NVarChar(10)
   CustomerID                                              Int?
   SupplierID                                              Int?
   ProjectManager                                          Int?
-  OrderDate                                               DateTime?        @db.Date
+  OrderDate                                               DateTime?          @db.Date
   OrderCount                                              Int?
   RootstockID                                             Int?
   ScionID                                                 Int?
   QRCode                                                  Bytes?
-  Tbl_People_Tbl_Orders_ProjectManagerToTbl_People        Tbl_People?      @relation("Tbl_Orders_ProjectManagerToTbl_People", fields: [ProjectManager], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_Orders_Tbl_People")
-  Tbl_People_Tbl_Orders_CustomerIDToTbl_People            Tbl_People?      @relation("Tbl_Orders_CustomerIDToTbl_People", fields: [CustomerID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_Orders_Tbl_People1")
-  Tbl_SeedPackage_Tbl_Orders_ScionIDToTbl_SeedPackage     Tbl_SeedPackage? @relation("Tbl_Orders_ScionIDToTbl_SeedPackage", fields: [ScionID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_Orders_Tbl_SeedPackage")
-  Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage Tbl_SeedPackage? @relation("Tbl_Orders_RootstockIDToTbl_SeedPackage", fields: [RootstockID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_Orders_Tbl_SeedPackage1")
-  Tbl_suppliers                                           Tbl_suppliers?   @relation(fields: [SupplierID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_Orders_Tbl_suppliers")
+  Tbl_People_Tbl_Orders_ProjectManagerToTbl_People        Tbl_People?        @relation("Tbl_Orders_ProjectManagerToTbl_People", fields: [ProjectManager], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_Orders_Tbl_People")
+  Tbl_People_Tbl_Orders_CustomerIDToTbl_People            Tbl_People?        @relation("Tbl_Orders_CustomerIDToTbl_People", fields: [CustomerID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_Orders_Tbl_People1")
+  Tbl_SeedPackage_Tbl_Orders_ScionIDToTbl_SeedPackage     Tbl_SeedPackage?   @relation("Tbl_Orders_ScionIDToTbl_SeedPackage", fields: [ScionID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_Orders_Tbl_SeedPackage")
+  Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage Tbl_SeedPackage?   @relation("Tbl_Orders_RootstockIDToTbl_SeedPackage", fields: [RootstockID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_Orders_Tbl_SeedPackage1")
+  Tbl_suppliers                                           Tbl_suppliers?     @relation(fields: [SupplierID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_Orders_Tbl_suppliers")
+  Tbl_SeedPlanting                                        Tbl_SeedPlanting[]
 }

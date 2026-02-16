@@ -73,6 +73,11 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
       title: "ثبت سفارش",
       page: "/dashboard/orders",
     },
+    {
+      icon: <ContainerOutlined />,
+      title: "کاشت بذور",
+      page: "/dashboard/seed-planting",
+    },
   ];
 
   // Accordion behavior
