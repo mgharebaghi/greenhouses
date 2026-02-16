@@ -14,6 +14,7 @@ interface OrdersQRModalProps {
 }
 
 const LABEL_SIZES = [
+    { label: "تنظیمات پرینتر (تمام صفحه / خودکار)", value: "auto" },
     // Square Sizes
     { label: "۱۰ × ۱۰ میلی‌متر (مربعی کوچک)", value: "10mm 10mm" },
     { label: "۱۵ × ۱۵ میلی‌متر (مربعی)", value: "15mm 15mm" },
@@ -104,16 +105,16 @@ export default function OrdersQRModal({ open, setOpen, data }: OrdersQRModalProp
         documentTitle: `Order-Label-${fullData?.OrderCode || ''}`,
         pageStyle: `
             @page { 
-                size: ${labelSize}; 
+                size: ${labelSize === 'auto' ? 'auto' : labelSize}; 
                 margin: 0; 
             }
             @media print {
                 html, body {
                     width: 100%;
-                    height: 100%;
+                    height: 100vh;
                     margin: 0 !important;
                     padding: 0 !important;
-                    overflow: hidden;
+                    overflow: visible;
                 }
             }
         `
@@ -447,8 +448,8 @@ export default function OrdersQRModal({ open, setOpen, data }: OrdersQRModalProp
                     </div>
 
                     {/* 2. Small Label (Dynamic Size) */}
-                    <div ref={labelRef} className="print-label flex flex-col items-center justify-center bg-white" style={{ width: "100%", height: "100%", overflow: "hidden", padding: "1mm" }}>
-                        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+                    <div ref={labelRef} className="print-label flex flex-col items-center justify-center bg-white" style={{ width: "100%", height: "100vh", padding: "1mm" }}>
+                        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", width: "100%" }}>
                             <div style={{ display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 0 }}>
                                 <QRCodeCanvas
                                     value={qrUrl}
