@@ -1,7 +1,7 @@
 "use client";
 
 import { Modal, Button, Tooltip, Select } from "antd";
-import { PrinterOutlined, CloseOutlined, QrcodeOutlined, DownloadOutlined, InfoCircleOutlined, FileTextOutlined } from "@ant-design/icons";
+import { CloseOutlined, QrcodeOutlined, DownloadOutlined, FileTextOutlined } from "@ant-design/icons";
 import { useRef, useEffect, useState } from "react";
 import QRCodeCanvas from "@/shared/components/QRCodeCanvas";
 import { useReactToPrint } from "react-to-print";
@@ -69,17 +69,6 @@ export default function OrdersQRModal({ open, setOpen, data }: OrdersQRModalProp
     const certificateRef = useRef<HTMLDivElement>(null);
     const labelRef = useRef<HTMLDivElement>(null);
 
-    // Calculate dynamic QR size for print
-    // 1mm approx 3.78px. We generate at 8px per mm for high quality (approx 200 DPI).
-    const getPrintQRSize = () => {
-        const dimensions = labelSize.split(" ");
-        const widthMm = parseInt(dimensions[0]);
-        const heightMm = parseInt(dimensions[1] || dimensions[0]);
-        const minMm = Math.min(widthMm, heightMm);
-        return Math.max(minMm * 10, 150); // Minimum 150px
-    };
-    const printQrSize = getPrintQRSize();
-
     // Fetch full data when opening to ensure we have all relations (Rootstock names etc.)
     useEffect(() => {
         if (open && data?.ID) {
@@ -94,11 +83,40 @@ export default function OrdersQRModal({ open, setOpen, data }: OrdersQRModalProp
     const handlePrintCertificate = useReactToPrint({
         contentRef: certificateRef,
         documentTitle: `Order-Certificate-${fullData?.OrderCode || ''}`,
+        pageStyle: `
+            @page { 
+                size: ${certificateSize};
+                margin: 0; 
+            }
+            @media print { 
+                body { 
+                    -webkit-print-color-adjust: exact; 
+                    margin: 0; 
+                    padding: 0; 
+                    background: white;
+                }
+            }
+        `
     });
 
     const handlePrintLabel = useReactToPrint({
         contentRef: labelRef,
         documentTitle: `Order-Label-${fullData?.OrderCode || ''}`,
+        pageStyle: `
+            @page { 
+                size: ${labelSize}; 
+                margin: 0; 
+            }
+            @media print {
+                html, body {
+                    width: 100%;
+                    height: 100%;
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    overflow: hidden;
+                }
+            }
+        `
     });
 
     const handleDownloadQR = () => {
@@ -426,35 +444,6 @@ export default function OrdersQRModal({ open, setOpen, data }: OrdersQRModalProp
                                 </div>
                             </div>
                         </div>
-
-                        <style type="text/css" media="print">
-                            {`
-                        @media print { 
-                            @page { 
-                                size: ${certificateSize}; 
-                                margin: 0; 
-                            }
-                            body { 
-                                -webkit-print-color-adjust: exact; 
-                                margin: 0; 
-                                padding: 0; 
-                                background: white;
-                            }
-                            .print-certificate { 
-                                width: 100%; 
-                                height: 100vh; 
-                                box-sizing: border-box; 
-                                background: white;
-                                padding: 0;
-                            }
-                            .cert-container { 
-                                width: 100%;
-                                height: 100%;
-                                position: relative;
-                            }
-                        }
-                        `}
-                        </style>
                     </div>
 
                     {/* 2. Small Label (Dynamic Size) */}
@@ -492,34 +481,6 @@ export default function OrdersQRModal({ open, setOpen, data }: OrdersQRModalProp
                                 </div>
                             )}
                         </div>
-                        {/* Fixed CSS to prevent multi-page print */}
-                        <style type="text/css" media="print">
-                            {`
-                        @page { 
-                            size: ${labelSize}; 
-                            margin: 0; 
-                        }
-                        @media print {
-                            html, body {
-                                width: 100%;
-                                height: 100%;
-                                margin: 0 !important;
-                                padding: 0 !important;
-                                overflow: hidden;
-                            }
-                            .print-label {
-                                width: 100%;
-                                height: 100%;
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                page-break-inside: avoid;
-                                page-break-after: avoid;
-                                page-break-before: avoid;
-                            }
-                        }
-                        `}
-                        </style>
                     </div>
                 </div>
             </div>
