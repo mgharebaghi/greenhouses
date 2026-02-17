@@ -14,7 +14,7 @@ interface OrdersQRModalProps {
 }
 
 const LABEL_SIZES = [
-    { label: "تنظیمات پرینتر (تمام صفحه / خودکار)", value: "auto" },
+    { label: "تنظیمات پرینتر ", value: "auto" },
     // Square Sizes
     { label: "۱۰ × ۱۰ میلی‌متر (مربعی کوچک)", value: "10mm 10mm" },
     { label: "۱۵ × ۱۵ میلی‌متر (مربعی)", value: "15mm 15mm" },
@@ -64,8 +64,8 @@ export default function OrdersQRModal({ open, setOpen, data }: OrdersQRModalProp
     const [fullData, setFullData] = useState<any>(null);
     const [loading, setLoading] = useState(false);
     const [certificateSize, setCertificateSize] = useState("A5");
-    const [labelSize, setLabelSize] = useState("40mm 40mm");
-    const [qrSize, setQrSize] = useState("20mm");
+    const [labelSize, setLabelSize] = useState("auto");
+    const [qrSize, setQrSize] = useState("100%");
 
     const certificateRef = useRef<HTMLDivElement>(null);
     const labelRef = useRef<HTMLDivElement>(null);
@@ -111,7 +111,7 @@ export default function OrdersQRModal({ open, setOpen, data }: OrdersQRModalProp
             @media print {
                 html, body {
                     width: 100%;
-                    height: 100vh;
+                    height: 100%;
                     margin: 0 !important;
                     padding: 0 !important;
                     overflow: visible;
@@ -448,7 +448,7 @@ export default function OrdersQRModal({ open, setOpen, data }: OrdersQRModalProp
                     </div>
 
                     {/* 2. Small Label (Dynamic Size) */}
-                    <div ref={labelRef} className="print-label flex flex-col items-center justify-center bg-white" style={{ width: "100%", height: "100vh", padding: "1mm" }}>
+                    <div ref={labelRef} className="print-label" style={{ width: "100%", height: "100%", padding: "1mm", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", overflow: "hidden", boxSizing: "border-box" }}>
                         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", width: "100%" }}>
                             <div style={{ display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 0 }}>
                                 <QRCodeCanvas
