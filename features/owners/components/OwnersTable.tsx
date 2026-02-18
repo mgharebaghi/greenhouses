@@ -60,9 +60,9 @@ export default function OwnersTable(props: OwnersProps) {
       key: "LastName",
     },
     {
-      title: "آدرس  ایمیل",
-      dataIndex: "EmailAddress",
-      key: "EmailAddress"
+      title: "کد ملی",
+      dataIndex: "NationalCode",
+      key: "NationalCode"
     },
     {
       title: "شماره تماس",

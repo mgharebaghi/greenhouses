@@ -1,10 +1,10 @@
 "use server";
-import { Tbl_plantVariety } from "@/app/generated/prisma";
+import { Tbl_PlantVariety } from "@/app/generated/prisma";
 import { prisma } from "@/lib/singletone";
 
-export async function updatePlantVariety(params: { id: number; data: Tbl_plantVariety }) {
+export async function updatePlantVariety(params: { id: number; data: Tbl_PlantVariety }) {
   try {
-    await prisma.tbl_plantVariety.update({
+    await prisma.tbl_PlantVariety.update({
       where: {
         ID: params.id,
       },

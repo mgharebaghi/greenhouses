@@ -1,10 +1,10 @@
 "use server";
-import { Tbl_plantVariety } from "@/app/generated/prisma";
+import { Tbl_PlantVariety } from "@/app/generated/prisma";
 import { prisma } from "@/lib/singletone";
 
-export async function createPlantVariety(data: Tbl_plantVariety) {
+export async function createPlantVariety(data: Tbl_PlantVariety) {
   try {
-    await prisma.tbl_plantVariety.create({
+    await prisma.tbl_PlantVariety.create({
       data: data,
     });
     return true;

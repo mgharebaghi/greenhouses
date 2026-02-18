@@ -11,7 +11,7 @@ import { Button, Tooltip } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import { generateCsv, download, mkConfig } from "export-to-csv";
 import { plantVarietiesCSVData, headers } from "../data/csvFileData";
-import { Tbl_plantVariety } from "@/app/generated/prisma";
+import { Tbl_PlantVariety } from "@/app/generated/prisma";
 
 type PlantVarietiesTableProps = {
   data: PlantVarietyDTO[];
@@ -26,7 +26,7 @@ export default function PlantVaritiesTable({
   setMainData,
   setMainLoading,
 }: PlantVarietiesTableProps) {
-  const [formModal, setFormModal] = useState<{ open: boolean; record: Tbl_plantVariety | null }>({
+  const [formModal, setFormModal] = useState<{ open: boolean; record: Tbl_PlantVariety | null }>({
     open: false,
     record: null,
   });
@@ -109,7 +109,7 @@ export default function PlantVaritiesTable({
       align: "center" as const,
       render: (_: any, record: PlantVarietyDTO) => (
         <TableActions
-          onEdit={() => setFormModal({ open: true, record: record as unknown as Tbl_plantVariety })}
+          onEdit={() => setFormModal({ open: true, record: record as unknown as Tbl_PlantVariety })}
           onDelete={() =>
             setDeleteModalOpen({
               open: true,

@@ -78,6 +78,11 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
       title: "کاشت بذور",
       page: "/dashboard/seed-planting",
     },
+    {
+      icon: <ExperimentOutlined />,
+      title: "شروع سیکل نشاء",
+      page: "/dashboard/start-seedling-cycle",
+    },
   ];
 
   // Accordion behavior

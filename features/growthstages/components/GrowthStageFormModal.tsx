@@ -1,4 +1,4 @@
-import { Tbl_PlantGrowthStage, Tbl_plantVariety } from "@/app/generated/prisma";
+import { Tbl_PlantGrowthStage, Tbl_PlantVariety } from "@/app/generated/prisma";
 import { getGrowthStages } from "@/features/growthstages/services";
 import { createGrowthStage } from "@/features/growthstages/services/create";
 import { updateGrowthStage } from "@/features/growthstages/services/update";

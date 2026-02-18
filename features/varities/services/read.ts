@@ -2,7 +2,7 @@
 import { prisma } from "@/lib/singletone";
 
 export async function getPlantVarieties() {
-  const data = await prisma.tbl_plantVariety.findMany({
+  const data = await prisma.tbl_PlantVariety.findMany({
     include: { Tbl_Plants: true },
     orderBy: { ID: "desc" },
   });

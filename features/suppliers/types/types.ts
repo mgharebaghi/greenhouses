@@ -1,3 +1,3 @@
-import { Tbl_suppliers } from "@/app/generated/prisma";
+import { Tbl_Suppliers } from "@/app/generated/prisma";
 
-export type SupplierDTO = Tbl_suppliers;
+export type SupplierDTO = Tbl_Suppliers;

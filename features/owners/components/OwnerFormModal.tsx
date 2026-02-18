@@ -34,7 +34,8 @@ export default function OwnerFormModal({
     const fields = [
         { name: "FirstName", label: "نام", required: true, placeholder: "نام را وارد کنید", icon: "👤", colSpan: 1 },
         { name: "LastName", label: "نام خانوادگی", required: true, placeholder: "نام خانوادگی را وارد کنید", icon: "👥", colSpan: 1 },
-        { name: "EmailAddress", label: "ایمیل", required: true, placeholder: "ایمیل را وارد کنید", icon: "📧", colSpan: 2 },
+        { name: "NationalCode", label: "کد ملی", required: true, placeholder: "کد ملی را وارد کنید", icon: "👤", colSpan: 1 },
+        { name: "EmailAddress", label: "ایمیل", required: true, placeholder: "ایمیل را وارد کنید", icon: "📧", colSpan: 1 },
         { name: "PhoneNumber", label: "شماره تماس", required: true, placeholder: "09123456789", icon: "📱", colSpan: 2 },
         { name: "PostID", label: "سمت", required: true, placeholder: "سمت را انتخاب کنید", icon: "💼", colSpan: 2, type: "select" },
         { name: "PersonCode", label: "کد شخص", required: true, placeholder: "کد شخص را وارد کنید", icon: "💼", colSpan: 2, type: "input", disabled: true },
@@ -203,7 +204,7 @@ export default function OwnerFormModal({
                                 name={field.name}
                                 rules={[{ required: field.required, message: `لطفاً ${field.label} را وارد کنید` }]}
                                 className={`mb-1 ${field.colSpan === 2 ? "col-span-2" : "col-span-2 sm:col-span-1"}`}
-                                initialValue={field.name == "PersonCode" && lastPersonCode ? lastPersonCode  :  ""}
+                                initialValue={field.name == "PersonCode" && lastPersonCode ? lastPersonCode : ""}
                             >
                                 {field.type === "select" ? (
                                     <Select

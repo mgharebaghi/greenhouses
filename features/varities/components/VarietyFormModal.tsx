@@ -2,7 +2,7 @@
 
 import { Modal, Form, Input, InputNumber, Select } from "antd";
 import { useEffect, useState } from "react";
-import type { Tbl_Plants, Tbl_plantVariety } from "@/app/generated/prisma";
+import type { Tbl_Plants, Tbl_PlantVariety } from "@/app/generated/prisma";
 import { getPlants } from "@/features/plants/services";
 import { getPlantVarieties, updatePlantVariety } from "@/features/varities/services";
 import { createPlantVariety } from "@/features/varities/services/create";
@@ -22,7 +22,7 @@ export type VarietyFormModalProps = {
   onClose?: () => void;
   setMainLoading?: (loading: boolean) => void;
   setMainData?: (data: any[]) => void;
-  record?: Tbl_plantVariety | null;
+  record?: Tbl_PlantVariety | null;
 };
 
 export default function VarietyFormModal({ isOpen, onClose, setMainLoading, setMainData, record }: VarietyFormModalProps) {
@@ -74,7 +74,7 @@ export default function VarietyFormModal({ isOpen, onClose, setMainLoading, setM
     { name: "LightRequirement", label: "نیاز نوری", placeholder: "نیاز نوری", type: "text", required: false, icon: "☀️" },
   ];
 
-  const handleSubmit = async (values: Tbl_plantVariety) => {
+  const handleSubmit = async (values: Tbl_PlantVariety) => {
     setLoading(true);
     setMessage(null);
     const ok = isEdit
