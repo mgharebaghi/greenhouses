@@ -222,12 +222,12 @@ export default function Table({
 
   // Soft professional styling
   const rowBase =
-    "transition-all duration-200 group even:bg-slate-50/40 dark:even:bg-slate-800/40 odd:bg-white dark:odd:bg-slate-900 hover:bg-emerald-50/40 dark:hover:bg-emerald-900/20 hover:shadow-[0_1px_4px_rgba(16,185,129,0.08)]";
-  const cellBase = "relative transition-colors duration-200";
+    "transition-all duration-300 group hover:shadow-[0_2px_8px_rgba(16,185,129,0.12)] hover:scale-[1.002] bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800/80";
+  const cellBase = "relative transition-colors duration-300";
 
   return (
-    <div className={`w-full ${className}`}>
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-br-xl rounded-bl-xl shadow-sm overflow-hidden transition-colors duration-300">
+    <div className={`w-full pb-8 ${className}`}>
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden">
         {/* Soft Header */}
         <div className="px-4 py-3 bg-gradient-to-r from-slate-50/80 to-slate-100/80 dark:from-slate-800/80 dark:to-slate-900/80 border-b border-slate-200/60 dark:border-slate-700/60 transition-colors">
           <div className="flex items-center justify-between gap-3">
@@ -363,14 +363,14 @@ export default function Table({
                         return (
                           <tr
                             key={key}
-                            className={`${rowBase} border-b border-slate-100/60 dark:border-slate-800/60 ${rowClass}`}
+                            className={`${rowBase} ${rowClass} hover:bg-emerald-50/30 dark:hover:bg-emerald-900/20`}
                             {...rowEvents}
                           >
                             {columns.map((column, colIdx) => (
                               <td
                                 key={column.key}
-                                className={`${paddingClasses[size]} ${sizeClasses[size]} ${cellBase} text-slate-600 dark:text-slate-400 ${colIdx === 0
-                                  ? "font-semibold text-emerald-600 dark:text-emerald-400"
+                                className={`${paddingClasses[size]} py-4 ${sizeClasses[size]} ${cellBase} text-slate-600 dark:text-slate-300 align-middle ${colIdx === 0
+                                  ? "font-semibold text-emerald-700 dark:text-emerald-400"
                                   : colIdx === columns.length - 1
                                     ? "text-right"
                                     : ""

@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import OrdersTable from "./OrdersTable";
 import { getAllOrders } from "@/features/orders/services";
+import PageHeader from "@/shared/components/PageHeader";
+import { ShoppingCartOutlined } from "@ant-design/icons";
 
 export default function OrdersClientPage() {
     const [data, setData] = useState<any[]>([]);
@@ -21,6 +23,11 @@ export default function OrdersClientPage() {
 
     return (
         <div className="p-6">
+            <PageHeader
+                title="ثبت سفارش"
+                subtitle="مدیریت سفارشات ثبت شده در سیستم"
+                icon={<ShoppingCartOutlined />}
+            />
             <OrdersTable
                 data={data}
                 loading={loading}

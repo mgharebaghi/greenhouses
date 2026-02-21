@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import WarehousesTable from "./WarehousesTable";
 import { getAllWarehouses } from "@/features/warehouses/services";
+import PageHeader from "@/shared/components/PageHeader";
+import { ContainerOutlined } from "@ant-design/icons";
 
 export default function WarehousesClientPage() {
     const [data, setData] = useState<any[]>([]);
@@ -21,6 +23,11 @@ export default function WarehousesClientPage() {
 
     return (
         <div className="p-6">
+            <PageHeader
+                title="مدیریت انبارها"
+                subtitle="تعریف و مدیریت اطلاعات پایه انبارهای بذر"
+                icon={<ContainerOutlined />}
+            />
             <WarehousesTable
                 data={data}
                 loading={loading}

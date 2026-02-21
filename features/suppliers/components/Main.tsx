@@ -3,6 +3,8 @@
 import { useState } from "react";
 import type { SupplierDTO } from "../types/types";
 import SuppliersTable from "./SuppliersTable";
+import PageHeader from "@/shared/components/PageHeader";
+import { ShopOutlined } from "@ant-design/icons";
 // import SupplierInsertModal from "./SupplierInsertModal"; // Deleted
 // import SupplierEditModal, { SupplierEditModalProps } from "./SupplierEditModal"; // Deleted
 
@@ -13,8 +15,13 @@ export default function SuppliersDashboard({ initialData }: { initialData: Suppl
   // const [editModal, setEditModal] = useState<SupplierEditModalProps>({ isOpen: false }); // Managed internally by SuppliersTable
 
   return (
-    <div className="w-full h-full">
-      <div className="w-full p-4 flex justify-center items-center">
+    <div className="w-full h-full p-6">
+      <PageHeader
+        title="تامین‌کنندگان"
+        subtitle="مدیریت اطلاعات پایه تامین‌کنندگان بذر"
+        icon={<ShopOutlined />}
+      />
+      <div className="w-full flex justify-center items-center">
         <SuppliersTable
           data={data}
           loading={loading}

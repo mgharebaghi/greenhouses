@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import SeedPlantingTable from "@/features/seedPlanting/components/SeedPlantingTable";
 import { getSeedPlantings } from "@/features/seedPlanting/services";
+import PageHeader from "@/shared/components/PageHeader";
+import { ContainerOutlined } from "@ant-design/icons";
 
 export default function SeedPlantingPage() {
     const [data, setData] = useState<any[]>([]);
@@ -20,11 +22,18 @@ export default function SeedPlantingPage() {
     };
 
     return (
-        <SeedPlantingTable
-            data={data}
-            loading={loading}
-            setMainData={setData}
-            setMainLoading={setLoading}
-        />
+        <div className="p-6">
+            <PageHeader
+                title="کاشت بذور"
+                subtitle="مدیریت عملیات کاشت بذر در سینی"
+                icon={<ContainerOutlined />}
+            />
+            <SeedPlantingTable
+                data={data}
+                loading={loading}
+                setMainData={setData}
+                setMainLoading={setLoading}
+            />
+        </div>
     );
 }

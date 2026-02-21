@@ -20,6 +20,9 @@ import {
   DatabaseOutlined,
   BorderOuterOutlined,
   ShoppingCartOutlined,
+  RetweetOutlined,
+  ToolOutlined,
+  MedicineBoxOutlined,
 } from "@ant-design/icons";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
@@ -79,14 +82,19 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
       page: "/dashboard/seed-planting",
     },
     {
-      icon: <ExperimentOutlined />,
+      icon: <RetweetOutlined />,
       title: "شروع سیکل نشاء",
       page: "/dashboard/start-seedling-cycle",
     },
     {
-      icon: <ExperimentOutlined />,
+      icon: <ToolOutlined />,
       title: "پیوند زنی",
       page: "/dashboard/grafting",
+    },
+    {
+      icon: <MedicineBoxOutlined />,
+      title: "اتاق ریکاوری",
+      page: "/dashboard/recoveryRoom",
     },
   ];
 

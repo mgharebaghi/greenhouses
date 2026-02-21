@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import SeedPackageTable from "./SeedPackageTable";
 import { getAllSeedPackages } from "@/features/seedPackage/services";
+import PageHeader from "@/shared/components/PageHeader";
+import { InboxOutlined } from "@ant-design/icons";
 
 export default function SeedPackagePage() {
     const [data, setData] = useState<any[]>([]);
@@ -21,6 +23,11 @@ export default function SeedPackagePage() {
 
     return (
         <div className="p-6">
+            <PageHeader
+                title="بسته‌بندی بذر"
+                subtitle="مدیریت عملیات مربوط به بسته‌بندی بذور و اختصاص شماره سریال"
+                icon={<InboxOutlined />}
+            />
             <SeedPackageTable
                 data={data}
                 loading={loading}

@@ -282,28 +282,39 @@ model Tbl_Suppliers {
 }
 
 model Tbl_GraftingOperation {
-  ID                   Int                @id(map: "PK_Tbl_GraftingOperation") @default(autoincrement())
-  OrderID              Int?
-  ColdRoomExitDate     DateTime?          @db.Date
-  GraftingDate         DateTime?          @db.Date
-  TrayNumber           Int?
-  CellPerTrayNumber    Int?
-  CellHeight           Int?
-  TrayMaterial         String?            @db.NVarChar(50)
-  PlantingBed          String?            @db.NVarChar(50)
-  PlantingBedRatio     Float?
-  GraftingClamp        String?            @db.NVarChar(50)
-  GraftingStick        String?            @db.NVarChar(50)
-  GraftingTechnicianID Int?
-  Tbl_Orders           Tbl_Orders?        @relation(fields: [OrderID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_GraftingOperation_Tbl_Orders")
-  Tbl_People           Tbl_People?        @relation(fields: [GraftingTechnicianID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_GraftingOperation_Tbl_People")
-  Tbl_GraftWorkers     Tbl_GraftWorkers[]
+  ID                       Int                        @id(map: "PK_Tbl_GraftingOperation") @default(autoincrement())
+  OrderID                  Int?
+  ColdRoomExitDate         DateTime?                  @db.Date
+  GraftingDate             DateTime?                  @db.Date
+  TrayNumber               Int?
+  CellPerTrayNumber        Int?
+  CellHeight               Int?
+  TrayMaterial             String?                    @db.NVarChar(50)
+  PlantingBed              String?                    @db.NVarChar(50)
+  PlantingBedRatio         Float?
+  GraftingClamp            String?                    @db.NVarChar(50)
+  GraftingStick            String?                    @db.NVarChar(50)
+  GraftingTechnicianID     Int?
+  Tbl_Orders               Tbl_Orders?                @relation(fields: [OrderID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_GraftingOperation_Tbl_Orders")
+  Tbl_People               Tbl_People?                @relation(fields: [GraftingTechnicianID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_GraftingOperation_Tbl_People")
+  Tbl_GraftWorkers         Tbl_GraftWorkers[]
+  Tbl_RecoveryRoomPerOrder Tbl_RecoveryRoomPerOrder[]
 }
 
 model Tbl_GraftWorkers {
   ID                    Int                    @id(map: "PK_Tbl_GraftWorkers") @default(autoincrement())
   GraftingOperationID   Int?
   GraftWorkerID         Int?
+  LossPerWorker         Int?
   Tbl_GraftingOperation Tbl_GraftingOperation? @relation(fields: [GraftingOperationID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_GraftWorkers_Tbl_GraftingOperation")
   Tbl_People            Tbl_People?            @relation(fields: [GraftWorkerID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_GraftWorkers_Tbl_People")
+}
+
+model Tbl_RecoveryRoomPerOrder {
+  ID                    Int                    @id(map: "PK_Tbl_RecoveryRoomPerOrder") @default(autoincrement())
+  GraftingOperationID   Int?
+  RecoveryEntryDate     DateTime?              @db.Date
+  RecoveryExitDate      DateTime?              @db.Date
+  GraftedLossCount      Int?
+  Tbl_GraftingOperation Tbl_GraftingOperation? @relation(fields: [GraftingOperationID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_RecoveryRoomPerOrder_Tbl_GraftingOperation")
 }
