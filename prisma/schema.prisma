@@ -51,19 +51,21 @@ model Tbl_NurseryRoom {
 }
 
 model Tbl_People {
-  ID                                               Int                @id(map: "PK_Tbl_People") @default(autoincrement())
-  PersonCode                                       String?            @db.NVarChar(6)
+  ID                                               Int                     @id(map: "PK_Tbl_People") @default(autoincrement())
+  PersonCode                                       String?                 @db.NVarChar(6)
   PostID                                           Int?
-  FirstName                                        String?            @db.NVarChar(150)
-  LastName                                         String?            @db.NVarChar(150)
-  NationalCode                                     String?            @db.NVarChar(10)
-  PhoneNumber                                      String?            @db.NVarChar(150)
-  EmailAddress                                     String?            @db.NVarChar(50)
-  Profesion                                        String?            @db.NVarChar(150)
+  FirstName                                        String?                 @db.NVarChar(150)
+  LastName                                         String?                 @db.NVarChar(150)
+  NationalCode                                     String?                 @db.NVarChar(10)
+  PhoneNumber                                      String?                 @db.NVarChar(150)
+  EmailAddress                                     String?                 @db.NVarChar(50)
+  Profesion                                        String?                 @db.NVarChar(150)
+  Tbl_GraftingOperation                            Tbl_GraftingOperation[]
+  Tbl_GraftWorkers                                 Tbl_GraftWorkers[]
   Tbl_Greenhouses                                  Tbl_Greenhouses[]
-  Tbl_Orders_Tbl_Orders_ProjectManagerToTbl_People Tbl_Orders[]       @relation("Tbl_Orders_ProjectManagerToTbl_People")
-  Tbl_Orders_Tbl_Orders_CustomerIDToTbl_People     Tbl_Orders[]       @relation("Tbl_Orders_CustomerIDToTbl_People")
-  Tbl_PeoplePosts                                  Tbl_PeoplePosts?   @relation(fields: [PostID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_People_Tbl_PeoplePosts")
+  Tbl_Orders_Tbl_Orders_ProjectManagerToTbl_People Tbl_Orders[]            @relation("Tbl_Orders_ProjectManagerToTbl_People")
+  Tbl_Orders_Tbl_Orders_CustomerIDToTbl_People     Tbl_Orders[]            @relation("Tbl_Orders_CustomerIDToTbl_People")
+  Tbl_PeoplePosts                                  Tbl_PeoplePosts?        @relation(fields: [PostID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_People_Tbl_PeoplePosts")
   Tbl_SeedPlanting                                 Tbl_SeedPlanting[]
 }
 
@@ -215,6 +217,7 @@ model Tbl_Orders {
   RootstockID                                             Int?
   ScionID                                                 Int?
   QRCode                                                  Bytes?
+  Tbl_GraftingOperation                                   Tbl_GraftingOperation[]
   Tbl_People_Tbl_Orders_ProjectManagerToTbl_People        Tbl_People?              @relation("Tbl_Orders_ProjectManagerToTbl_People", fields: [ProjectManager], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_Orders_Tbl_People")
   Tbl_People_Tbl_Orders_CustomerIDToTbl_People            Tbl_People?              @relation("Tbl_Orders_CustomerIDToTbl_People", fields: [CustomerID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_Orders_Tbl_People1")
   Tbl_SeedPackage_Tbl_Orders_ScionIDToTbl_SeedPackage     Tbl_SeedPackage?         @relation("Tbl_Orders_ScionIDToTbl_SeedPackage", fields: [ScionID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_Orders_Tbl_SeedPackage")
@@ -276,4 +279,31 @@ model Tbl_Suppliers {
   Tbl_Orders           Tbl_Orders[]
   Tbl_SeedlingPlanting Tbl_SeedlingPlanting[]
   Tbl_SeedPackage      Tbl_SeedPackage[]
+}
+
+model Tbl_GraftingOperation {
+  ID                   Int                @id(map: "PK_Tbl_GraftingOperation") @default(autoincrement())
+  OrderID              Int?
+  ColdRoomExitDate     DateTime?          @db.Date
+  GraftingDate         DateTime?          @db.Date
+  TrayNumber           Int?
+  CellPerTrayNumber    Int?
+  CellHeight           Int?
+  TrayMaterial         String?            @db.NVarChar(50)
+  PlantingBed          String?            @db.NVarChar(50)
+  PlantingBedRatio     Float?
+  GraftingClamp        String?            @db.NVarChar(50)
+  GraftingStick        String?            @db.NVarChar(50)
+  GraftingTechnicianID Int?
+  Tbl_Orders           Tbl_Orders?        @relation(fields: [OrderID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_GraftingOperation_Tbl_Orders")
+  Tbl_People           Tbl_People?        @relation(fields: [GraftingTechnicianID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_GraftingOperation_Tbl_People")
+  Tbl_GraftWorkers     Tbl_GraftWorkers[]
+}
+
+model Tbl_GraftWorkers {
+  ID                    Int                    @id(map: "PK_Tbl_GraftWorkers") @default(autoincrement())
+  GraftingOperationID   Int?
+  GraftWorkerID         Int?
+  Tbl_GraftingOperation Tbl_GraftingOperation? @relation(fields: [GraftingOperationID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_GraftWorkers_Tbl_GraftingOperation")
+  Tbl_People            Tbl_People?            @relation(fields: [GraftWorkerID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_GraftWorkers_Tbl_People")
 }

@@ -22,6 +22,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/dashboard/plantvarities": "اطلاعات واریته",
   "/dashboard/growthstages": "مراحل رشد گیاه",
   "/dashboard/planting": "اطلاعات کاشت",
+  "/dashboard/grafting": "پیوند زنی",
 
   "/dashboard/climatedaily": "ثبت اطلاعات اقلیمی",
   "/dashboard/irrigation": "آبیاری",

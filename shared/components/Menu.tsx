@@ -83,6 +83,11 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
       title: "شروع سیکل نشاء",
       page: "/dashboard/start-seedling-cycle",
     },
+    {
+      icon: <ExperimentOutlined />,
+      title: "پیوند زنی",
+      page: "/dashboard/grafting",
+    },
   ];
 
   // Accordion behavior
