@@ -93,7 +93,7 @@ export default function RecoveryRoomTable({ data, loading, setLoading, setData, 
     return (
         <div className="w-full">
             <InsertionRow
-                text="گیاه پیوند زده شده"
+                text="ریکاوری جدید"
                 insertOnclick={() => setFormModal({ open: true, data: null })}
                 data={data}
                 csvOnclick={async () => {
