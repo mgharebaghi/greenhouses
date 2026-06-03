@@ -75,7 +75,7 @@
 
 ### متغیرهای محیطی
 
-فایل `.env` در ریشه پروژه (در gitignore). **هرگز رمز و آدرس واقعی را در مستندات یا git commit نکنید.**
+فایل `.env` در ریشه پروژه (در `.gitignore`؛ از `.env.example` کپی بگیرید). **هرگز `.env` واقعی را commit نکنید.**
 
 ```env
 DATABASE_URL="sqlserver://HOST:1433;database=DB_NAME;user=USER;password=PASSWORD;encrypt=true;trustServerCertificate=true"

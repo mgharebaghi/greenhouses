@@ -7,7 +7,7 @@ Smart greenhouse operations management system (Persian RTL UI).
 ```bash
 npm install
 npx prisma generate
-# Configure DATABASE_URL in .env (SQL Server)
+# Copy .env.example → .env, then set DATABASE_URL (SQL Server)
 npm run dev
 ```
 

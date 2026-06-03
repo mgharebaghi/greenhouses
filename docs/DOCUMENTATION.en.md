@@ -75,7 +75,7 @@ The system is primarily an **operational CRUD and traceability** application, no
 
 ### Environment Variables
 
-Create `.env` at the project root (gitignored). **Never commit real credentials or paste them into documentation.**
+Create `.env` at the project root from `.env.example` (`.env` is gitignored). **Never commit real credentials or paste them into documentation.**
 
 ```env
 DATABASE_URL="sqlserver://HOST:1433;database=DB_NAME;user=USER;password=PASSWORD;encrypt=true;trustServerCertificate=true"
