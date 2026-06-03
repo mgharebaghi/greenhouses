@@ -41,3 +41,10 @@ yarn-error.log*
 next-env.d.ts
 
 /app/generated/prisma
+
+# Docker — image exports & local build artifacts (keep Dockerfile / .dockerignore tracked)
+*.tar
+*.tar.gz
+*.tgz
+docker-images/
+.docker/

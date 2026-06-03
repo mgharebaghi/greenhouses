@@ -59,10 +59,18 @@ const QR_LABLE_SIZE = [
     { label: "تمام صفحه (Full)", value: "100%" },
 ];
 
+const PLANT_TYPE_OPTIONS = [
+    { label: "—  (بدون انتخاب)", value: "" },
+    { label: "گیاه پایه (Root Stock)", value: "rootstock" },
+    { label: "پیوندک (Scion)", value: "scion" },
+    { label: "نشاء پیوندی (Grafted)", value: "grafted" },
+];
+
 export default function WorkerQRModal({ open, onClose, workerData }: WorkerQRModalProps) {
     const [labelSize, setLabelSize] = useState("auto");
     const [qrSize, setQrSize] = useState("100%");
     const labelRef = useRef<HTMLDivElement>(null);
+    const [plantType, setPlantType] = useState<string>("");
 
     const handlePrintLabel = useReactToPrint({
         contentRef: labelRef,
@@ -83,6 +91,13 @@ export default function WorkerQRModal({ open, onClose, workerData }: WorkerQRMod
             }
         `
     });
+
+    // Label text shown under QR in print: OrderCode + (R) or (S) if plantType is selected
+    const printOrderLabel = workerData?.orderCode
+        ? plantType
+            ? `${workerData.orderCode} (${plantType === "rootstock" ? "R" : plantType === "scion" ? "S" : "G"})`
+            : workerData.orderCode
+        : "";
 
     const handleDownloadQR = () => {
         const canvas = document.querySelector(".worker-qr-canvas") as HTMLCanvasElement;
@@ -156,6 +171,24 @@ export default function WorkerQRModal({ open, onClose, workerData }: WorkerQRMod
                 {/* Print Settings */}
                 <div className="bg-slate-50/50 border border-slate-100 rounded-3xl p-6 w-full shadow-sm">
                     <div className="grid grid-cols-2 gap-5 mb-5">
+
+                        {/* Plant Type Dropdown */}
+                        <div className="flex flex-col gap-2 sm:col-span-2">
+                            <div className="flex items-center gap-2 text-slate-500 mb-1">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                                <label className="text-[11px] font-black uppercase tracking-wider">نوع گیاه</label>
+                            </div>
+                            <Select
+                                value={plantType}
+                                onChange={setPlantType}
+                                options={PLANT_TYPE_OPTIONS}
+                                className="w-full dir-rtl"
+                                popupClassName="dir-rtl font-iransans"
+                                size="large"
+                                popupMatchSelectWidth={false}
+                            />
+                        </div>
+
                         <div className="flex flex-col gap-2">
                             <label className="text-[11px] font-black uppercase tracking-wider text-slate-500">سایز کاغذ</label>
                             <Select
@@ -218,7 +251,7 @@ export default function WorkerQRModal({ open, onClose, workerData }: WorkerQRMod
                             wordBreak: "break-all",
                             fontFamily: "tahoma"
                         }}>
-                            <div style={{ marginBottom: "0.2mm" }}>{workerData?.orderCode}</div>
+                            <div style={{ marginBottom: "0.2mm" }}>{printOrderLabel}</div>
                             <div>کد پیوندزن: {workerData?.personCode}</div>
                         </div>
                     </div>
