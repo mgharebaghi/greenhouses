@@ -99,10 +99,7 @@ npm run dev
 npx prisma db seed
 ```
 
-| Field | Default (`prisma/seed.ts`) |
-|-------|----------------------------|
-| Username | `admin` |
-| Password | `Qwerty@1234` |
+Configure the admin username and password **only in your local environment** via `prisma/seed.ts` (or environment variables). Do not commit credentials or document them in the repository.
 
 ---
 

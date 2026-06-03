@@ -13,7 +13,7 @@ npm run dev
 
 Open **http://localhost:3001**
 
-Default seed user (see `prisma/seed.ts`): `admin` / `Qwerty@1234`
+Admin credentials for seeding: configure locally in `prisma/seed.ts` (not documented here).
 
 ## Documentation
 
