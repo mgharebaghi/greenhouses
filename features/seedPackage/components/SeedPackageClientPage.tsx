@@ -24,8 +24,8 @@ export default function SeedPackagePage() {
     return (
         <div className="p-6">
             <PageHeader
-                title="بسته‌بندی بذر"
-                subtitle="مدیریت عملیات مربوط به بسته‌بندی بذور و اختصاص شماره سریال"
+                title="بسته‌های بذر"
+                subtitle="مدیریت عملیات مربوط به بسته‌های بذر و اختصاص شماره سریال"
                 icon={<InboxOutlined />}
             />
             <SeedPackageTable

@@ -187,7 +187,7 @@ export default function SeedPackageInsUpModal({ open, setOpen, setLoading, data,
                         </h3>
                         <p className={`text-sm mt-1 flex items-center gap-1.5 ${isEditMode ? "text-amber-600/80 dark:text-slate-400" : "text-emerald-600/80 dark:text-slate-400"}`}>
                             <span className={`h-1.5 w-1.5 rounded-full animate-pulse ${pulseColor}`}></span>
-                            {isEditMode ? `ویرایش اطلاعات بسته: ${data?.SerialNumber}` : "اطلاعات بسته بندی را با دقت وارد کنید"}
+                            {isEditMode ? `ویرایش اطلاعات بسته: ${data?.SerialNumber}` : "اطلاعات بسته را با دقت وارد کنید"}
                         </p>
                     </div>
                 </div>
