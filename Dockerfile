@@ -26,8 +26,6 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/app/generated ./app/app/generated
 COPY --from=builder /app/prisma ./prisma
 
-ENV HOSTNAME=0.0.0.0
-
 EXPOSE 3000
 
-CMD ["node", "server.js"]
+CMD ["sh", "-c", "HOSTNAME=0.0.0.0 node server.js"]
