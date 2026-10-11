@@ -228,7 +228,7 @@ test("unavailable recovery storage blocks reads and all writes without touching 
       ] as Action
     )(...args);
     assert.equal(result.status, "error");
-    assert.match(result.message ?? "", /جدول ریکاوری/);
+    assert.match(result.message ?? "", /بخش ریکاوری در حال حاضر در دسترس نیست/);
   }
   const reads = loader.load("@/features/recovery-rooms/server/read");
   for (const name of [
@@ -237,7 +237,7 @@ test("unavailable recovery storage blocks reads and all writes without touching 
   ])
     await assert.rejects(
       (reads[name] as () => Promise<unknown>)(),
-      /جدول ریکاوری/,
+      /بخش ریکاوری در حال حاضر در دسترس نیست/,
     );
   assert.equal(accesses, 0);
 });
