@@ -12,8 +12,14 @@ const compat = new FlatCompat({
 const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
+    files: ["app/icon.tsx"],
+    // ImageResponse renders through Satori and requires a native image element.
+    rules: { "@next/next/no-img-element": "off" },
+  },
+  {
     ignores: [
       "node_modules/**",
+      "app/generated/**",
       ".next/**",
       "out/**",
       "build/**",

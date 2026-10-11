@@ -1,6 +1,6 @@
-import { getPlantVarieties } from "@/features/varities/services";
-import PlantsVaritiesDashboard from "@/features/varities/components/Main";
-import type { PlantVarietyDTO } from "@/features/varities/types/types";
+import { getPlantVarieties } from "@/features/plant-varieties/actions";
+import PlantVarietiesClientPage from "@/features/plant-varieties/components/PlantVarietiesClientPage";
+import type { PlantVarietyDTO } from "@/features/plant-varieties/types/index";
 
 import type { Metadata } from "next";
 
@@ -10,5 +10,5 @@ export const metadata: Metadata = {
 
 export default async function PlantVaritiesPage() {
   const initialData: PlantVarietyDTO[] = await getPlantVarieties();
-  return <PlantsVaritiesDashboard initialData={initialData} />;
+  return <PlantVarietiesClientPage initialData={initialData} />;
 }

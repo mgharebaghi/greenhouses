@@ -7,7 +7,12 @@ interface ButtonProps {
   type?: "button" | "submit" | "reset";
 }
 
-export default function PrimaryButton({ onclick, text, className, type }: ButtonProps) {
+export default function PrimaryButton({
+  onclick,
+  text,
+  className,
+  type,
+}: ButtonProps) {
   return (
     <button
       onClick={onclick}

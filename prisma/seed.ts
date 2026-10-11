@@ -1,13 +1,16 @@
 import "dotenv/config";
 import bcrypt from "bcryptjs";
-import { prisma } from "../lib/singletone";
+import { PrismaClient } from "../app/generated/prisma";
+
+// CLI entry points create their own client; the application singleton is server-only.
+const prisma = new PrismaClient();
 
 async function main() {
   // 1) خواندن env
-  const username = "admin";
-  const password = "Qwerty@1234";
+  const username = process.env.ADMIN_USERNAME;
+  const password = process.env.ADMIN_PASSWORD;
   const role = 1;
-  const email = "admin@example.com";
+  const email = process.env.ADMIN_EMAIL || "admin@example.com";
   const isActive = true;
 
   if (!username || !password) {
@@ -37,7 +40,10 @@ async function main() {
     },
   });
 
-  console.log("✅ Admin ensured:", { Username: admin.Username, RoleID: admin.RoleID });
+  console.log("✅ Admin ensured:", {
+    Username: admin.Username,
+    RoleID: admin.RoleID,
+  });
 }
 
 main()

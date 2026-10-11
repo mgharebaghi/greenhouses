@@ -1,6 +1,7 @@
 "use client";
-import React from "react";
+
 import clsx from "clsx";
+import React from "react";
 
 type ButtonType = "button" | "submit" | "reset";
 type ButtonVariant = "primary" | "secondary" | "outline";
@@ -37,7 +38,12 @@ export default function GreenhouseButton({
       "bg-transparent hover:bg-emerald-50 text-emerald-700 border border-emerald-400 hover:border-emerald-300 focus-visible:ring-emerald-500",
   };
 
-  const classes = clsx(baseClasses, variantClasses[variant], fullWidth && "w-full", className);
+  const classes = clsx(
+    baseClasses,
+    variantClasses[variant],
+    fullWidth && "w-full",
+    className,
+  );
 
   return (
     <button
@@ -51,7 +57,9 @@ export default function GreenhouseButton({
       {loading && (
         <span className="inline-block h-4 w-4 border-2 border-current/30 border-r-current rounded-full animate-spin" />
       )}
-      {!loading && icon ? <span className="text-current/90">{icon}</span> : null}
+      {!loading && icon ? (
+        <span className="text-current/90">{icon}</span>
+      ) : null}
       <span>{text}</span>
     </button>
   );

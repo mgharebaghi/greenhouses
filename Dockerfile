@@ -6,7 +6,7 @@ RUN apk add --no-cache curl
 
 COPY package*.json ./
 
-RUN npm install
+RUN npm ci
 
 COPY . .
 
@@ -25,7 +25,7 @@ COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
 
-COPY --from=builder /app/app/generated ./app/app/generated
+COPY --from=builder /app/app/generated ./app/generated
 COPY --from=builder /app/prisma ./prisma
 
 ENV HOSTNAME=0.0.0.0

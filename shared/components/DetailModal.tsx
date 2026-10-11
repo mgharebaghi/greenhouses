@@ -1,5 +1,5 @@
-import { Modal, Card } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
+import { Card, Modal } from "antd";
 import { ReactNode } from "react";
 
 interface DetailModalProps {
@@ -17,7 +17,7 @@ interface InfoCardProps {
   title: string;
   icon: ReactNode;
   color: string;
-  items: { label: string; value: any; span?: boolean }[];
+  items: { label: string; value: ReactNode; span?: boolean }[];
 }
 
 export const InfoCard = ({ title, icon, color, items }: InfoCardProps) => (
@@ -33,8 +33,12 @@ export const InfoCard = ({ title, icon, color, items }: InfoCardProps) => (
     variant="borderless"
     title={
       <div className="flex items-center gap-2">
-        <span style={{ color }} className="dark:brightness-125 transition-all">{icon}</span>
-        <span className="font-semibold text-slate-800 dark:text-slate-200">{title}</span>
+        <span style={{ color }} className="dark:brightness-125 transition-all">
+          {icon}
+        </span>
+        <span className="font-semibold text-slate-800 dark:text-slate-200">
+          {title}
+        </span>
       </div>
     }
   >
@@ -42,11 +46,20 @@ export const InfoCard = ({ title, icon, color, items }: InfoCardProps) => (
       {items.map((item, idx) => (
         <div
           key={idx}
-          className={`flex ${item.span ? "flex-col gap-1" : "items-center justify-between"} ${idx !== items.length - 1 ? "pb-3 border-b border-slate-100 dark:border-slate-700" : ""
-            }`}
+          className={`flex ${item.span ? "flex-col gap-1" : "items-center justify-between"} ${
+            idx !== items.length - 1
+              ? "pb-3 border-b border-slate-100 dark:border-slate-700"
+              : ""
+          }`}
         >
-          <span className="text-sm text-slate-600 dark:text-slate-400">{item.label}</span>
-          <span className={`font-bold text-slate-900 dark:text-slate-100 ${item.span ? "text-sm" : ""}`}>{item.value || "—"}</span>
+          <span className="text-sm text-slate-600 dark:text-slate-400">
+            {item.label}
+          </span>
+          <span
+            className={`font-bold text-slate-900 dark:text-slate-100 ${item.span ? "text-sm" : ""}`}
+          >
+            {item.value ?? "—"}
+          </span>
         </div>
       ))}
     </div>
@@ -54,12 +67,15 @@ export const InfoCard = ({ title, icon, color, items }: InfoCardProps) => (
 );
 
 // Safelist keys for Tailwind
-const themeConfig: Record<string, {
-  headerBg: string;
-  iconBg: string;
-  closeBtnHover: string;
-  iconColor: string;
-}> = {
+const themeConfig: Record<
+  string,
+  {
+    headerBg: string;
+    iconBg: string;
+    closeBtnHover: string;
+    iconColor: string;
+  }
+> = {
   purple: {
     headerBg: "from-purple-50/80 via-indigo-50/60",
     iconBg: "from-purple-500 to-indigo-600",
@@ -104,12 +120,11 @@ export default function DetailModal({
   title,
   icon,
   gradientFrom,
-  gradientTo, // Kept for API compatibility, but logic mainly uses gradientFrom as the key
   children,
   width,
 }: DetailModalProps) {
   // Fallback to 'emerald' or use the provided 'gradientFrom' as key
-  const theme = themeConfig[gradientFrom] || themeConfig['emerald'];
+  const theme = themeConfig[gradientFrom] || themeConfig["emerald"];
   const modalWidth = width || "clamp(360px, 95vw, 1100px)";
 
   return (
@@ -135,7 +150,7 @@ export default function DetailModal({
         },
         mask: {
           backdropFilter: "blur(4px)",
-        }
+        },
       }}
     >
       {/* Header */}
@@ -157,7 +172,9 @@ export default function DetailModal({
             {icon}
           </div>
           <div>
-            <h2 className="font-bold text-xl text-slate-900 dark:text-slate-100">{title}</h2>
+            <h2 className="font-bold text-xl text-slate-900 dark:text-slate-100">
+              {title}
+            </h2>
           </div>
         </div>
       </div>

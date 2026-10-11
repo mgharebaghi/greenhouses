@@ -1,4 +1,10 @@
-import { EditOutlined, DeleteOutlined, QrcodeOutlined, PrinterOutlined, EyeOutlined } from "@ant-design/icons";
+import {
+  DeleteOutlined,
+  EditOutlined,
+  EyeOutlined,
+  PrinterOutlined,
+  QrcodeOutlined,
+} from "@ant-design/icons";
 
 interface TableActionsProps {
   onEdit: () => void;

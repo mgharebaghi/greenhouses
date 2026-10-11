@@ -1,21 +1,20 @@
 "use client";
-import "@ant-design/v5-patch-for-react-19";
 
+import { removeAuth } from "@/server/auth/actions";
+import DashboardMenu from "@/shared/components/Menu";
+import { MenuOutlined, UserOutlined } from "@ant-design/icons";
 import { Layout } from "antd";
 import { Content } from "antd/es/layout/layout";
 import { useState } from "react";
-import DashboardMenu from "@/shared/components/Menu";
-import GreenhouseButton from "@/shared/components/GreenhouseButton";
-import { MenuOutlined, EnvironmentOutlined, UserOutlined } from "@ant-design/icons";
 
-import { usePathname } from "next/navigation";
-import Image from "next/image";
 import ThemeToggle from "@/shared/components/ThemeToggle";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 // Mapping of paths to titles
 const PAGE_TITLES: Record<string, string> = {
   "/dashboard": "داشبورد",
-  "/dashboard/owners": "اطلاعات اشخاص",
+  "/dashboard/people": "اطلاعات اشخاص",
   "/dashboard/suppliers": "اطلاعات تامین کنندگان",
   "/dashboard/greenhouse": "اطلاعات گلخانه ها",
   "/dashboard/plants": "اطلاعات پایه گیاهی",
@@ -31,12 +30,17 @@ const PAGE_TITLES: Record<string, string> = {
   "/dashboard/seed-warehousing": "انبارداری بذر",
   "/dashboard/warehouses": "مدیریت انبارها",
   "/dashboard/nursery-rooms": "مدیریت اتاق های نشاء",
-
-
-
+  "/dashboard/orders": "ثبت سفارش",
+  "/dashboard/seed-planting": "کاشت بذور",
+  "/dashboard/start-seedling-cycle": "شروع چرخه نشاء",
+  "/dashboard/recoveryRoom": "اتاق ریکاوری",
 };
 
-export default function DashboardShell({ children }: { children: React.ReactNode }) {
+export default function DashboardShell({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [openDrawer, setOpenDrawer] = useState(false);
   const pathname = usePathname();
   const currentTitle = PAGE_TITLES[pathname] || "سامانه گلخانه";
@@ -48,7 +52,6 @@ export default function DashboardShell({ children }: { children: React.ReactNode
       <header className="sticky top-0 z-50 h-[90px] bg-white/95 dark:bg-slate-900/90 backdrop-blur-2xl border-b border-emerald-200/80 dark:border-slate-700/80 shadow-[0_4px_20px_-2px_rgba(16,185,129,0.15),0_10px_40px_-10px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_20px_-2px_rgba(0,0,0,0.5)] transition-all duration-300">
         <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-400 opacity-80 dark:opacity-60"></div>
         <div className="h-full px-3 sm:px-6 flex items-center justify-between mx-auto max-w-[1920px] pt-2">
-
           {/* Left: Menu + Brand Identity */}
           <div className="flex items-center gap-2 sm:gap-5">
             <button
@@ -62,14 +65,22 @@ export default function DashboardShell({ children }: { children: React.ReactNode
             {/* Brand Section */}
             <div className="flex items-center gap-2 sm:gap-3 select-none">
               <div className="relative h-10 w-10 sm:h-12 sm:w-12 flex items-center justify-center rounded-xl bg-white dark:bg-slate-800 shadow-[0_4px_15px_-3px_rgba(0,0,0,0.1)] dark:shadow-none border border-emerald-50 dark:border-slate-700 overflow-hidden p-1.5 flex-shrink-0">
-                <Image src="/fakoor-logo.png" alt="Logo" width={44} height={44} className="object-contain" />
+                <Image
+                  src="/fakoor-logo.png"
+                  alt="Logo"
+                  width={44}
+                  height={44}
+                  className="object-contain"
+                />
               </div>
 
               <div className="flex flex-col justify-center min-w-0 max-w-[140px] sm:max-w-xs">
                 <h1 className="text-emerald-950 dark:text-slate-100 font-black text-sm sm:text-xl tracking-tight leading-tight drop-shadow-sm transition-colors whitespace-nowrap truncate">
                   فکور پیوند آریا
                 </h1>
-                <p className="text-emerald-700/80 dark:text-emerald-400/80 font-medium text-[10px] sm:text-[13px] leading-none mt-0.5 transition-colors whitespace-nowrap truncate block">{currentTitle}</p>
+                <p className="text-emerald-700/80 dark:text-emerald-400/80 font-medium text-[10px] sm:text-[13px] leading-none mt-0.5 transition-colors whitespace-nowrap truncate block">
+                  {currentTitle}
+                </p>
               </div>
             </div>
           </div>
@@ -81,11 +92,23 @@ export default function DashboardShell({ children }: { children: React.ReactNode
 
             {/* Date/Time Widget (Useful) */}
             <div className="hidden md:flex flex-col items-end mr-2 px-3 border-r-2 border-slate-100 dark:border-slate-700">
-              <span className="text-slate-900 dark:text-slate-200 font-bold text-sm tracking-widest leading-none numbers-fa transition-colors" suppressHydrationWarning>
-                {new Date().toLocaleTimeString("fa-IR", { hour: '2-digit', minute: '2-digit' })}
+              <span
+                className="text-slate-900 dark:text-slate-200 font-bold text-sm tracking-widest leading-none numbers-fa transition-colors"
+                suppressHydrationWarning
+              >
+                {new Date().toLocaleTimeString("fa-IR", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
               </span>
-              <span className="text-slate-400 dark:text-slate-500 text-[10px] font-medium mt-1 leading-none transition-colors" suppressHydrationWarning>
-                {new Date().toLocaleDateString("fa-IR", { day: 'numeric', month: 'long' })}
+              <span
+                className="text-slate-400 dark:text-slate-500 text-[10px] font-medium mt-1 leading-none transition-colors"
+                suppressHydrationWarning
+              >
+                {new Date().toLocaleDateString("fa-IR", {
+                  day: "numeric",
+                  month: "long",
+                })}
               </span>
             </div>
 
@@ -114,7 +137,9 @@ export default function DashboardShell({ children }: { children: React.ReactNode
           }}
         ></div>
 
-        <div className="relative z-10 w-full h-full overflow-auto">{children}</div>
+        <div className="relative z-10 w-full h-full overflow-auto">
+          {children}
+        </div>
 
         <style jsx>{`
           @keyframes blob {
@@ -141,7 +166,11 @@ export default function DashboardShell({ children }: { children: React.ReactNode
         `}</style>
       </Content>
 
-      <DashboardMenu open={openDrawer} onClose={() => setOpenDrawer(false)} />
+      <DashboardMenu
+        open={openDrawer}
+        onClose={() => setOpenDrawer(false)}
+        onSignOut={removeAuth}
+      />
     </Layout>
   );
 }

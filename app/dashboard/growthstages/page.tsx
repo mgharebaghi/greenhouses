@@ -1,5 +1,5 @@
-import { getGrowthStages } from "@/features/growthstages/services";
-import GrowthStagesDashboard from "@/features/growthstages/components/Main";
+import { getGrowthStages } from "@/features/growth-stages/actions";
+import GrowthStagesDashboard from "@/features/growth-stages/components/GrowthStagesClientPage";
 
 import type { Metadata } from "next";
 

@@ -1,0 +1,22 @@
+[
+  "app/api/auth/invalid/route.ts",
+  "app/dashboard/grafting/page.tsx",
+  "app/dashboard/greenhouse/page.tsx",
+  "app/dashboard/growthstages/page.tsx",
+  "app/dashboard/nursery-rooms/page.tsx",
+  "app/dashboard/orders/page.tsx",
+  "app/dashboard/page.tsx",
+  "app/dashboard/people/page.tsx",
+  "app/dashboard/plants/page.tsx",
+  "app/dashboard/plantvarities/page.tsx",
+  "app/dashboard/recoveryRoom/page.tsx",
+  "app/dashboard/seed-package/page.tsx",
+  "app/dashboard/seed-planting/page.tsx",
+  "app/dashboard/seed-warehousing/page.tsx",
+  "app/dashboard/start-seedling-cycle/page.tsx",
+  "app/dashboard/suppliers/page.tsx",
+  "app/dashboard/warehouses/page.tsx",
+  "app/page.tsx",
+  "app/public/scan/orders/[id]/page.tsx",
+  "app/public/scan/seed-package/[id]/page.tsx"
+]

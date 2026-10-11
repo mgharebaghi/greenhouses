@@ -17,9 +17,11 @@ Admin credentials for seeding: configure locally in `prisma/seed.ts` (not docume
 
 ## Documentation
 
-| Language | File |
-|----------|------|
-| **فارسی** | [docs/DOCUMENTATION.fa.md](./docs/DOCUMENTATION.fa.md) |
+- [Architecture refactor and verification (فارسی)](./docs/REFACTOR.fa.md)
+
+| Language    | File                                                   |
+| ----------- | ------------------------------------------------------ |
+| **فارسی**   | [docs/DOCUMENTATION.fa.md](./docs/DOCUMENTATION.fa.md) |
 | **English** | [docs/DOCUMENTATION.en.md](./docs/DOCUMENTATION.en.md) |
 
 Full coverage includes: architecture, authentication, database model, all dashboard modules, QR public pages, deployment, and troubleshooting.
@@ -30,12 +32,12 @@ Next.js 16 · React 19 · Ant Design 5 · Tailwind 4 · Prisma 6 · SQL Server
 
 ## Scripts
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Dev server on port 3001 |
-| `npm run build` | Production build (standalone) |
-| `npm start` | Run `server.js` |
-| `npx prisma db seed` | Ensure admin user |
+| Command              | Description                   |
+| -------------------- | ----------------------------- |
+| `npm run dev`        | Dev server on port 3001       |
+| `npm run build`      | Production build (standalone) |
+| `npm start`          | Run `server.js`               |
+| `npx prisma db seed` | Ensure admin user             |
 
 ## Project Layout
 

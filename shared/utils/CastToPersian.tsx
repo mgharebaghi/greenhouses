@@ -1,12 +1,24 @@
 "use client";
+
 import { useEffect } from "react";
 
-const toFaDigits = (s: string) => s.replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[Number(d)]);
+const toFaDigits = (s: string) =>
+  s.replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[Number(d)]);
 
 export default function GlobalFaDigits() {
   useEffect(() => {
-    const skipTags = new Set(["INPUT", "TEXTAREA", "SCRIPT", "STYLE", "CODE", "PRE"]);
-    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    const skipTags = new Set([
+      "INPUT",
+      "TEXTAREA",
+      "SCRIPT",
+      "STYLE",
+      "CODE",
+      "PRE",
+    ]);
+    const walker = document.createTreeWalker(
+      document.body,
+      NodeFilter.SHOW_TEXT,
+    );
 
     const convertNode = (n: Node) => {
       const p = n.parentElement;
@@ -36,7 +48,11 @@ export default function GlobalFaDigits() {
       }
     });
 
-    obs.observe(document.body, { childList: true, characterData: true, subtree: true });
+    obs.observe(document.body, {
+      childList: true,
+      characterData: true,
+      subtree: true,
+    });
     return () => obs.disconnect();
   }, []);
 

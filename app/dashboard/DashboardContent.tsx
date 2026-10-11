@@ -1,21 +1,24 @@
 "use client";
-import { useState, useEffect } from "react";
+
 import Image from "next/image";
+import { useEffect, useState } from "react";
+
+const phrases = [
+  "مدیریت پیشرفته کشاورزی با فناوری‌های نوین",
+  "کنترل هوشمند دما، رطوبت و نور",
+  "بهینه‌سازی مصرف آب و انرژی",
+  "افزایش بهره‌وری و کاهش هزینه‌ها",
+  "پایش لحظه‌ای و گزارش‌گیری دقیق",
+];
 
 export default function DashboardContent() {
   const [typedText, setTypedText] = useState("");
   const [currentPhraseIndex, setCurrentPhraseIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
-  const [particles, setParticles] = useState<any[]>([]);
-
-  const phrases = [
-    "مدیریت پیشرفته کشاورزی با فناوری‌های نوین",
-    "کنترل هوشمند دما، رطوبت و نور",
-    "بهینه‌سازی مصرف آب و انرژی",
-    "افزایش بهره‌وری و کاهش هزینه‌ها",
-    "پایش لحظه‌ای و گزارش‌گیری دقیق",
-  ];
+  const [particles, setParticles] = useState<import("react").CSSProperties[]>(
+    [],
+  );
 
   useEffect(() => {
     if (isPaused) return;
@@ -48,21 +51,23 @@ export default function DashboardContent() {
           }
         }
       },
-      isDeleting ? 30 : 80
+      isDeleting ? 30 : 80,
     );
 
     return () => clearTimeout(timeout);
   }, [typedText, currentPhraseIndex, isDeleting, isPaused]);
 
   useEffect(() => {
-    setParticles([...Array(20)].map(() => ({
-      left: `${Math.random() * 100}%`,
-      bottom: '-20px',
-      width: `${Math.random() * 6 + 2}px`,
-      height: `${Math.random() * 6 + 6}px`,
-      animationDuration: `${Math.random() * 10 + 10}s`,
-      animationDelay: `${Math.random() * 5}s`,
-    })));
+    setParticles(
+      [...Array(20)].map(() => ({
+        left: `${Math.random() * 100}%`,
+        bottom: "-20px",
+        width: `${Math.random() * 6 + 2}px`,
+        height: `${Math.random() * 6 + 6}px`,
+        animationDuration: `${Math.random() * 10 + 10}s`,
+        animationDelay: `${Math.random() * 5}s`,
+      })),
+    );
   }, []);
 
   return (
@@ -95,7 +100,8 @@ export default function DashboardContent() {
           style={{
             backgroundImage: `linear-gradient(to right, rgb(16 185 129 / 0.5) 1px, transparent 1px), linear-gradient(to bottom, rgb(16 185 129 / 0.5) 1px, transparent 1px)`,
             backgroundSize: "60px 60px",
-            maskImage: "radial-gradient(ellipse at center, black 30%, transparent 70%)",
+            maskImage:
+              "radial-gradient(ellipse at center, black 30%, transparent 70%)",
           }}
         ></div>
       </div>
@@ -104,7 +110,7 @@ export default function DashboardContent() {
       <div className="absolute top-12 left-12 w-32 h-32 bg-white/5 dark:bg-white/5 backdrop-blur-3xl rounded-full border border-white/20 dark:border-white/10 hidden lg:block animate-float-slow pointer-events-none"></div>
       <div className="absolute bottom-24 right-12 w-48 h-48 bg-emerald-500/5 dark:bg-emerald-500/5 backdrop-blur-3xl rounded-full border border-white/10 hidden lg:block animate-float-delayed pointer-events-none"></div>
 
-      {/* Main Content */}
+      {/* SuppliersClientPage Content */}
       <div className="relative h-full w-full flex items-center justify-center px-4 z-10">
         <div className="text-center w-full max-w-6xl animate-fade-in-up">
           {/* Logo Area */}
@@ -139,14 +145,24 @@ export default function DashboardContent() {
 
           {/* Features - Glass Pills */}
           <div className="flex flex-wrap justify-center gap-3 sm:gap-4 lg:gap-5 mb-10 sm:mb-14 lg:mb-16 px-2 animate-fade-in-more-delayed relative z-20">
-            {["پایش لحظه‌ای", "کنترل هوشمند", "گزارش‌گیری دقیق", "هوش مصنوعی"].map((feature, idx) => (
-              <div key={idx} className="relative group overflow-hidden px-5 py-2.5 bg-white/40 dark:bg-slate-800/40 backdrop-blur-md border border-white/60 dark:border-slate-600 rounded-2xl text-emerald-900 dark:text-emerald-100 font-bold hover:bg-white/60 dark:hover:bg-slate-700/60 transition-all duration-300 cursor-default text-xs sm:text-sm lg:text-base transform hover:-translate-y-1 hover:shadow-lg hover:shadow-emerald-500/20">
+            {[
+              "پایش لحظه‌ای",
+              "کنترل هوشمند",
+              "گزارش‌گیری دقیق",
+              "هوش مصنوعی",
+            ].map((feature, idx) => (
+              <div
+                key={idx}
+                className="relative group overflow-hidden px-5 py-2.5 bg-white/40 dark:bg-slate-800/40 backdrop-blur-md border border-white/60 dark:border-slate-600 rounded-2xl text-emerald-900 dark:text-emerald-100 font-bold hover:bg-white/60 dark:hover:bg-slate-700/60 transition-all duration-300 cursor-default text-xs sm:text-sm lg:text-base transform hover:-translate-y-1 hover:shadow-lg hover:shadow-emerald-500/20"
+              >
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:animate-shimmer"></div>
                 <span className="relative z-10 flex items-center gap-2">
-                  <span className="text-lg">{idx === 0 && "📊"}
+                  <span className="text-lg">
+                    {idx === 0 && "📊"}
                     {idx === 1 && "🌡️"}
                     {idx === 2 && "📈"}
-                    {idx === 3 && "💡"}</span>
+                    {idx === 3 && "💡"}
+                  </span>
                   {feature}
                 </span>
               </div>
@@ -161,8 +177,12 @@ export default function DashboardContent() {
                 <div className="text-3xl lg:text-5xl mb-3 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 inline-block filter drop-shadow-md">
                   🌿
                 </div>
-                <div className="text-xl lg:text-4xl font-black text-emerald-800 dark:text-emerald-400 mt-2 tracking-tight">+۹۵٪</div>
-                <div className="text-[10px] sm:text-xs lg:text-sm text-emerald-700/70 dark:text-emerald-300/60 font-medium mt-1 uppercase tracking-wider">بهره‌وری محصولات</div>
+                <div className="text-xl lg:text-4xl font-black text-emerald-800 dark:text-emerald-400 mt-2 tracking-tight">
+                  +۹۵٪
+                </div>
+                <div className="text-[10px] sm:text-xs lg:text-sm text-emerald-700/70 dark:text-emerald-300/60 font-medium mt-1 uppercase tracking-wider">
+                  بهره‌وری محصولات
+                </div>
               </div>
             </div>
             <div className="relative bg-gradient-to-br from-white/40 to-white/10 dark:from-slate-800/40 dark:to-slate-900/10 backdrop-blur-xl border border-white/40 dark:border-slate-700/40 rounded-3xl p-4 sm:p-6 lg:p-8 shadow-xl hover:shadow-2xl hover:shadow-lime-500/10 transition-all duration-500 group overflow-hidden text-center transform hover:-translate-y-2">
@@ -171,8 +191,12 @@ export default function DashboardContent() {
                 <div className="text-3xl lg:text-5xl mb-3 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-500 inline-block filter drop-shadow-md">
                   💧
                 </div>
-                <div className="text-xl lg:text-4xl font-black text-lime-700 dark:text-lime-400 mt-2 tracking-tight">-۶۰٪</div>
-                <div className="text-[10px] sm:text-xs lg:text-sm text-lime-700/70 dark:text-lime-300/60 font-medium mt-1 uppercase tracking-wider">مصرف آب</div>
+                <div className="text-xl lg:text-4xl font-black text-lime-700 dark:text-lime-400 mt-2 tracking-tight">
+                  -۶۰٪
+                </div>
+                <div className="text-[10px] sm:text-xs lg:text-sm text-lime-700/70 dark:text-lime-300/60 font-medium mt-1 uppercase tracking-wider">
+                  مصرف آب
+                </div>
               </div>
             </div>
             <div className="relative bg-gradient-to-br from-white/40 to-white/10 dark:from-slate-800/40 dark:to-slate-900/10 backdrop-blur-xl border border-white/40 dark:border-slate-700/40 rounded-3xl p-4 sm:p-6 lg:p-8 shadow-xl hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-500 group overflow-hidden text-center transform hover:-translate-y-2">
@@ -181,8 +205,12 @@ export default function DashboardContent() {
                 <div className="text-3xl lg:text-5xl mb-3 group-hover:scale-110 transition-all duration-500 inline-block filter drop-shadow-md">
                   📊
                 </div>
-                <div className="text-xl lg:text-4xl font-black text-emerald-800 dark:text-emerald-400 mt-2 tracking-tight">۲۴/۷</div>
-                <div className="text-[10px] sm:text-xs lg:text-sm text-emerald-700/70 dark:text-emerald-300/60 font-medium mt-1 uppercase tracking-wider">پایش هوشمند</div>
+                <div className="text-xl lg:text-4xl font-black text-emerald-800 dark:text-emerald-400 mt-2 tracking-tight">
+                  ۲۴/۷
+                </div>
+                <div className="text-[10px] sm:text-xs lg:text-sm text-emerald-700/70 dark:text-emerald-300/60 font-medium mt-1 uppercase tracking-wider">
+                  پایش هوشمند
+                </div>
               </div>
             </div>
           </div>
@@ -192,67 +220,144 @@ export default function DashboardContent() {
       {/* Custom Animations */}
       <style jsx>{`
         @keyframes orb-float {
-            0%, 100% { transform: translate(0, 0); }
-            33% { transform: translate(30px, -50px); }
-            66% { transform: translate(-20px, 40px); }
+          0%,
+          100% {
+            transform: translate(0, 0);
+          }
+          33% {
+            transform: translate(30px, -50px);
+          }
+          66% {
+            transform: translate(-20px, 40px);
+          }
         }
         @keyframes orb-float-delayed {
-            0%, 100% { transform: translate(0, 0); }
-            33% { transform: translate(-40px, 30px); }
-            66% { transform: translate(20px, -20px); }
+          0%,
+          100% {
+            transform: translate(0, 0);
+          }
+          33% {
+            transform: translate(-40px, 30px);
+          }
+          66% {
+            transform: translate(20px, -20px);
+          }
         }
         @keyframes orb-float-reverse {
-            0%, 100% { transform: translate(0, 0); }
-            33% { transform: translate(20px, 40px); }
-            66% { transform: translate(-30px, -30px); }
+          0%,
+          100% {
+            transform: translate(0, 0);
+          }
+          33% {
+            transform: translate(20px, 40px);
+          }
+          66% {
+            transform: translate(-30px, -30px);
+          }
         }
-        .animate-orb-float { animation: orb-float 20s infinite ease-in-out; }
-        .animate-orb-float-delayed { animation: orb-float-delayed 25s infinite ease-in-out; }
-        .animate-orb-float-reverse { animation: orb-float-reverse 22s infinite ease-in-out; }
+        .animate-orb-float {
+          animation: orb-float 20s infinite ease-in-out;
+        }
+        .animate-orb-float-delayed {
+          animation: orb-float-delayed 25s infinite ease-in-out;
+        }
+        .animate-orb-float-reverse {
+          animation: orb-float-reverse 22s infinite ease-in-out;
+        }
 
         @keyframes rise {
-            0% { transform: translateY(100vh) scale(0); opacity: 0; }
-            50% { opacity: 0.5; }
-            100% { transform: translateY(-20vh) scale(1.5); opacity: 0; }
+          0% {
+            transform: translateY(100vh) scale(0);
+            opacity: 0;
+          }
+          50% {
+            opacity: 0.5;
+          }
+          100% {
+            transform: translateY(-20vh) scale(1.5);
+            opacity: 0;
+          }
         }
         .animate-rise {
-            animation-name: rise;
-            animation-timing-function: linear;
-            animation-iteration-count: infinite;
+          animation-name: rise;
+          animation-timing-function: linear;
+          animation-iteration-count: infinite;
         }
 
         @keyframes shimmer {
-            100% { transform: translateX(100%); }
+          100% {
+            transform: translateX(100%);
+          }
         }
-        .animate-shimmer { animation: shimmer 1.5s infinite; }
+        .animate-shimmer {
+          animation: shimmer 1.5s infinite;
+        }
 
         @keyframes pulse-slow {
-            0%, 100% { opacity: 0.2; transform: translate(-50%, -50%) scale(1); }
-            50% { opacity: 0.4; transform: translate(-50%, -50%) scale(1.1); }
+          0%,
+          100% {
+            opacity: 0.2;
+            transform: translate(-50%, -50%) scale(1);
+          }
+          50% {
+            opacity: 0.4;
+            transform: translate(-50%, -50%) scale(1.1);
+          }
         }
-        .animate-pulse-slow { animation: pulse-slow 6s infinite ease-in-out; }
+        .animate-pulse-slow {
+          animation: pulse-slow 6s infinite ease-in-out;
+        }
 
         @keyframes float-slow {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
+          0%,
+          100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-20px);
+          }
         }
-         .animate-float-slow { animation: float-slow 10s infinite ease-in-out; }
-         .animate-float-delayed { animation: float-slow 12s infinite ease-in-out reverse; }
-        
+        .animate-float-slow {
+          animation: float-slow 10s infinite ease-in-out;
+        }
+        .animate-float-delayed {
+          animation: float-slow 12s infinite ease-in-out reverse;
+        }
+
         @keyframes fade-in-up {
-          from { opacity: 0; transform: translateY(30px); }
-          to { opacity: 1; transform: translateY(0); }
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
-        @keyframes fade-in-more-delayed { animation: fade-in-up 1s ease-out 0.6s backwards; }
+        @keyframes fade-in-more-delayed {
+          animation: fade-in-up 1s ease-out 0.6s backwards;
+        }
 
         @keyframes blink {
-          0%, 49% { opacity: 1; }
-          50%, 100% { opacity: 0; }
+          0%,
+          49% {
+            opacity: 1;
+          }
+          50%,
+          100% {
+            opacity: 0;
+          }
         }
-        .animate-blink { animation: blink 1s infinite; }
+        .animate-blink {
+          animation: blink 1s infinite;
+        }
 
-        .filtered-drop-shadow { filter: drop-shadow(0 0 15px rgba(16, 185, 129, 0.3)); }
-        .dark .filtered-drop-shadow { filter: drop-shadow(0 0 30px rgba(16, 185, 129, 0.4)); }
+        .filtered-drop-shadow {
+          filter: drop-shadow(0 0 15px rgba(16, 185, 129, 0.3));
+        }
+        .dark .filtered-drop-shadow {
+          filter: drop-shadow(0 0 30px rgba(16, 185, 129, 0.4));
+        }
       `}</style>
     </div>
   );

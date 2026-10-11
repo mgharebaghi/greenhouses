@@ -1,40 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { getAllRecoveryRooms } from "@/features/recoveryRoom/services/read";
-import RecoveryRoomTable from "@/features/recoveryRoom/components/RecoveryRoomTable";
+import { RECOVERY_UNAVAILABLE_MESSAGE } from "@/features/recovery-rooms/domain/availability";
 import PageHeader from "@/shared/components/PageHeader";
 import { MedicineBoxOutlined } from "@ant-design/icons";
 
 export default function RecoveryRoomPage() {
-    const [data, setData] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
-
-    const fetchData = async () => {
-        setLoading(true);
-        const rooms = await getAllRecoveryRooms();
-        setData(rooms);
-        setLoading(false);
-    };
-
-    useEffect(() => {
-        fetchData();
-    }, []);
-
-    return (
-        <div className="p-6">
-            <PageHeader
-                title="اتاق ریکاوری"
-                subtitle="مدیریت و مشاهده وضعیت سینی‌های موجود در اتاق ریکاوری"
-                icon={<MedicineBoxOutlined />}
-            />
-            <RecoveryRoomTable
-                data={data}
-                loading={loading}
-                setLoading={setLoading}
-                setData={setData}
-                refreshData={fetchData}
-            />
-        </div>
-    );
+  return (
+    <div className="p-6">
+      <PageHeader
+        title="اتاق ریکاوری"
+        subtitle="مدیریت و مشاهده وضعیت سینی‌های موجود در اتاق ریکاوری"
+        icon={<MedicineBoxOutlined />}
+      />
+      <div role="status" className="p-6 text-center">
+        {RECOVERY_UNAVAILABLE_MESSAGE}
+      </div>
+    </div>
+  );
 }

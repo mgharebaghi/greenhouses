@@ -1,14 +1,14 @@
-import { Modal } from "antd";
-import { ExclamationCircleOutlined, CloseOutlined } from "@ant-design/icons";
 import GreenhouseButton from "@/shared/components/GreenhouseButton";
-import { useEffect } from "react";
+import { CloseOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
+import { Modal } from "antd";
+import { useEffect, useState } from "react";
 
 export type DeleteModalProps = {
   open: boolean;
   onClose: () => void;
   id?: number;
   name?: string;
-  onDelete?: (id: number) => void;
+  onDelete?: (id: number) => void | Promise<void>;
   deleteLoading?: boolean;
   msg?: string;
   setMsg?: (msg: string) => void;
@@ -24,11 +24,22 @@ export default function DeleteModal({
   msg,
   setMsg,
 }: DeleteModalProps) {
+  const [busy, setBusy] = useState(false);
+  const deleting = busy || deleteLoading;
+  const handleDelete = async () => {
+    if (id == null || deleting) return;
+    setBusy(true);
+    try {
+      await onDelete?.(id);
+    } finally {
+      setBusy(false);
+    }
+  };
   useEffect(() => {
     if (!open) return;
     // Reset any state or perform any actions when the modal opens
     setMsg?.("");
-  }, [open]);
+  }, [open, setMsg]);
 
   return (
     <Modal
@@ -45,7 +56,8 @@ export default function DeleteModal({
           padding: 0,
           borderRadius: "1rem",
           overflow: "hidden",
-          boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+          boxShadow:
+            "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
         },
       }}
     >
@@ -64,8 +76,12 @@ export default function DeleteModal({
             <ExclamationCircleOutlined className="text-2xl" />
           </div>
           <div>
-            <h3 className="font-bold text-xl text-slate-900 dark:text-slate-100">تأیید حذف</h3>
-            <p className="text-sm text-slate-600 dark:text-slate-400 mt-0.5">این عملیات برگشت‌ناپذیر است</p>
+            <h3 className="font-bold text-xl text-slate-900 dark:text-slate-100">
+              تأیید حذف
+            </h3>
+            <p className="text-sm text-slate-600 dark:text-slate-400 mt-0.5">
+              این عملیات برگشت‌ناپذیر است
+            </p>
           </div>
         </div>
       </div>
@@ -74,17 +90,23 @@ export default function DeleteModal({
       <div className="px-6 py-6 bg-white dark:bg-slate-900">
         <div className="mb-4">
           <p className="text-slate-700 dark:text-slate-300 text-base leading-relaxed">
-            آیا از حذف <span className="font-bold text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700">{name}</span> اطمینان
-            دارید؟
+            آیا از حذف{" "}
+            <span className="font-bold text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700">
+              {name}
+            </span>{" "}
+            اطمینان دارید؟
           </p>
           <p className="text-slate-500 dark:text-slate-400 text-sm mt-3">
-            با تأیید این عملیات، تمامی داده‌های مرتبط به صورت دائمی از سیستم پاک خواهند شد.
+            با تأیید این عملیات، تمامی داده‌های مرتبط به صورت دائمی از سیستم پاک
+            خواهند شد.
           </p>
         </div>
 
         {msg && (
           <div className="mb-4 p-3 bg-rose-50/60 dark:bg-rose-900/20 border border-rose-200/70 dark:border-rose-800/50 rounded-lg">
-            <p className="text-sm text-rose-700 dark:text-rose-400 font-medium">{msg}</p>
+            <p className="text-sm text-rose-700 dark:text-rose-400 font-medium">
+              {msg}
+            </p>
           </div>
         )}
 
@@ -94,17 +116,19 @@ export default function DeleteModal({
             text="انصراف"
             variant="secondary"
             onClick={onClose}
-            disabled={deleteLoading}
+            disabled={deleting}
             className="min-w-[120px]"
           />
           <GreenhouseButton
-            text={deleteLoading ? "در حال حذف..." : "حذف کامل"}
+            text={deleting ? "در حال حذف..." : "حذف کامل"}
             variant="primary"
-            loading={deleteLoading}
-            onClick={() => onDelete?.(id!)}
+            loading={deleting}
+            onClick={handleDelete}
             className="min-w-[120px]"
             style={{
-              background: deleteLoading ? undefined : "linear-gradient(135deg, #be123c 0%, #e11d48 100%)",
+              background: deleteLoading
+                ? undefined
+                : "linear-gradient(135deg, #be123c 0%, #e11d48 100%)",
               borderColor: "#be123c",
             }}
           />

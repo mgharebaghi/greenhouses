@@ -1,5 +1,5 @@
-import { StartSeedlingCyclePage } from "@/features/startSeedlingCycle";
+import { StartSeedlingCyclePage } from "@/features/seedling-cycles";
 
 export default function Page() {
-    return <StartSeedlingCyclePage />;
+  return <StartSeedlingCyclePage />;
 }
