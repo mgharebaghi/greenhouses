@@ -1,11 +1,10 @@
-import { Tbl_People } from "@/app/generated/prisma";
-import { createOwner, updateOwner, getAllOwners, getPersonsPosts, OwnerResponse, getLastPersonCode } from "@/features/owners/services";
+import { createOwner, updateOwner, getAllOwners, getPersonsPosts, getLastPersonCode } from "@/features/owners/services";
 import { Modal, Form, Input, Select } from "antd";
 import { useEffect, useState } from "react";
 import { CloseOutlined, UserAddOutlined, EditOutlined, CheckCircleOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
 import GreenhouseButton from "@/shared/components/GreenhouseButton";
 
-import { PeopleReadDTO } from "../schema";
+import { ownerInputSchema, type OwnerInput, type PeopleReadDTO } from "../schema";
 
 type OwnerFormModalProps = {
     isOpen: boolean;
@@ -26,12 +25,12 @@ export default function OwnerFormModal({
     const [message, setMessage] = useState<{ status: "ok" | "error"; message: string } | null>(null);
     const [posts, setPosts] = useState<{ ID: number, PostName: string | null }[]>([]);
     const [postsLoading, setPostsLoading] = useState(false);
-    const [lastPersonCode, setLastPersonCode] = useState<number>(0);
-    const [form] = Form.useForm();
+    const [codeLoading, setCodeLoading] = useState(false);
+    const [form] = Form.useForm<OwnerInput>();
 
     const isEdit = !!record;
 
-    const fields = [
+    const fields: { name: keyof OwnerInput; label: string; required: boolean; placeholder: string; icon: string; colSpan: number; type?: string; disabled?: boolean }[] = [
         { name: "FirstName", label: "نام", required: true, placeholder: "نام را وارد کنید", icon: "👤", colSpan: 1 },
         { name: "LastName", label: "نام خانوادگی", required: true, placeholder: "نام خانوادگی را وارد کنید", icon: "👥", colSpan: 1 },
         { name: "NationalCode", label: "کد ملی", required: true, placeholder: "کد ملی را وارد کنید", icon: "👤", colSpan: 1 },
@@ -43,33 +42,50 @@ export default function OwnerFormModal({
     ];
 
     useEffect(() => {
+        if (!isOpen) return;
+        let cancelled = false;
         const fetchPosts = async () => {
             setPostsLoading(true);
-            const res = await getPersonsPosts();
-            if (res.status === "ok") {
-                setPosts(res.dta || []);
+            try {
+                const res = await getPersonsPosts();
+                if (!cancelled && res.status === "ok") setPosts(res.dta || []);
+            } catch {
+                if (!cancelled) setMessage({ status: "error", message: "دریافت سمت‌ها انجام نشد. فرم را دوباره باز کنید." });
+            } finally {
+                if (!cancelled) setPostsLoading(false);
             }
-            setPostsLoading(false);
         };
 
         const fetchLastCode = async () => {
-            const res = await getLastPersonCode();
-            if (res) {
-                setLastPersonCode(parseInt(res) + 1);
+            setCodeLoading(true);
+            try {
+                const res = await getLastPersonCode();
+                const nextCode = (Number.parseInt(res, 10) || 0) + 1;
+                if (!cancelled) form.setFieldValue("PersonCode", String(nextCode));
+            } catch {
+                if (!cancelled) setMessage({ status: "error", message: "دریافت کد شخص انجام نشد. فرم را دوباره باز کنید." });
+            } finally {
+                if (!cancelled) setCodeLoading(false);
             }
-        }
+        };
 
-        fetchPosts();
-        if (!isEdit) {
-            fetchLastCode();
-        }
-    }, []);
+        void fetchPosts();
+        if (!isEdit) void fetchLastCode();
+        else setCodeLoading(false);
+        return () => { cancelled = true; };
+    }, [isOpen, isEdit, form]);
 
     useEffect(() => {
         if (isOpen) {
             if (record) {
                 form.setFieldsValue({
-                    ...record,
+                    FirstName: record.FirstName ?? "",
+                    LastName: record.LastName ?? "",
+                    NationalCode: record.NationalCode ?? "",
+                    EmailAddress: record.EmailAddress ?? "",
+                    PhoneNumber: record.PhoneNumber ?? "",
+                    PersonCode: record.PersonCode ?? "",
+                    Profesion: record.Profesion ?? "",
                     PostID: record.Tbl_PeoplePosts?.ID,
                 });
             } else {
@@ -79,28 +95,33 @@ export default function OwnerFormModal({
         }
     }, [isOpen, record, form]);
 
-    const handleSubmit = async (values: any) => {
+    const handleSubmit = async (values: OwnerInput) => {
         setMessage(null);
         setLoading(true);
 
-        let ok = false;
-        if (isEdit && record) {
-            const result = await updateOwner({ id: record.ID, data: values });
-            ok = !!result;
-        } else {
-            const res: OwnerResponse = await createOwner({
-                ...values,
-                PersonCode: lastPersonCode.toString()
-            });
-            ok = res.status === "ok";
-        }
+        try {
+            const result = isEdit && record
+                ? await updateOwner({ id: record.ID, data: values })
+                : await createOwner(values);
+            if (result.status === "error") {
+                if (result.fieldErrors) {
+                    form.setFields(fields.map(({ name }) => ({ name, errors: result.fieldErrors?.[name] ?? [] })));
+                }
+                setMessage({ status: "error", message: result.message });
+                return;
+            }
 
-        if (ok) {
-            setMessage({ status: "ok", message: isEdit ? "ویرایش با موفقیت انجام شد" : "افزودن با موفقیت انجام شد" });
+            setMessage({ status: "ok", message: result.message });
             setMainLoading(true);
-            const mainData = await getAllOwners();
-            setMainData(mainData.dta || []);
-            setMainLoading(false);
+            try {
+                const mainData = await getAllOwners();
+                if (mainData.status !== "ok") throw new Error("Refresh failed");
+                setMainData(mainData.dta || []);
+            } catch {
+                setMessage({ status: "ok", message: "اطلاعات ذخیره شد؛ برای دیدن فهرست به‌روز، صفحه را تازه کنید." });
+            } finally {
+                setMainLoading(false);
+            }
 
             if (!isEdit) form.resetFields();
 
@@ -108,10 +129,11 @@ export default function OwnerFormModal({
                 setIsOpen(false);
                 setMessage(null);
             }, 1500);
-        } else {
-            setMessage({ status: "error", message: isEdit ? "خطا در ویرایش اطلاعات" : "خطا در ثبت اطلاعات" });
+        } catch {
+            setMessage({ status: "error", message: "ارتباط با سرور انجام نشد. لطفاً دوباره تلاش کنید." });
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     const handleClose = () => {
@@ -202,9 +224,16 @@ export default function OwnerFormModal({
                                     </span>
                                 }
                                 name={field.name}
-                                rules={[{ required: field.required, message: `لطفاً ${field.label} را وارد کنید` }]}
+                                rules={[{
+                                    validator: async (_, value: unknown) => {
+                                        if (value === undefined || value === null || value === "") {
+                                            throw new Error(`لطفاً ${field.label} را وارد کنید`);
+                                        }
+                                        const result = ownerInputSchema.shape[field.name].safeParse(value);
+                                        if (!result.success) throw new Error(result.error.issues[0].message);
+                                    },
+                                }]}
                                 className={`mb-1 ${field.colSpan === 2 ? "col-span-2" : "col-span-2 sm:col-span-1"}`}
-                                initialValue={field.name == "PersonCode" && lastPersonCode ? lastPersonCode : ""}
                             >
                                 {field.type === "select" ? (
                                     <Select
@@ -219,7 +248,7 @@ export default function OwnerFormModal({
                                     <Input
                                         onChange={() => setMessage(null)}
                                         placeholder={field.placeholder}
-                                        disabled={loading || (field as any).disabled}
+                                        disabled={loading || field.disabled}
                                         className={`rounded-xl border-2 border-slate-200 dark:border-slate-700 ${theme.fieldHover} ${theme.fieldFocus} transition-all shadow-sm hover:shadow dark:bg-slate-800 dark:text-white dark:placeholder-slate-500 h-10 text-sm`}
                                     />
                                 )}
@@ -254,6 +283,7 @@ export default function OwnerFormModal({
                             variant="primary"
                             type="submit"
                             loading={loading}
+                            disabled={codeLoading || postsLoading}
                             className="w-full sm:w-auto min-w-[100px] h-10 shadow-md hover:shadow-lg text-sm"
                         />
                     </div>
