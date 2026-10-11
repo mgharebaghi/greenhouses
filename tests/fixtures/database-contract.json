@@ -1,5 +1,5 @@
 {
   "prisma/migrations/20251004094925_init/migration.sql": "0afe073f4d35b35fdb54e63d13eb361250583530f8054499ca9f464e4747f04b",
   "prisma/migrations/migration_lock.toml": "4374e08ac7359a92263725f17df74111da4850bfac589668370ecd46406a8f86",
-  "prisma/schema.prisma": "49811c3da020180e1aa71c0d677951ae89e82747321f40e0a2cc165a0d58571e"
+  "prisma/schema.prisma": "fd5fc456ec958a0e636eac6215a8f2a242da69822245d96742b648fff4860c1d"
 }

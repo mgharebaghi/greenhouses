@@ -6,7 +6,7 @@ import { test } from "node:test";
 import database from "./fixtures/database-contract.json";
 import routes from "./fixtures/routes.json";
 
-test("schema and migrations stay byte-for-byte unchanged", () => {
+test("Prisma matches the approved read-only introspection snapshot; migrations stay unchanged", () => {
   for (const [file, expected] of Object.entries(database)) {
     // Git normalizes text line endings; Windows checkouts may use CRLF.
     const source = fs.readFileSync(file, "utf8").replace(/\r\n/g, "\n");

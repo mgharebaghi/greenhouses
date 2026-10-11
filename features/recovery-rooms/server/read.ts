@@ -1,85 +1,16 @@
 "use server";
 import { requireSession } from "@/server/auth/require-session";
+import type { RecoveryRoomListItem, RecoveryGraftingOpDTO } from "../types";
+import { requireRecoveryStorage } from "./availability";
 
-import { prisma } from "@/server/db/prisma";
-
-export async function getAllRecoveryRooms() {
+export async function getAllRecoveryRooms(): Promise<RecoveryRoomListItem[]> {
   await requireSession();
-  try {
-    const rooms = await prisma.tbl_RecoveryRoomPerOrder.findMany({
-      include: {
-        Tbl_GraftingOperation: {
-          include: {
-            Tbl_Orders: {
-              select: {
-                OrderCode: true,
-                Tbl_People_Tbl_Orders_CustomerIDToTbl_People: {
-                  select: { FirstName: true, LastName: true },
-                },
-              },
-            },
-            Tbl_GraftWorkers: {
-              include: {
-                Tbl_People: {
-                  select: {
-                    FirstName: true,
-                    LastName: true,
-                    NationalCode: true,
-                    PersonCode: true,
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-      orderBy: { ID: "desc" },
-    });
-    return rooms;
-  } catch (error) {
-    console.error("Query failed", error);
-    throw new Error("دریافت اطلاعات انجام نشد. لطفاً دوباره تلاش کنید.");
-  }
+  requireRecoveryStorage();
 }
 
-export async function getGraftingOperationsForDropdown() {
+export async function getGraftingOperationsForDropdown(): Promise<
+  RecoveryGraftingOpDTO[]
+> {
   await requireSession();
-  try {
-    // Fetch operations that don't have a recovery room yet, or maybe all of them
-    // Depending on requirements, we can fetch all and let user edit/create
-    const ops = await prisma.tbl_GraftingOperation.findMany({
-      include: {
-        Tbl_Orders: {
-          select: {
-            OrderCode: true,
-            Tbl_People_Tbl_Orders_CustomerIDToTbl_People: {
-              select: { FirstName: true, LastName: true },
-            },
-          },
-        },
-        Tbl_GraftWorkers: {
-          include: {
-            Tbl_People: {
-              select: {
-                FirstName: true,
-                LastName: true,
-                NationalCode: true,
-                PersonCode: true,
-              },
-            },
-          },
-        },
-        Tbl_RecoveryRoomPerOrder: true,
-      },
-      orderBy: { ID: "desc" },
-    });
-
-    // Return only those that do NOT have a recovery room entry yet
-    // Wait, if we want to allow editing, maybe they should just use the grid's Edit button.
-    // For new creation, we show ones without a recovery room entry.
-    return ops.filter((op) => op.Tbl_RecoveryRoomPerOrder.length === 0);
-  } catch (error) {
-    console.error("Query failed", error);
-    throw new Error("دریافت اطلاعات انجام نشد. لطفاً دوباره تلاش کنید.");
-  }
+  requireRecoveryStorage();
 }

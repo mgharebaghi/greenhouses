@@ -2,6 +2,7 @@ import { AuthenticationError } from "@/server/auth/require-session";
 import type { ActionResult } from "@/shared/contracts/action-result";
 import { InputValidationError } from "@/shared/validation/input";
 import "server-only";
+import { FeatureUnavailableError } from "./feature-unavailable";
 
 export function actionError(
   error: unknown,
@@ -13,7 +14,10 @@ export function actionError(
       message: error.message,
       fieldErrors: error.fieldErrors,
     };
-  if (error instanceof AuthenticationError)
+  if (
+    error instanceof AuthenticationError ||
+    error instanceof FeatureUnavailableError
+  )
     return { status: "error", message: error.message };
   if (error && typeof error === "object" && "code" in error) {
     if (error.code === "P2003")

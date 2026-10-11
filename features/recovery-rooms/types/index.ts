@@ -9,6 +9,8 @@ import { recoveryRoomSchema } from "../schema";
 export type RecoveryRoomFormData = z.infer<typeof recoveryRoomSchema>;
 
 export type RecoveryWorkerDTO = GraftWorkerRecord & {
+  // Reserved UI contract; current database has no loss column or recovery storage.
+  LossPerWorker?: number | null;
   Tbl_People: {
     FirstName: string | null;
     LastName: string | null;

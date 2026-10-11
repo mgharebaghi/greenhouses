@@ -42,7 +42,6 @@ export async function createGraftingOperation(
           data: Workers.map((worker) => ({
             GraftingOperationID: operation.ID,
             GraftWorkerID: worker.PersonID,
-            LossPerWorker: 0,
           })),
         });
       }

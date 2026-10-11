@@ -200,19 +200,55 @@ test("person code is generated inside a serializable transaction and retries ser
   assert.equal(attempts, 2);
 });
 
-test("recovery cannot update a worker from a different grafting operation", async () => {
-  let writes = 0;
-  const tx = {
-    tbl_RecoveryRoomPerOrder: {
-      findFirst: async () => null,
-      create: async () => {
-        writes++;
+test("unavailable recovery storage blocks reads and all writes without touching Prisma", async () => {
+  let accesses = 0;
+  const loader = createServerLoader(
+    new Proxy(
+      {},
+      {
+        get() {
+          accesses++;
+          throw new Error("Unexpected database access");
+        },
       },
-    },
+    ),
+  );
+  const input = {
+    GraftingOperationID: 1,
+    WorkersLoss: [{ ID: 99, LossPerWorker: 1 }],
+  };
+  for (const [operation, name, args] of [
+    ["create", "createRecoveryRoom", [input]],
+    ["update", "updateRecoveryRoom", [1, input]],
+    ["delete", "deleteRecoveryRoom", [1]],
+  ] as const) {
+    const result = await (
+      loader.load(`@/features/recovery-rooms/server/${operation}`)[
+        name
+      ] as Action
+    )(...args);
+    assert.equal(result.status, "error");
+    assert.match(result.message ?? "", /جدول ریکاوری/);
+  }
+  const reads = loader.load("@/features/recovery-rooms/server/read");
+  for (const name of [
+    "getAllRecoveryRooms",
+    "getGraftingOperationsForDropdown",
+  ])
+    await assert.rejects(
+      (reads[name] as () => Promise<unknown>)(),
+      /جدول ریکاوری/,
+    );
+  assert.equal(accesses, 0);
+});
+
+test("grafting worker writes use only columns present in the introspected database", async () => {
+  let workers: unknown;
+  const tx = {
+    tbl_GraftingOperation: { create: async () => ({ ID: 7 }) },
     tbl_GraftWorkers: {
-      findMany: async () => [{ ID: 2 }],
-      update: async () => {
-        writes++;
+      createMany: async ({ data }: { data: unknown }) => {
+        workers = data;
       },
     },
   };
@@ -220,15 +256,24 @@ test("recovery cannot update a worker from a different grafting operation", asyn
     $transaction: async (operation: (tx: unknown) => Promise<unknown>) =>
       operation(tx),
   });
-  const create = loader.load("@/features/recovery-rooms/server/create")
-    .createRecoveryRoom as Action;
+  const create = loader.load("@/features/grafting/server/create")
+    .createGraftingOperation as Action;
   const result = await create({
-    GraftingOperationID: 1,
-    WorkersLoss: [{ ID: 99, LossPerWorker: 1 }],
+    OrderID: 1,
+    ColdRoomExitDate: new Date("2026-10-01"),
+    GraftingDate: new Date("2026-10-02"),
+    TrayNumber: 1,
+    CellPerTrayNumber: 10,
+    CellHeight: 5,
+    TrayMaterial: "",
+    PlantingBed: "",
+    GraftingClamp: "",
+    GraftingStick: "",
+    GraftingTechnicianID: 2,
+    Workers: [{ PersonID: 3, LossPerWorker: 99 }],
   });
-  assert.equal(result.status, "error");
-  assert.ok(result.fieldErrors?.WorkersLoss);
-  assert.equal(writes, 0);
+  assert.equal(result.status, "ok");
+  assert.deepEqual(workers, [{ GraftingOperationID: 7, GraftWorkerID: 3 }]);
 });
 
 test("warehouse updates persist zero quantity and false transaction type", async () => {

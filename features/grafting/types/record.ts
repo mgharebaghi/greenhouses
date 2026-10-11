@@ -19,5 +19,4 @@ export type GraftWorkerRecord = {
   ID: number;
   GraftingOperationID: number | null;
   GraftWorkerID: number | null;
-  LossPerWorker: number | null;
 };
