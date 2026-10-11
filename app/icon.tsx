@@ -32,7 +32,6 @@ export default function Icon() {
       }}
     >
       {/* ImageResponse uses Satori, which requires a native img element. */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={logoSrc}
         alt="Icon"
