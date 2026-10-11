@@ -41,23 +41,23 @@
 
 ## پشته فناوری
 
-| لایه | فناوری | نسخه (تقریبی) |
-|------|--------|----------------|
-| Framework | Next.js | 16.x |
-| UI Library | React | 19.x |
-| Component Library | Ant Design | 5.x |
-| Styling | Tailwind CSS | 4.x |
-| ORM | Prisma | 6.x |
-| Database | SQL Server | — |
-| Validation | Zod | 4.x |
-| Forms | react-hook-form | 7.x |
-| Auth | سفارشی (Cookie + Session table) | — |
-| QR | qrcode | 1.5.x |
-| Print | react-to-print | 3.x |
-| CSV Export | export-to-csv | 1.x |
-| Theme | next-themes | 0.4.x |
-| Dates | dayjs, jalaliday, react-multi-date-picker | — |
-| Runtime (prod) | Node.js standalone | 22 (Docker) |
+| لایه              | فناوری                                    | نسخه (تقریبی) |
+| ----------------- | ----------------------------------------- | ------------- |
+| Framework         | Next.js                                   | 16.x          |
+| UI Library        | React                                     | 19.x          |
+| Component Library | Ant Design                                | 5.x           |
+| Styling           | Tailwind CSS                              | 4.x           |
+| ORM               | Prisma                                    | 6.x           |
+| Database          | SQL Server                                | —             |
+| Validation        | Zod                                       | 4.x           |
+| Forms             | react-hook-form                           | 7.x           |
+| Auth              | سفارشی (Cookie + Session table)           | —             |
+| QR                | qrcode                                    | 1.5.x         |
+| Print             | react-to-print                            | 3.x           |
+| CSV Export        | export-to-csv                             | 1.x           |
+| Theme             | next-themes                               | 0.4.x         |
+| Dates             | dayjs, jalaliday, react-multi-date-picker | —             |
+| Runtime (prod)    | Node.js standalone                        | 22 (Docker)   |
 
 **نکته:** پکیج `@auth/prisma-adapter` در `package.json` وجود دارد ولی در کد استفاده نشده؛ احراز هویت کاملاً دستی پیاده‌سازی شده است.
 
@@ -122,14 +122,14 @@ green-house-demo/
 ├── features/                 # ماژول‌های دامنه
 │   └── <name>/
 │       ├── components/
-│       ├── services/         # Server Actions
+│       ├── server/         # Server Actions
 │       ├── schema/           # Zod (اختیاری)
 │       ├── types/
-│       └── data/csvFileData.ts
+│       └── exports/csv.ts
 ├── shared/                   # UI و ابزار مشترک
 │   ├── components/
 │   └── utils/
-├── lib/                      # auth, session, prisma singleton
+├── server/                   # auth, session, database and action infrastructure
 ├── prisma/
 │   ├── schema.prisma
 │   ├── seed.ts
@@ -160,17 +160,17 @@ green-house-demo/
 
 ### Server vs Client Components
 
-| نوع | علامت | کاربرد در پروژه |
-|-----|--------|------------------|
-| Server Component | بدون `"use client"` | `page.tsx`، `layout.tsx`، خواندن اولیه DB در برخی صفحات |
-| Client Component | `"use client"` | جداول تعاملی، مودال‌ها، فرم‌ها، QR، state |
-| Server Action | `"use server"` در `services/` | CRUD Prisma، `revalidatePath` |
+| نوع              | علامت                       | کاربرد در پروژه                                         |
+| ---------------- | --------------------------- | ------------------------------------------------------- |
+| Server Component | بدون `"use client"`         | `page.tsx`، `layout.tsx`، خواندن اولیه DB در برخی صفحات |
+| Client Component | `"use client"`              | جداول تعاملی، مودال‌ها، فرم‌ها، QR، state               |
+| Server Action    | `"use server"` در `server/` | CRUD Prisma، `revalidatePath`                           |
 
 ### Server Actions و Prisma
 
-- Singleton: `lib/singletone.ts`
+- Singleton: `server/db/prisma.ts`
 - پس از mutate: `revalidatePath("/dashboard/...")`
-- انواع Prisma (`Decimal`, `BigInt`, `Buffer`) قبل از ارسال به Client باید serialize شوند (مثال: `features/orders/services/read.ts`, `features/seedPlanting/services/read.ts`)
+- انواع Prisma (`Decimal`, `BigInt`, `Buffer`) قبل از ارسال به Client باید serialize شوند (مثال: `features/orders/server/read.ts`, `features/seed-planting/server/read.ts`)
 
 ### پیکربندی Next
 
@@ -194,7 +194,7 @@ green-house-demo/
 sequenceDiagram
     participant U as کاربر
     participant L as LoginForm
-    participant A as signIn (lib/auth)
+    participant A as signIn (server/auth/actions)
     participant S as CreateSession
     participant DB as SQL Server
 
@@ -226,7 +226,7 @@ csn_<publicId>.<secret>
 
 ### خروج
 
-`removeAuth()` در `lib/auth.ts` — حذف Session از DB و پاک کردن کوکی
+`removeAuth()` در `server/auth/actions.ts` — حذف Session از DB و پاک کردن کوکی
 
 **نکته:** `RoleID` در schema وجود دارد؛ کنترل دسترسی نقش‌محور در UI پیاده نشده است.
 
@@ -258,27 +258,27 @@ erDiagram
 
 ### جداول و نقش
 
-| جدول Prisma | نقش |
-|-------------|------|
-| `Tbl_People` | اشخاص (مشتری، مدیر پروژه، تکنسین، کارگر) |
-| `Tbl_PeoplePosts` | سمت/پست شغلی |
-| `Tbl_suppliers` | تامین‌کنندگان |
-| `Tbl_Greenhouses` | گلخانه‌ها (مالک → People) |
-| `Tbl_Plants` | انواع گیاه |
-| `Tbl_PlantVariety` | ارقام/واریته |
-| `Tbl_PlantGrowthStage` | مراحل رشد per variety |
-| `Tbl_Warehouses` | انبار فیزیکی |
-| `Tbl_SeedPackage` | بسته بذر |
-| `Tbl_WarehousesTransaction` | تراکنش ورود/خروج بذر |
-| `Tbl_Orders` | سفارش (پایه + پیوندک) |
-| `Tbl_SeedPlanting` | کاشت بذر |
-| `Tbl_StartSeedlingCycle` | سیکل نشاء |
-| `Tbl_GraftingOperation` | عملیات پیوند |
-| `Tbl_GraftWorkers` | کارگران پیوند + تلفات |
-| `Tbl_RecoveryRoomPerOrder` | ریکاوری بعد از پیوند |
-| `Tbl_NurseryRoom` | تعریف پایه اتاق/محیط (دما، نور، …) |
-| `Tbl_SeedlingPlanting` | **در schema هست؛ UI ندارد** |
-| `Users` / `Session` | احراز هویت اپ |
+| جدول Prisma                 | نقش                                      |
+| --------------------------- | ---------------------------------------- |
+| `Tbl_People`                | اشخاص (مشتری، مدیر پروژه، تکنسین، کارگر) |
+| `Tbl_PeoplePosts`           | سمت/پست شغلی                             |
+| `Tbl_suppliers`             | تامین‌کنندگان                            |
+| `Tbl_Greenhouses`           | گلخانه‌ها (مالک → People)                |
+| `Tbl_Plants`                | انواع گیاه                               |
+| `Tbl_PlantVariety`          | ارقام/واریته                             |
+| `Tbl_PlantGrowthStage`      | مراحل رشد per variety                    |
+| `Tbl_Warehouses`            | انبار فیزیکی                             |
+| `Tbl_SeedPackage`           | بسته بذر                                 |
+| `Tbl_WarehousesTransaction` | تراکنش ورود/خروج بذر                     |
+| `Tbl_Orders`                | سفارش (پایه + پیوندک)                    |
+| `Tbl_SeedPlanting`          | کاشت بذر                                 |
+| `Tbl_StartSeedlingCycle`    | سیکل نشاء                                |
+| `Tbl_GraftingOperation`     | عملیات پیوند                             |
+| `Tbl_GraftWorkers`          | کارگران پیوند + تلفات                    |
+| `Tbl_RecoveryRoomPerOrder`  | ریکاوری بعد از پیوند                     |
+| `Tbl_NurseryRoom`           | تعریف پایه اتاق/محیط (دما، نور، …)       |
+| `Tbl_SeedlingPlanting`      | **در schema هست؛ UI ندارد**              |
+| `Users` / `Session`         | احراز هویت اپ                            |
 
 ### فیلدهای مهم `Tbl_Orders`
 
@@ -306,44 +306,44 @@ erDiagram
 
 ### مسیرهای عمومی
 
-| مسیر | فایل | توضیح |
-|------|------|--------|
-| `/` | `app/page.tsx` | ورود |
-| `/public/scan/orders/[id]` | `app/public/scan/orders/[id]/page.tsx` | شناسنامه عمومی سفارش |
-| `/public/scan/seed-package/[id]` | `app/public/scan/seed-package/[id]/page.tsx` | شناسنامه بسته بذر |
-| `/api/auth/invalid` | `app/api/auth/invalid/route.ts` | پاکسازی کوکی |
+| مسیر                             | فایل                                         | توضیح                |
+| -------------------------------- | -------------------------------------------- | -------------------- |
+| `/`                              | `app/page.tsx`                               | ورود                 |
+| `/public/scan/orders/[id]`       | `app/public/scan/orders/[id]/page.tsx`       | شناسنامه عمومی سفارش |
+| `/public/scan/seed-package/[id]` | `app/public/scan/seed-package/[id]/page.tsx` | شناسنامه بسته بذر    |
+| `/api/auth/invalid`              | `app/api/auth/invalid/route.ts`              | پاکسازی کوکی         |
 
 **دامنه QR در کد:** `https://mygreenhouses.ir/public/scan/...`
 
 ### داشبورد — نگاشت مسیر به Feature
 
-| مسیر | Feature folder | یادداشت |
-|------|----------------|---------|
-| `/dashboard` | — | `DashboardContent` — خوش‌آمد |
-| `/dashboard/people` | `features/owners` | UI: اشخاص؛ جدول `Tbl_People` |
-| `/dashboard/suppliers` | `features/suppliers` | |
-| `/dashboard/greenhouse` | `features/greenhouse` | |
-| `/dashboard/plants` | `features/plants` | |
-| `/dashboard/plantvarities` | `features/varities` | |
-| `/dashboard/growthstages` | `features/growthstages` | |
-| `/dashboard/warehouses` | `features/warehouses` | |
-| `/dashboard/nursery-rooms` | `features/nurseryRooms` | تعریف اتاق پایه |
-| `/dashboard/seed-package` | `features/seedPackage` | + چاپ |
-| `/dashboard/seed-warehousing` | `features/seedWarehousing` | |
-| `/dashboard/orders` | `features/orders` | + `OrdersQRModal` |
-| `/dashboard/seed-planting` | `features/seedPlanting` | |
-| `/dashboard/start-seedling-cycle` | `features/startSeedlingCycle` | |
-| `/dashboard/grafting` | `features/grafting` | + `WorkerQRModal` |
-| `/dashboard/recoveryRoom` | `features/recoveryRoom` | ریکاوری per graft |
+| مسیر                              | Feature folder              | یادداشت                      |
+| --------------------------------- | --------------------------- | ---------------------------- |
+| `/dashboard`                      | —                           | `DashboardContent` — خوش‌آمد |
+| `/dashboard/people`               | `features/people`           | UI: اشخاص؛ جدول `Tbl_People` |
+| `/dashboard/suppliers`            | `features/suppliers`        |                              |
+| `/dashboard/greenhouse`           | `features/greenhouses`      |                              |
+| `/dashboard/plants`               | `features/plants`           |                              |
+| `/dashboard/plantvarities`        | `features/plant-varieties`  |                              |
+| `/dashboard/growthstages`         | `features/growth-stages`    |                              |
+| `/dashboard/warehouses`           | `features/warehouses`       |                              |
+| `/dashboard/nursery-rooms`        | `features/nursery-rooms`    | تعریف اتاق پایه              |
+| `/dashboard/seed-package`         | `features/seed-packages`    | + چاپ                        |
+| `/dashboard/seed-warehousing`     | `features/seed-warehousing` |                              |
+| `/dashboard/orders`               | `features/orders`           | + `OrdersQRModal`            |
+| `/dashboard/seed-planting`        | `features/seed-planting`    |                              |
+| `/dashboard/start-seedling-cycle` | `features/seedling-cycles`  |                              |
+| `/dashboard/grafting`             | `features/grafting`         | + `WorkerQRModal`            |
+| `/dashboard/recoveryRoom`         | `features/recovery-rooms`   | ریکاوری per graft            |
 
 منوی کناری: `shared/components/Menu.tsx`
 
 ### الگوی بارگذاری داده در صفحات
 
-| الگو | مثال | توضیح |
-|------|------|--------|
+| الگو                      | مثال                                   | توضیح                            |
+| ------------------------- | -------------------------------------- | -------------------------------- |
 | Server page + initialData | `people/page.tsx`, `grafting/page.tsx` | fetch در server، props به client |
-| Client page + useEffect | `orders`, `nursery-rooms` | `getAll*` در mount |
+| Client page + useEffect   | `orders`, `nursery-rooms`              | `getAll*` در mount               |
 
 ---
 
@@ -358,7 +358,7 @@ features/<name>/
 │   ├── *FormModal.tsx
 │   ├── *DetailModal.tsx
 │   └── *ClientPage.tsx (اختیاری)
-├── services/
+├── server/
 │   ├── create.ts
 │   ├── read.ts
 │   ├── update.ts
@@ -366,7 +366,7 @@ features/<name>/
 │   └── index.ts          # re-export
 ├── schema/index.ts       # Zod (اختیاری)
 ├── types/
-└── data/csvFileData.ts   # export CSV (اختیاری)
+└── exports/csv.ts   # export CSV (اختیاری)
 ```
 
 ### قرارداد پاسخ سرویس
@@ -379,7 +379,7 @@ features/<name>/
 
 ### حذف و FK
 
-`lib/helpers/prismaErrorHelper.ts` — خطای Prisma `P2003` به پیام فارسی «در X استفاده شده» تبدیل می‌شود.
+`server/actions/errors.ts` — خطای Prisma `P2003` به پیام فارسی «در X استفاده شده» تبدیل می‌شود.
 
 ### اعتبارسنجی
 
@@ -393,21 +393,21 @@ Zod schema در `features/*/schema/` — با react-hook-form در مودال‌
 
 ## کامپوننت‌های مشترک
 
-| کامپوننت | مسیر | کاربرد |
-|----------|------|--------|
-| `Table` | `shared/components/Table.tsx` | جدول سفارشی (جستجو، sort، pagination) |
-| `PageHeader` | `shared/components/PageHeader.tsx` | عنوان صفحه |
-| `GreenhouseButton` | `shared/components/GreenhouseButton.tsx` | دکمه استایل پروژه |
-| `TableActions` | `shared/components/TableActions.tsx` | ویرایش/حذف/جزئیات |
-| `InsertionRow` | `shared/components/InsertionRow.tsx` | ردیف افزودن |
-| `DeleteModal` | `shared/components/DeleteModal.tsx` | تایید حذف |
-| `DetailModal` | `shared/components/DetailModal.tsx` | نمایش جزئیات |
-| `QRCodeCanvas` | `shared/components/QRCodeCanvas.tsx` | رندر QR روی canvas |
-| `QRCodeModal` | `shared/components/QRCodeModal.tsx` | مودال QR عمومی |
-| `Menu` | `shared/components/Menu.tsx` | Drawer منو |
-| `NavigationProgressBar` | — | NProgress |
-| `ThemeToggle` | — | روشن/تاریک |
-| `LoginForm` | `shared/components/auth/LoginForm.tsx` | ورود |
+| کامپوننت                | مسیر                                     | کاربرد                                |
+| ----------------------- | ---------------------------------------- | ------------------------------------- |
+| `Table`                 | `shared/components/Table.tsx`            | جدول سفارشی (جستجو، sort، pagination) |
+| `PageHeader`            | `shared/components/PageHeader.tsx`       | عنوان صفحه                            |
+| `GreenhouseButton`      | `shared/components/GreenhouseButton.tsx` | دکمه استایل پروژه                     |
+| `TableActions`          | `shared/components/TableActions.tsx`     | ویرایش/حذف/جزئیات                     |
+| `InsertionRow`          | `shared/components/InsertionRow.tsx`     | ردیف افزودن                           |
+| `DeleteModal`           | `shared/components/DeleteModal.tsx`      | تایید حذف                             |
+| `DetailModal`           | `shared/components/DetailModal.tsx`      | نمایش جزئیات                          |
+| `QRCodeCanvas`          | `shared/components/QRCodeCanvas.tsx`     | رندر QR روی canvas                    |
+| `QRCodeModal`           | `shared/components/QRCodeModal.tsx`      | مودال QR عمومی                        |
+| `Menu`                  | `shared/components/Menu.tsx`             | Drawer منو                            |
+| `NavigationProgressBar` | —                                        | NProgress                             |
+| `ThemeToggle`           | —                                        | روشن/تاریک                            |
+| `LoginForm`             | `shared/components/auth/LoginForm.tsx`   | ورود                                  |
 
 **توجه:** `shared/utils/CastToPersian.tsx` (تبدیل ارقام به فارسی) در layout mount نشده است.
 
@@ -418,7 +418,7 @@ Zod schema در `features/*/schema/` — با react-hook-form در مودال‌
 ### سفارش
 
 - URL اسکن: `https://mygreenhouses.ir/public/scan/orders/{ID}`
-- داده: `getOrderById` از `features/orders/services`
+- داده: `getOrderById` از `features/orders/server`
 - نمایش: مشتری، مدیر، تامین‌کننده، پایه/پیوندک، QR
 
 ### بسته بذر
@@ -458,12 +458,12 @@ Zod schema در `features/*/schema/` — با react-hook-form در مودال‌
 
 ## اسکریپت‌های npm
 
-| Script | دستور | توضیح |
-|--------|--------|--------|
-| dev | `next dev -p 3001` | توسعه |
-| build | `next build` | build production |
-| start | `node server.js` | اجرای standalone |
-| lint | `eslint` | lint |
+| Script | دستور              | توضیح            |
+| ------ | ------------------ | ---------------- |
+| dev    | `next dev -p 3001` | توسعه            |
+| build  | `next build`       | build production |
+| start  | `node server.js`   | اجرای standalone |
+| lint   | `eslint`           | lint             |
 
 Prisma seed: `npx prisma db seed` (تعریف در `package.json` → `tsx prisma/seed.ts`)
 
@@ -471,29 +471,25 @@ Prisma seed: `npx prisma db seed` (تعریف در `package.json` → `tsx prism
 
 ## محدودیت‌ها و نکات شناخته‌شده
 
-| موضوع | جزئیات |
-|--------|--------|
-| README ریشه | هنوز قالب پیش‌فرض create-next-app |
-| `PAGE_TITLES` در Shell | ناقص برای برخی مسیرهای جدید |
-| داشبورد | بدون آمار زنده از DB |
-| `Tbl_SeedlingPlanting` | بدون UI |
-| RBAC | `RoleID` بدون enforcement در UI |
-| نام‌گذاری | `owners` feature = `people` route |
-| دو مفهوم «ریکاوری» | `nursery-rooms` = تعریف محیط؛ `recoveryRoom` = لاگ عملیاتی |
-| `@auth/prisma-adapter` | نصب شده، استفاده نشده |
+| موضوع                  | جزئیات                                                     |
+| ---------------------- | ---------------------------------------------------------- |
+| داشبورد                | بدون آمار زنده از DB                                       |
+| `Tbl_SeedlingPlanting` | بدون UI                                                    |
+| RBAC                   | `RoleID` بدون enforcement در UI                            |
+| دو مفهوم «ریکاوری»     | `nursery-rooms` = تعریف محیط؛ `recoveryRoom` = لاگ عملیاتی |
 
 ---
 
 ## عیب‌یابی
 
-| مشکل | بررسی |
-|------|--------|
-| صفحه خالی / خطای DB | `DATABASE_URL`، فایروال SQL Server، `npx prisma generate` |
-| همیشه به لاگین برمی‌گردد | کوکی `GHSession`، انقضای Session، `/api/auth/invalid` |
-| Prisma Client not found | `npx prisma generate` بعد از clone |
-| خطای Server Action origin | `allowedOrigins` در `next.config.ts` |
-| Decimal/BigInt در client | serialize در `read.ts` |
-| پورت اشتباه | dev = **3001** نه 3000 |
+| مشکل                      | بررسی                                                     |
+| ------------------------- | --------------------------------------------------------- |
+| صفحه خالی / خطای DB       | `DATABASE_URL`، فایروال SQL Server، `npx prisma generate` |
+| همیشه به لاگین برمی‌گردد  | کوکی `GHSession`، انقضای Session، `/api/auth/invalid`     |
+| Prisma Client not found   | `npx prisma generate` بعد از clone                        |
+| خطای Server Action origin | `allowedOrigins` در `next.config.ts`                      |
+| Decimal/BigInt در client  | serialize در `read.ts`                                    |
+| پورت اشتباه               | dev = **3001** نه 3000                                    |
 
 ---
 
@@ -505,4 +501,4 @@ Prisma seed: `npx prisma db seed` (تعریف در `package.json` → `tsx prism
 
 ---
 
-*آخرین به‌روزرسانی مستند بر اساس وضعیت codebase در زمان نگارش.*
+_آخرین به‌روزرسانی مستند بر اساس وضعیت codebase در زمان نگارش._

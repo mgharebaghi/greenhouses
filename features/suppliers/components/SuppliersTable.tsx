@@ -1,16 +1,25 @@
-import Table from "@/shared/components/Table";
-import InsertionRow from "@/shared/components/InsertionRow";
-import TableActions from "@/shared/components/TableActions";
+import { deleteSupplier, getSuppliers } from "@/features/suppliers/actions";
+import type { SupplierResponse } from "@/features/suppliers/types";
 import DeleteModal, { DeleteModalProps } from "@/shared/components/DeleteModal";
 import DetailModal, { InfoCard } from "@/shared/components/DetailModal";
-import SupplierFormModal from "./SupplierFormModal";
-import { useState } from "react";
-import type { SupplierDTO } from "../types/types";
-import { deleteSupplier, getSuppliers, SupplierResponse } from "@/features/suppliers/services";
-import { generateCsv, download, mkConfig } from "export-to-csv";
-import { suppliersCSVData, headers } from "../data/csvFileData";
+import InsertionRow from "@/shared/components/InsertionRow";
+import Table from "@/shared/components/Table";
+import TableActions from "@/shared/components/TableActions";
+import { csvRows } from "@/shared/exports/csv";
+import { ActionFailure, runDeletion } from "@/shared/forms/delete-record";
+import {
+  CheckCircleOutlined,
+  GlobalOutlined,
+  InfoCircleOutlined,
+  ShopOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
 import { Button } from "antd";
-import { ShopOutlined, UserOutlined, GlobalOutlined, CheckCircleOutlined, InfoCircleOutlined, UserAddOutlined } from "@ant-design/icons";
+import { download, generateCsv, mkConfig } from "export-to-csv";
+import { useState } from "react";
+import { headers, suppliersCSVData } from "../exports/csv";
+import type { SupplierDTO } from "../types";
+import SupplierFormModal from "./SupplierFormModal";
 
 interface SuppliersTableProps {
   data: SupplierDTO[];
@@ -33,7 +42,10 @@ export default function SuppliersTable({
 
   // Unified Modal State: { open: boolean, record: SupplierDTO | null }
   // When record is null, it's an Insert operation. When record is set, it's an Edit operation.
-  const [formModal, setFormModal] = useState<{ open: boolean; record: SupplierDTO | null }>({
+  const [formModal, setFormModal] = useState<{
+    open: boolean;
+    record: SupplierDTO | null;
+  }>({
     open: false,
     record: null,
   });
@@ -44,7 +56,7 @@ export default function SuppliersTable({
       key: "details",
       width: 70,
       align: "center" as const,
-      render: (_: any, record: SupplierDTO) => (
+      render: (_: unknown, record: SupplierDTO) => (
         <Button
           type="text"
           icon={<InfoCircleOutlined className="text-blue-500 text-lg" />}
@@ -58,7 +70,8 @@ export default function SuppliersTable({
     {
       title: "نام شرکت / شخص",
       key: "Name",
-      render: (_: any, r: SupplierDTO) => r.CompanyName || `${r.FirstName || ""} ${r.LastName || ""}`
+      render: (_: unknown, r: SupplierDTO) =>
+        r.CompanyName || `${r.FirstName || ""} ${r.LastName || ""}`,
     },
     { title: "برند", dataIndex: "BrandName", key: "BrandName" },
     { title: "شماره مجوز", dataIndex: "LicenseNumber", key: "LicenseNumber" },
@@ -68,7 +81,7 @@ export default function SuppliersTable({
     {
       title: "عملیات",
       key: "actions",
-      render: (_: any, record: SupplierDTO) => (
+      render: (_: unknown, record: SupplierDTO) => (
         <TableActions
           onEdit={() => setFormModal({ open: true, record: record })}
           onDelete={() => {
@@ -88,21 +101,26 @@ export default function SuppliersTable({
   ];
 
   const handleDelete = async (id: number) => {
-    setDeleteMsg("");
-    setDeleteLoading(true);
-    const res: SupplierResponse = await deleteSupplier(id);
-    if (res.status === "ok") {
-      setDeleteLoading(false);
-      setDeleteModal(null);
-    } else {
-      setDeleteLoading(false);
-      setDeleteMsg(res.message);
-      return;
-    }
-    setLoading(true);
-    const fresh = await getSuppliers();
-    setData(fresh);
-    setLoading(false);
+    await runDeletion(
+      async () => {
+        setDeleteMsg("");
+        setDeleteLoading(true);
+        const res: SupplierResponse = await deleteSupplier(id);
+        if (res.status !== "ok") throw new ActionFailure(res.message);
+        {
+          setDeleteLoading(false);
+          setDeleteModal(null);
+        }
+        setLoading(true);
+        const fresh = await getSuppliers();
+        setData(fresh);
+        setLoading(false);
+      },
+      () => {
+        setDeleteLoading(false);
+        setLoading(false);
+      },
+    );
   };
 
   return (
@@ -111,15 +129,25 @@ export default function SuppliersTable({
         text="اطلاعات تامین کنندگان"
         insertOnclick={() => setFormModal({ open: true, record: null })}
         csvOnclick={async () => {
-          const csvData = await suppliersCSVData(data as any);
-          const options = mkConfig({ useKeysAsHeaders: false, columnHeaders: headers, filename: "suppliers" });
-          const csv = generateCsv(options)(csvData);
+          const csvData = await suppliersCSVData(data);
+          const options = mkConfig({
+            useKeysAsHeaders: false,
+            columnHeaders: headers,
+            filename: "suppliers",
+          });
+          const csv = generateCsv(options)(csvRows(csvData, headers));
           download(options)(csv);
         }}
         data={data}
       />
 
-      <Table columns={columns} dataSource={data} rowKey="ID" pagination={{ pageSize: 5 }} loading={loading} />
+      <Table
+        columns={columns}
+        dataSource={data}
+        rowKey="ID"
+        pagination={{ pageSize: 5 }}
+        loading={loading}
+      />
 
       <DeleteModal
         open={deleteModal?.open || false}
@@ -135,7 +163,7 @@ export default function SuppliersTable({
       {/* Unified Insert/Edit Modal */}
       <SupplierFormModal
         isOpen={formModal.open}
-        setIsOpen={(open) => setFormModal(prev => ({ ...prev, open }))}
+        setIsOpen={(open) => setFormModal((prev) => ({ ...prev, open }))}
         record={formModal.record}
         setMainData={setData}
         setMainLoading={setLoading}
@@ -145,7 +173,10 @@ export default function SuppliersTable({
         <DetailModal
           open={viewModal}
           onClose={() => setViewModal(false)}
-          title={viewRecord.CompanyName || `${viewRecord.FirstName || ""} ${viewRecord.LastName || ""}`}
+          title={
+            viewRecord.CompanyName ||
+            `${viewRecord.FirstName || ""} ${viewRecord.LastName || ""}`
+          }
           icon={<ShopOutlined />}
           gradientFrom="emerald"
           gradientTo="teal"
@@ -155,10 +186,25 @@ export default function SuppliersTable({
             icon={<UserOutlined />}
             color="#10b981"
             items={[
-              { label: "نوع شخص", value: viewRecord.Legal ? <><CheckCircleOutlined className="text-emerald-500 ml-1" /> حقوقی</> : <><UserOutlined className="text-blue-500 ml-1" /> حقیقی</> },
+              {
+                label: "نوع شخص",
+                value: viewRecord.Legal ? (
+                  <>
+                    <CheckCircleOutlined className="text-emerald-500 ml-1" />{" "}
+                    حقوقی
+                  </>
+                ) : (
+                  <>
+                    <UserOutlined className="text-blue-500 ml-1" /> حقیقی
+                  </>
+                ),
+              },
               { label: "نام شرکت", value: viewRecord.CompanyName },
               { label: "برند", value: viewRecord.BrandName },
-              { label: "نام شخص", value: `${viewRecord.FirstName || ""} ${viewRecord.LastName || ""}` },
+              {
+                label: "نام شخص",
+                value: `${viewRecord.FirstName || ""} ${viewRecord.LastName || ""}`,
+              },
               { label: "شماره مجوز", value: viewRecord.LicenseNumber },
             ]}
           />

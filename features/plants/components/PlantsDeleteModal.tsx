@@ -1,14 +1,14 @@
-import { Tbl_Plants } from "@/app/generated/prisma";
-import { getPlants } from "@/features/plants/services";
-import { deletePlant } from "@/features/plants/services/delete";
+import { deletePlant, getPlants } from "@/features/plants/actions";
+import type { PlantRecord } from "@/features/plants/types/record";
+import { ActionFailure, runDeletion } from "@/shared/forms/delete-record";
 import { Button, Divider, Modal } from "antd";
 import { useState } from "react";
 
 export type PlantsDeleteModalProps = {
   isOpen: boolean;
   onClose?: () => void;
-  plant?: Tbl_Plants;
-  setMainData?: (data: Tbl_Plants[]) => void;
+  plant?: PlantRecord;
+  setMainData?: (data: PlantRecord[]) => void;
   setMainLoading?: (loading: boolean) => void;
 };
 
@@ -22,16 +22,27 @@ export default function PlantsDeleteModal({
   const [loading, setLoading] = useState(false);
 
   const handleDelete = async () => {
-    setLoading(true);
-    const res = await deletePlant(plant?.ID!);
-    if (res) {
-      setLoading(false);
-      onClose?.();
-      setMainLoading?.(true);
-      const updateData = await getPlants();
-      setMainData?.(updateData);
-      setMainLoading?.(false);
-    }
+    await runDeletion(
+      async () => {
+        if (!plant) return;
+
+        setLoading(true);
+        const res = await deletePlant(plant.ID);
+        if (res.status !== "ok") throw new ActionFailure(res.message);
+        {
+          setLoading(false);
+          onClose?.();
+          setMainLoading?.(true);
+          const updateData = await getPlants();
+          setMainData?.(updateData);
+          setMainLoading?.(false);
+        }
+      },
+      () => {
+        setLoading(false);
+        setMainLoading?.(false);
+      },
+    );
   };
 
   return (

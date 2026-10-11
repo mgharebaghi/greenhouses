@@ -41,23 +41,23 @@ The system is primarily an **operational CRUD and traceability** application, no
 
 ## Technology Stack
 
-| Layer | Technology | Approx. version |
-|-------|------------|-----------------|
-| Framework | Next.js | 16.x |
-| UI Library | React | 19.x |
-| Component Library | Ant Design | 5.x |
-| Styling | Tailwind CSS | 4.x |
-| ORM | Prisma | 6.x |
-| Database | SQL Server | — |
-| Validation | Zod | 4.x |
-| Forms | react-hook-form | 7.x |
-| Auth | Custom (cookie + Session table) | — |
-| QR | qrcode | 1.5.x |
-| Print | react-to-print | 3.x |
-| CSV Export | export-to-csv | 1.x |
-| Theme | next-themes | 0.4.x |
-| Dates | dayjs, jalaliday, react-multi-date-picker | — |
-| Production runtime | Node.js standalone | 22 (Docker) |
+| Layer              | Technology                                | Approx. version |
+| ------------------ | ----------------------------------------- | --------------- |
+| Framework          | Next.js                                   | 16.x            |
+| UI Library         | React                                     | 19.x            |
+| Component Library  | Ant Design                                | 5.x             |
+| Styling            | Tailwind CSS                              | 4.x             |
+| ORM                | Prisma                                    | 6.x             |
+| Database           | SQL Server                                | —               |
+| Validation         | Zod                                       | 4.x             |
+| Forms              | react-hook-form                           | 7.x             |
+| Auth               | Custom (cookie + Session table)           | —               |
+| QR                 | qrcode                                    | 1.5.x           |
+| Print              | react-to-print                            | 3.x             |
+| CSV Export         | export-to-csv                             | 1.x             |
+| Theme              | next-themes                               | 0.4.x           |
+| Dates              | dayjs, jalaliday, react-multi-date-picker | —               |
+| Production runtime | Node.js standalone                        | 22 (Docker)     |
 
 **Note:** `@auth/prisma-adapter` is listed in `package.json` but is **not used** in the codebase. Authentication is fully custom.
 
@@ -99,7 +99,7 @@ npm run dev
 npx prisma db seed
 ```
 
-Configure the admin username and password **only in your local environment** via `prisma/seed.ts` (or environment variables). Do not commit credentials or document them in the repository.
+Configure the admin username and password using the required `ADMIN_USERNAME` and `ADMIN_PASSWORD` environment variables. Do not commit credentials or document them in the repository.
 
 ---
 
@@ -122,14 +122,14 @@ green-house-demo/
 ├── features/                 # Domain modules
 │   └── <name>/
 │       ├── components/
-│       ├── services/         # Server Actions
+│       ├── server/         # Server Actions
 │       ├── schema/           # Zod (optional)
 │       ├── types/
-│       └── data/csvFileData.ts
+│       └── exports/csv.ts
 ├── shared/                   # Shared UI and utilities
 │   ├── components/
 │   └── utils/
-├── lib/                      # auth, session, prisma singleton
+├── server/                   # auth, session, database and action infrastructure
 ├── prisma/
 │   ├── schema.prisma
 │   ├── seed.ts
@@ -160,17 +160,17 @@ Request /dashboard/orders
 
 ### Server vs Client Components
 
-| Type | Marker | Use in this project |
-|------|--------|---------------------|
-| Server Component | No `"use client"` | `page.tsx`, `layout.tsx`, some initial DB reads |
-| Client Component | `"use client"` | Tables, modals, forms, QR, React state |
-| Server Action | `"use server"` in `services/` | Prisma CRUD, `revalidatePath` |
+| Type             | Marker                      | Use in this project                             |
+| ---------------- | --------------------------- | ----------------------------------------------- |
+| Server Component | No `"use client"`           | `page.tsx`, `layout.tsx`, some initial DB reads |
+| Client Component | `"use client"`              | Tables, modals, forms, QR, React state          |
+| Server Action    | `"use server"` in `server/` | Prisma CRUD, `revalidatePath`                   |
 
 ### Server Actions and Prisma
 
-- Singleton: `lib/singletone.ts`
+- Singleton: `server/db/prisma.ts`
 - After mutations: `revalidatePath("/dashboard/...")`
-- Prisma types (`Decimal`, `BigInt`, `Buffer`) must be serialized before sending to the client (e.g. `features/orders/services/read.ts`, `features/seedPlanting/services/read.ts`)
+- Prisma types (`Decimal`, `BigInt`, `Buffer`) must be serialized before sending to the client (e.g. `features/orders/server/read.ts`, `features/seed-planting/server/read.ts`)
 
 ### Next Configuration
 
@@ -194,7 +194,7 @@ Request /dashboard/orders
 sequenceDiagram
     participant U as User
     participant L as LoginForm
-    participant A as signIn (lib/auth)
+    participant A as signIn (server/auth/actions)
     participant S as CreateSession
     participant DB as SQL Server
 
@@ -226,7 +226,7 @@ csn_<publicId>.<secret>
 
 ### Sign-out
 
-`removeAuth()` in `lib/auth.ts` — deletes DB session and clears the cookie
+`removeAuth()` in `server/auth/actions.ts` — deletes DB session and clears the cookie
 
 **Note:** `RoleID` exists in the schema; role-based access control is not enforced in the UI.
 
@@ -258,27 +258,27 @@ erDiagram
 
 ### Tables and Roles
 
-| Prisma Model | Role |
-|--------------|------|
-| `Tbl_People` | People (customer, project manager, technician, workers) |
-| `Tbl_PeoplePosts` | Job posts / titles |
-| `Tbl_suppliers` | Suppliers |
-| `Tbl_Greenhouses` | Greenhouses (owner → People) |
-| `Tbl_Plants` | Plant species |
-| `Tbl_PlantVariety` | Varieties / cultivars |
-| `Tbl_PlantGrowthStage` | Growth stages per variety |
-| `Tbl_Warehouses` | Physical warehouses |
-| `Tbl_SeedPackage` | Seed packages |
-| `Tbl_WarehousesTransaction` | Seed warehouse in/out transactions |
-| `Tbl_Orders` | Orders (rootstock + scion packages) |
-| `Tbl_SeedPlanting` | Seed planting records |
-| `Tbl_StartSeedlingCycle` | Seedling cycle tracking |
-| `Tbl_GraftingOperation` | Grafting operations |
-| `Tbl_GraftWorkers` | Grafting workers + per-worker loss |
-| `Tbl_RecoveryRoomPerOrder` | Post-graft recovery per operation |
-| `Tbl_NurseryRoom` | Master data for room/environment parameters |
-| `Tbl_SeedlingPlanting` | **In schema only — no UI** |
-| `Users` / `Session` | Application authentication |
+| Prisma Model                | Role                                                    |
+| --------------------------- | ------------------------------------------------------- |
+| `Tbl_People`                | People (customer, project manager, technician, workers) |
+| `Tbl_PeoplePosts`           | Job posts / titles                                      |
+| `Tbl_suppliers`             | Suppliers                                               |
+| `Tbl_Greenhouses`           | Greenhouses (owner → People)                            |
+| `Tbl_Plants`                | Plant species                                           |
+| `Tbl_PlantVariety`          | Varieties / cultivars                                   |
+| `Tbl_PlantGrowthStage`      | Growth stages per variety                               |
+| `Tbl_Warehouses`            | Physical warehouses                                     |
+| `Tbl_SeedPackage`           | Seed packages                                           |
+| `Tbl_WarehousesTransaction` | Seed warehouse in/out transactions                      |
+| `Tbl_Orders`                | Orders (rootstock + scion packages)                     |
+| `Tbl_SeedPlanting`          | Seed planting records                                   |
+| `Tbl_StartSeedlingCycle`    | Seedling cycle tracking                                 |
+| `Tbl_GraftingOperation`     | Grafting operations                                     |
+| `Tbl_GraftWorkers`          | Grafting workers + per-worker loss                      |
+| `Tbl_RecoveryRoomPerOrder`  | Post-graft recovery per operation                       |
+| `Tbl_NurseryRoom`           | Master data for room/environment parameters             |
+| `Tbl_SeedlingPlanting`      | **In schema only — no UI**                              |
+| `Users` / `Session`         | Application authentication                              |
 
 ### Important `Tbl_Orders` Fields
 
@@ -306,44 +306,44 @@ erDiagram
 
 ### Public Routes
 
-| Route | File | Description |
-|-------|------|-------------|
-| `/` | `app/page.tsx` | Login |
-| `/public/scan/orders/[id]` | `app/public/scan/orders/[id]/page.tsx` | Public order certificate |
+| Route                            | File                                         | Description                     |
+| -------------------------------- | -------------------------------------------- | ------------------------------- |
+| `/`                              | `app/page.tsx`                               | Login                           |
+| `/public/scan/orders/[id]`       | `app/public/scan/orders/[id]/page.tsx`       | Public order certificate        |
 | `/public/scan/seed-package/[id]` | `app/public/scan/seed-package/[id]/page.tsx` | Public seed package certificate |
-| `/api/auth/invalid` | `app/api/auth/invalid/route.ts` | Clear session cookie |
+| `/api/auth/invalid`              | `app/api/auth/invalid/route.ts`              | Clear session cookie            |
 
 **QR base URL in code:** `https://mygreenhouses.ir/public/scan/...`
 
 ### Dashboard — Route to Feature Mapping
 
-| Route | Feature folder | Notes |
-|-------|----------------|-------|
-| `/dashboard` | — | `DashboardContent` welcome screen |
-| `/dashboard/people` | `features/owners` | UI label: people; table `Tbl_People` |
-| `/dashboard/suppliers` | `features/suppliers` | |
-| `/dashboard/greenhouse` | `features/greenhouse` | |
-| `/dashboard/plants` | `features/plants` | |
-| `/dashboard/plantvarities` | `features/varities` | |
-| `/dashboard/growthstages` | `features/growthstages` | |
-| `/dashboard/warehouses` | `features/warehouses` | |
-| `/dashboard/nursery-rooms` | `features/nurseryRooms` | Environment master data |
-| `/dashboard/seed-package` | `features/seedPackage` | Includes print modal |
-| `/dashboard/seed-warehousing` | `features/seedWarehousing` | |
-| `/dashboard/orders` | `features/orders` | Includes `OrdersQRModal` |
-| `/dashboard/seed-planting` | `features/seedPlanting` | |
-| `/dashboard/start-seedling-cycle` | `features/startSeedlingCycle` | |
-| `/dashboard/grafting` | `features/grafting` | Includes `WorkerQRModal` |
-| `/dashboard/recoveryRoom` | `features/recoveryRoom` | Recovery per graft operation |
+| Route                             | Feature folder              | Notes                                |
+| --------------------------------- | --------------------------- | ------------------------------------ |
+| `/dashboard`                      | —                           | `DashboardContent` welcome screen    |
+| `/dashboard/people`               | `features/people`           | UI label: people; table `Tbl_People` |
+| `/dashboard/suppliers`            | `features/suppliers`        |                                      |
+| `/dashboard/greenhouse`           | `features/greenhouses`      |                                      |
+| `/dashboard/plants`               | `features/plants`           |                                      |
+| `/dashboard/plantvarities`        | `features/plant-varieties`  |                                      |
+| `/dashboard/growthstages`         | `features/growth-stages`    |                                      |
+| `/dashboard/warehouses`           | `features/warehouses`       |                                      |
+| `/dashboard/nursery-rooms`        | `features/nursery-rooms`    | Environment master data              |
+| `/dashboard/seed-package`         | `features/seed-packages`    | Includes print modal                 |
+| `/dashboard/seed-warehousing`     | `features/seed-warehousing` |                                      |
+| `/dashboard/orders`               | `features/orders`           | Includes `OrdersQRModal`             |
+| `/dashboard/seed-planting`        | `features/seed-planting`    |                                      |
+| `/dashboard/start-seedling-cycle` | `features/seedling-cycles`  |                                      |
+| `/dashboard/grafting`             | `features/grafting`         | Includes `WorkerQRModal`             |
+| `/dashboard/recoveryRoom`         | `features/recovery-rooms`   | Recovery per graft operation         |
 
 Side menu: `shared/components/Menu.tsx`
 
 ### Page Data Loading Patterns
 
-| Pattern | Examples | Description |
-|---------|----------|-------------|
+| Pattern                   | Examples                               | Description                           |
+| ------------------------- | -------------------------------------- | ------------------------------------- |
 | Server page + initialData | `people/page.tsx`, `grafting/page.tsx` | Fetch on server, pass props to client |
-| Client page + useEffect | `orders`, `nursery-rooms` | Call `getAll*` on mount |
+| Client page + useEffect   | `orders`, `nursery-rooms`              | Call `getAll*` on mount               |
 
 ---
 
@@ -358,7 +358,7 @@ features/<name>/
 │   ├── *FormModal.tsx
 │   ├── *DetailModal.tsx
 │   └── *ClientPage.tsx (optional)
-├── services/
+├── server/
 │   ├── create.ts
 │   ├── read.ts
 │   ├── update.ts
@@ -366,7 +366,7 @@ features/<name>/
 │   └── index.ts
 ├── schema/index.ts       # Zod (optional)
 ├── types/
-└── data/csvFileData.ts   # CSV export (optional)
+└── exports/csv.ts   # CSV export (optional)
 ```
 
 ### Typical Service Response
@@ -377,7 +377,7 @@ features/<name>/
 
 ### Delete and Foreign Keys
 
-`lib/helpers/prismaErrorHelper.ts` maps Prisma error `P2003` to a Persian user-facing message when records are referenced elsewhere.
+`server/actions/errors.ts` maps Prisma error `P2003` to a Persian user-facing message when records are referenced elsewhere.
 
 ### Validation
 
@@ -391,21 +391,21 @@ Zod schemas under `features/*/schema/`, used with react-hook-form in modals.
 
 ## Shared Components
 
-| Component | Path | Purpose |
-|-----------|------|---------|
-| `Table` | `shared/components/Table.tsx` | Custom table (search, sort, pagination) |
-| `PageHeader` | `shared/components/PageHeader.tsx` | Page title block |
-| `GreenhouseButton` | `shared/components/GreenhouseButton.tsx` | Styled project button |
-| `TableActions` | `shared/components/TableActions.tsx` | Edit/delete/detail actions |
-| `InsertionRow` | `shared/components/InsertionRow.tsx` | Add row trigger |
-| `DeleteModal` | `shared/components/DeleteModal.tsx` | Delete confirmation |
-| `DetailModal` | `shared/components/DetailModal.tsx` | Read-only details |
-| `QRCodeCanvas` | `shared/components/QRCodeCanvas.tsx` | Canvas QR rendering |
-| `QRCodeModal` | `shared/components/QRCodeModal.tsx` | Generic QR modal |
-| `Menu` | `shared/components/Menu.tsx` | Navigation drawer |
-| `NavigationProgressBar` | — | NProgress on navigation |
-| `ThemeToggle` | — | Light/dark mode |
-| `LoginForm` | `shared/components/auth/LoginForm.tsx` | Sign-in form |
+| Component               | Path                                     | Purpose                                 |
+| ----------------------- | ---------------------------------------- | --------------------------------------- |
+| `Table`                 | `shared/components/Table.tsx`            | Custom table (search, sort, pagination) |
+| `PageHeader`            | `shared/components/PageHeader.tsx`       | Page title block                        |
+| `GreenhouseButton`      | `shared/components/GreenhouseButton.tsx` | Styled project button                   |
+| `TableActions`          | `shared/components/TableActions.tsx`     | Edit/delete/detail actions              |
+| `InsertionRow`          | `shared/components/InsertionRow.tsx`     | Add row trigger                         |
+| `DeleteModal`           | `shared/components/DeleteModal.tsx`      | Delete confirmation                     |
+| `DetailModal`           | `shared/components/DetailModal.tsx`      | Read-only details                       |
+| `QRCodeCanvas`          | `shared/components/QRCodeCanvas.tsx`     | Canvas QR rendering                     |
+| `QRCodeModal`           | `shared/components/QRCodeModal.tsx`      | Generic QR modal                        |
+| `Menu`                  | `shared/components/Menu.tsx`             | Navigation drawer                       |
+| `NavigationProgressBar` | —                                        | NProgress on navigation                 |
+| `ThemeToggle`           | —                                        | Light/dark mode                         |
+| `LoginForm`             | `shared/components/auth/LoginForm.tsx`   | Sign-in form                            |
 
 **Note:** `shared/utils/CastToPersian.tsx` (Latin → Persian digits) is not mounted in the root layout.
 
@@ -416,7 +416,7 @@ Zod schemas under `features/*/schema/`, used with react-hook-form in modals.
 ### Orders
 
 - Scan URL: `https://mygreenhouses.ir/public/scan/orders/{ID}`
-- Data: `getOrderById` from `features/orders/services`
+- Data: `getOrderById` from `features/orders/server`
 - Shows: customer, project manager, supplier, rootstock/scion details, QR code
 
 ### Seed Package
@@ -456,12 +456,12 @@ Root-level `*.tar` files (if present) are Docker image artifacts, not source cod
 
 ## npm Scripts
 
-| Script | Command | Description |
-|--------|---------|-------------|
-| dev | `next dev -p 3001` | Development server |
-| build | `next build` | Production build |
-| start | `node server.js` | Run standalone server |
-| lint | `eslint` | Lint |
+| Script | Command            | Description           |
+| ------ | ------------------ | --------------------- |
+| dev    | `next dev -p 3001` | Development server    |
+| build  | `next build`       | Production build      |
+| start  | `node server.js`   | Run standalone server |
+| lint   | `eslint`           | Lint                  |
 
 Prisma seed: `npx prisma db seed` (configured as `tsx prisma/seed.ts` in `package.json`)
 
@@ -469,29 +469,25 @@ Prisma seed: `npx prisma db seed` (configured as `tsx prisma/seed.ts` in `packag
 
 ## Known Limitations
 
-| Topic | Details |
-|-------|---------|
-| Root README | Still default create-next-app template |
-| `PAGE_TITLES` in Shell | Incomplete for some newer routes |
-| Dashboard | No live DB-driven statistics |
-| `Tbl_SeedlingPlanting` | No UI module |
-| RBAC | `RoleID` not enforced in UI |
-| Naming | `owners` feature vs `people` route |
+| Topic                   | Details                                                          |
+| ----------------------- | ---------------------------------------------------------------- |
+| Dashboard               | No live DB-driven statistics                                     |
+| `Tbl_SeedlingPlanting`  | No UI module                                                     |
+| RBAC                    | `RoleID` not enforced in UI                                      |
 | Two “recovery” concepts | `nursery-rooms` = master data; `recoveryRoom` = operational logs |
-| `@auth/prisma-adapter` | Installed but unused |
 
 ---
 
 ## Troubleshooting
 
-| Issue | What to check |
-|-------|----------------|
-| Empty page / DB errors | `DATABASE_URL`, SQL Server firewall, `npx prisma generate` |
-| Redirected to login always | `GHSession` cookie, session expiry, `/api/auth/invalid` |
-| Prisma Client not found | Run `npx prisma generate` after clone |
-| Server Action origin error | `allowedOrigins` in `next.config.ts` |
-| Decimal/BigInt errors on client | Add serialization in `read.ts` services |
-| Wrong port | Dev uses **3001**, not 3000 |
+| Issue                           | What to check                                              |
+| ------------------------------- | ---------------------------------------------------------- |
+| Empty page / DB errors          | `DATABASE_URL`, SQL Server firewall, `npx prisma generate` |
+| Redirected to login always      | `GHSession` cookie, session expiry, `/api/auth/invalid`    |
+| Prisma Client not found         | Run `npx prisma generate` after clone                      |
+| Server Action origin error      | `allowedOrigins` in `next.config.ts`                       |
+| Decimal/BigInt errors on client | Add serialization in `read.ts` services                    |
+| Wrong port                      | Dev uses **3001**, not 3000                                |
 
 ---
 
@@ -503,4 +499,4 @@ Prisma seed: `npx prisma db seed` (configured as `tsx prisma/seed.ts` in `packag
 
 ---
 
-*This document reflects the codebase at the time it was written.*
+_This document reflects the codebase at the time it was written._

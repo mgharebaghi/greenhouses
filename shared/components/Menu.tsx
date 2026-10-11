@@ -1,34 +1,33 @@
 "use client";
 
-import { Drawer } from "antd";
 import {
-  HomeOutlined,
-  LogoutOutlined,
-  DownOutlined,
-  FolderOutlined,
-  ExperimentOutlined,
-  CalendarOutlined,
-  RightOutlined,
-  UsergroupAddOutlined,
-  ShopOutlined,
-  GatewayOutlined,
-  FileTextOutlined,
   AppstoreOutlined,
-  RiseOutlined,
-  ContainerOutlined,
-  InboxOutlined,
-  DatabaseOutlined,
   BorderOuterOutlined,
-  ShoppingCartOutlined,
-  RetweetOutlined,
-  ToolOutlined,
+  CalendarOutlined,
+  ContainerOutlined,
+  DatabaseOutlined,
+  DownOutlined,
+  ExperimentOutlined,
+  FileTextOutlined,
+  FolderOutlined,
+  GatewayOutlined,
+  HomeOutlined,
+  InboxOutlined,
+  LogoutOutlined,
   MedicineBoxOutlined,
+  RetweetOutlined,
+  RightOutlined,
+  RiseOutlined,
+  ShopOutlined,
+  ShoppingCartOutlined,
+  ToolOutlined,
+  UsergroupAddOutlined,
 } from "@ant-design/icons";
-import { useRouter, usePathname } from "next/navigation";
-import Link from "next/link";
+import { Drawer } from "antd";
 import Image from "next/image";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import NProgress from "nprogress";
-import { removeAuth } from "@/lib/auth";
 import { useState } from "react";
 
 type MenuItem = {
@@ -38,10 +37,20 @@ type MenuItem = {
   submenu?: { title: string; page: string; icon?: React.ReactNode }[];
 };
 
-export default function DashboardMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
+export default function DashboardMenu({
+  open,
+  onClose,
+  onSignOut,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onSignOut: () => Promise<void>;
+}) {
   const route = useRouter();
   const pathname = usePathname();
-  const [expandedMenus, setExpandedMenus] = useState<{ [key: string]: boolean }>({});
+  const [expandedMenus, setExpandedMenus] = useState<{
+    [key: string]: boolean;
+  }>({});
 
   const menuItems: MenuItem[] = [
     {
@@ -53,22 +62,62 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
       icon: <FolderOutlined />,
       title: "اطلاعات پایه",
       submenu: [
-        { title: "اشخاص", page: "/dashboard/people", icon: <UsergroupAddOutlined /> },
-        { title: "تامین‌کنندگان", page: "/dashboard/suppliers", icon: <ShopOutlined /> },
-        { title: "گلخانه‌ها", page: "/dashboard/greenhouse", icon: <GatewayOutlined /> },
-        { title: "انواع گیاه", page: "/dashboard/plants", icon: <FileTextOutlined /> },
-        { title: "واریته - رقم", page: "/dashboard/plantvarities", icon: <AppstoreOutlined /> },
-        { title: "مراحل رشد", page: "/dashboard/growthstages", icon: <RiseOutlined /> },
-        { title: "انبارها", page: "/dashboard/warehouses", icon: <ContainerOutlined /> },
-        { title: "اتاق‌های ریکاوری", page: "/dashboard/nursery-rooms", icon: <BorderOuterOutlined /> },
+        {
+          title: "اشخاص",
+          page: "/dashboard/people",
+          icon: <UsergroupAddOutlined />,
+        },
+        {
+          title: "تامین‌کنندگان",
+          page: "/dashboard/suppliers",
+          icon: <ShopOutlined />,
+        },
+        {
+          title: "گلخانه‌ها",
+          page: "/dashboard/greenhouse",
+          icon: <GatewayOutlined />,
+        },
+        {
+          title: "انواع گیاه",
+          page: "/dashboard/plants",
+          icon: <FileTextOutlined />,
+        },
+        {
+          title: "واریته - رقم",
+          page: "/dashboard/plantvarities",
+          icon: <AppstoreOutlined />,
+        },
+        {
+          title: "مراحل رشد",
+          page: "/dashboard/growthstages",
+          icon: <RiseOutlined />,
+        },
+        {
+          title: "انبارها",
+          page: "/dashboard/warehouses",
+          icon: <ContainerOutlined />,
+        },
+        {
+          title: "اتاق‌های ریکاوری",
+          page: "/dashboard/nursery-rooms",
+          icon: <BorderOuterOutlined />,
+        },
       ],
     },
     {
       icon: <ExperimentOutlined />,
       title: "مدیریت بذر",
       submenu: [
-        { title: "بسته‌های بذر", page: "/dashboard/seed-package", icon: <InboxOutlined /> },
-        { title: "انبارداری بذر", page: "/dashboard/seed-warehousing", icon: <DatabaseOutlined /> },
+        {
+          title: "بسته‌های بذر",
+          page: "/dashboard/seed-package",
+          icon: <InboxOutlined />,
+        },
+        {
+          title: "انبارداری بذر",
+          page: "/dashboard/seed-warehousing",
+          icon: <DatabaseOutlined />,
+        },
       ],
     },
     {
@@ -114,16 +163,23 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
 
   const handleLogout = async () => {
     onClose();
-    await removeAuth();
+    await onSignOut();
   };
 
   // Helper for rendering icons with consistent style
-  const MenuIcon = ({ icon, active }: { icon: React.ReactNode; active: boolean }) => (
+  const MenuIcon = ({
+    icon,
+    active,
+  }: {
+    icon: React.ReactNode;
+    active: boolean;
+  }) => (
     <div
       className={`h-9 w-9 rounded-xl flex items-center justify-center text-lg transition-all duration-300
-        ${active
-          ? "bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md scale-110"
-          : "bg-emerald-50 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-800/60 group-hover:scale-105"
+        ${
+          active
+            ? "bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md scale-110"
+            : "bg-emerald-50 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-800/60 group-hover:scale-105"
         }`}
     >
       {icon}
@@ -144,7 +200,6 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
       className="!bg-transparent"
     >
       <div className="flex flex-col h-full bg-gradient-to-br from-white via-slate-50 to-emerald-50/30 dark:from-slate-900 dark:via-slate-900 dark:to-emerald-950/30 transition-colors duration-300">
-
         {/* User Profile Header - Enhanced Design */}
         <div className="relative pt-8 pb-6 px-6 bg-gradient-to-br from-emerald-600 to-teal-700 dark:from-emerald-800 dark:to-teal-900 text-white overflow-hidden shrink-0 rounded-b-[2rem] shadow-xl z-20">
           {/* Background Decorations */}
@@ -161,11 +216,18 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
                 height={64}
                 className="relative rounded-full border-2 border-white dark:border-slate-700 shadow-lg object-cover bg-white"
               />
-              <span className="absolute bottom-0 right-0 h-4 w-4 bg-lime-400 border-2 border-emerald-700 rounded-full" title="آنلاین"></span>
+              <span
+                className="absolute bottom-0 right-0 h-4 w-4 bg-lime-400 border-2 border-emerald-700 rounded-full"
+                title="آنلاین"
+              ></span>
             </div>
 
-            <h3 className="font-bold text-lg text-white mb-0.5 tracking-tight">مدیر سیستم</h3>
-            <p className="text-emerald-100 text-xs opacity-90 font-light">فکور پیوند آریا</p>
+            <h3 className="font-bold text-lg text-white mb-0.5 tracking-tight">
+              مدیر سیستم
+            </h3>
+            <p className="text-emerald-100 text-xs opacity-90 font-light">
+              فکور پیوند آریا
+            </p>
           </div>
 
           {/* Close Button Absolute */}
@@ -182,10 +244,15 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
           {menuItems.map((item, index) => {
             const hasSubmenu = !!item.submenu;
             const isExpanded = expandedMenus[item.title];
-            const isActive = item.page ? pathname === item.page : isSubmenuItemActive(item.submenu);
+            const isActive = item.page
+              ? pathname === item.page
+              : isSubmenuItemActive(item.submenu);
 
             return (
-              <div key={index} className={`select-none transition-all duration-500 ${isExpanded ? "mb-4 bg-emerald-50/30 dark:bg-emerald-900/10 rounded-3xl ring-1 ring-emerald-100/50 dark:ring-emerald-800/20 pb-2" : ""}`}>
+              <div
+                key={index}
+                className={`select-none transition-all duration-500 ${isExpanded ? "mb-4 bg-emerald-50/30 dark:bg-emerald-900/10 rounded-3xl ring-1 ring-emerald-100/50 dark:ring-emerald-800/20 pb-2" : ""}`}
+              >
                 {/* Main Item */}
                 <div
                   onClick={() => {
@@ -197,15 +264,18 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
                     }
                   }}
                   className={`group relative flex items-center justify-between p-3 rounded-2xl cursor-pointer transition-all duration-300 border
-                        ${isActive
-                      ? "bg-white dark:bg-slate-800 border-emerald-200 dark:border-emerald-800 shadow-lg shadow-emerald-100/50 dark:shadow-none scale-[1.02]"
-                      : "bg-transparent border-transparent hover:bg-white dark:hover:bg-slate-800 hover:shadow-sm hover:border-slate-100 dark:hover:border-slate-700"
-                    }
+                        ${
+                          isActive
+                            ? "bg-white dark:bg-slate-800 border-emerald-200 dark:border-emerald-800 shadow-lg shadow-emerald-100/50 dark:shadow-none scale-[1.02]"
+                            : "bg-transparent border-transparent hover:bg-white dark:hover:bg-slate-800 hover:shadow-sm hover:border-slate-100 dark:hover:border-slate-700"
+                        }
                     `}
                 >
                   <div className="flex items-center gap-3">
                     <MenuIcon icon={item.icon} active={isActive} />
-                    <span className={`font-medium text-sm transition-colors ${isActive ? "text-emerald-900 dark:text-emerald-400" : "text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-200"}`}>
+                    <span
+                      className={`font-medium text-sm transition-colors ${isActive ? "text-emerald-900 dark:text-emerald-400" : "text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-200"}`}
+                    >
                       {item.title}
                     </span>
                   </div>
@@ -217,15 +287,18 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
                     )}
 
                     {hasSubmenu && (
-                      <DownOutlined className={`text-xs text-slate-400 transition-transform duration-300 ${isExpanded ? "rotate-180 text-emerald-500" : ""}`} />
+                      <DownOutlined
+                        className={`text-xs text-slate-400 transition-transform duration-300 ${isExpanded ? "rotate-180 text-emerald-500" : ""}`}
+                      />
                     )}
                   </div>
                 </div>
 
                 {/* Submenu */}
-                <div className={`overflow-hidden transition-all duration-500 ease-in-out ${isExpanded ? "max-h-screen opacity-100" : "max-h-0 opacity-0"}`}>
+                <div
+                  className={`overflow-hidden transition-all duration-500 ease-in-out ${isExpanded ? "max-h-screen opacity-100" : "max-h-0 opacity-0"}`}
+                >
                   <div className="relative pt-2 pb-2 pl-2 pr-4 mt-2 mb-2 bg-slate-50/50 dark:bg-slate-800/40 border border-slate-100/50 dark:border-slate-700/30 rounded-2xl mx-1 shadow-inner">
-
                     {item.submenu?.map((sub, subIdx) => {
                       const isSubActive = pathname === sub.page;
                       return (
@@ -237,23 +310,28 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
                             onClose();
                           }}
                           className={`relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 mb-1 last:mb-0
-                                        ${isSubActive
-                              ? "bg-white dark:bg-slate-700 text-emerald-800 dark:text-emerald-300 font-bold shadow-sm border border-emerald-100/50 dark:border-slate-600"
-                              : "text-slate-600 dark:text-slate-400 hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-white/60 dark:hover:bg-slate-700/50 hover:shadow-sm"
-                            }
+                                        ${
+                                          isSubActive
+                                            ? "bg-white dark:bg-slate-700 text-emerald-800 dark:text-emerald-300 font-bold shadow-sm border border-emerald-100/50 dark:border-slate-600"
+                                            : "text-slate-600 dark:text-slate-400 hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-white/60 dark:hover:bg-slate-700/50 hover:shadow-sm"
+                                        }
                                     `}
                         >
                           {/* Icon Indicator */}
-                          <div className={`text-base transition-all duration-300 ${isSubActive ? "text-emerald-600 dark:text-emerald-400 scale-110" : "text-slate-400 dark:text-slate-500 group-hover:text-emerald-500"}`}>
+                          <div
+                            className={`text-base transition-all duration-300 ${isSubActive ? "text-emerald-600 dark:text-emerald-400 scale-110" : "text-slate-400 dark:text-slate-500 group-hover:text-emerald-500"}`}
+                          >
                             {sub.icon}
                           </div>
 
                           <span className="text-sm">{sub.title}</span>
 
                           {/* Active Dot */}
-                          {isSubActive && <div className="absolute left-3 w-1.5 h-1.5 rounded-full bg-emerald-500 ring-2 ring-emerald-100 dark:ring-emerald-900"></div>}
+                          {isSubActive && (
+                            <div className="absolute left-3 w-1.5 h-1.5 rounded-full bg-emerald-500 ring-2 ring-emerald-100 dark:ring-emerald-900"></div>
+                          )}
                         </Link>
-                      )
+                      );
                     })}
                   </div>
                 </div>
@@ -272,8 +350,14 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
                 {new Date().toLocaleDateString("fa-IR")}
               </span>
             </div>
-            <div className="text-emerald-800 dark:text-slate-300 font-bold text-sm tracking-widest numbers-fa" suppressHydrationWarning>
-              {new Date().toLocaleTimeString("fa-IR", { hour: '2-digit', minute: '2-digit' })}
+            <div
+              className="text-emerald-800 dark:text-slate-300 font-bold text-sm tracking-widest numbers-fa"
+              suppressHydrationWarning
+            >
+              {new Date().toLocaleTimeString("fa-IR", {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
             </div>
           </div>
 
@@ -285,11 +369,12 @@ export default function DashboardMenu({ open, onClose }: { open: boolean; onClos
             <div className="p-1.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 group-hover:bg-rose-100 dark:group-hover:bg-rose-900/20 group-hover:text-rose-500 transition-colors">
               <LogoutOutlined />
             </div>
-            <span className="text-sm font-medium text-slate-600 dark:text-slate-300 group-hover:text-rose-600 dark:group-hover:text-rose-400">خروج از حساب کاربری</span>
+            <span className="text-sm font-medium text-slate-600 dark:text-slate-300 group-hover:text-rose-600 dark:group-hover:text-rose-400">
+              خروج از حساب کاربری
+            </span>
           </button>
         </div>
       </div>
     </Drawer>
   );
 }
-

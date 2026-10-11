@@ -1,8 +1,15 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
-import { Modal, Button, Space, Card, Spin, Alert } from "antd";
-import { DownloadOutlined, PrinterOutlined, QrcodeOutlined, LinkOutlined } from "@ant-design/icons";
+import QrImage from "@/shared/components/QrImage";
+
+import {
+  DownloadOutlined,
+  LinkOutlined,
+  PrinterOutlined,
+  QrcodeOutlined,
+} from "@ant-design/icons";
+import { Alert, Button, Card, Modal, Space, Spin } from "antd";
 import QRCodeLib from "qrcode";
+import { useEffect, useRef, useState } from "react";
 
 export type QRCodeModalProps = {
   visible: boolean;
@@ -12,11 +19,20 @@ export type QRCodeModalProps = {
   title?: string;
 };
 
-export default function QRCodeModal({ visible, url, onClose, title, serial }: QRCodeModalProps) {
+export default function QRCodeModal({
+  visible,
+  url,
+  onClose,
+  title,
+  serial,
+}: QRCodeModalProps) {
   const [qrDataUrl, setQrDataUrl] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [notice, setNotice] = useState<{ type: "success" | "info" | "warning" | "error"; text: string } | null>(null);
+  const [notice, setNotice] = useState<{
+    type: "success" | "info" | "warning" | "error";
+    text: string;
+  } | null>(null);
 
   // Force English digits for this modal only
   const toEn = (val: string | number | null | undefined) => {
@@ -47,42 +63,42 @@ export default function QRCodeModal({ visible, url, onClose, title, serial }: QR
   };
 
   useEffect(() => {
+    const generateQRCode = async () => {
+      setLoading(true);
+      try {
+        const normalizedUrl = toEn(url);
+        const dataUrl = await QRCodeLib.toDataURL(normalizedUrl, {
+          type: "image/png",
+          width: 300,
+          margin: 2,
+          errorCorrectionLevel: "M",
+          color: {
+            dark: "#000000",
+            light: "#FFFFFF",
+          },
+        });
+        setQrDataUrl(dataUrl);
+
+        // رسم QR Code روی Canvas برای دانلود با کیفیت بهتر
+        if (canvasRef.current) {
+          await QRCodeLib.toCanvas(canvasRef.current, normalizedUrl, {
+            width: 300,
+            margin: 2,
+            errorCorrectionLevel: "M",
+          });
+        }
+      } catch (err) {
+        console.error("خطا در تولید QR Code:", err);
+        setNotice({ type: "error", text: "خطا در تولید کد QR" });
+      } finally {
+        setLoading(false);
+      }
+    };
+
     if (visible && url) {
       generateQRCode();
     }
   }, [visible, url]);
-
-  const generateQRCode = async () => {
-    setLoading(true);
-    try {
-      const normalizedUrl = toEn(url);
-      const dataUrl = await QRCodeLib.toDataURL(normalizedUrl, {
-        type: "image/png",
-        width: 300,
-        margin: 2,
-        errorCorrectionLevel: "M",
-        color: {
-          dark: "#000000",
-          light: "#FFFFFF",
-        },
-      });
-      setQrDataUrl(dataUrl);
-
-      // رسم QR Code روی Canvas برای دانلود با کیفیت بهتر
-      if (canvasRef.current) {
-        await QRCodeLib.toCanvas(canvasRef.current, normalizedUrl, {
-          width: 300,
-          margin: 2,
-          errorCorrectionLevel: "M",
-        });
-      }
-    } catch (err) {
-      console.error("خطا در تولید QR Code:", err);
-      setNotice({ type: "error", text: "خطا در تولید کد QR" });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleDownload = () => {
     if (!qrDataUrl) return;
@@ -154,7 +170,7 @@ export default function QRCodeModal({ visible, url, onClose, title, serial }: QR
           </head>
           <body>
             <h2>${title || "کد QR"}</h2>
-            <img src="${qrDataUrl}" alt="QR Code" />
+            <QrImage src="${qrDataUrl}" alt="QR Code" />
             <p class="url-text">${normalizedUrl}</p>
             ${normalizedSerial ? `<p class="serial-text">${normalizedSerial}</p>` : ""}
             <script>
@@ -175,9 +191,16 @@ export default function QRCodeModal({ visible, url, onClose, title, serial }: QR
     <Modal
       open={visible}
       title={
-        <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "16px" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            fontSize: "16px",
+          }}
+        >
           <QrcodeOutlined style={{ fontSize: "20px", color: "#1890ff" }} />
-          <span>{title  || "کد QR"}</span>
+          <span>{title || "کد QR"}</span>
         </div>
       }
       onCancel={onClose}
@@ -244,14 +267,17 @@ export default function QRCodeModal({ visible, url, onClose, title, serial }: QR
             }}
           >
             <Spin size="large" />
-            <span style={{ color: "#666", fontSize: "14px" }}>در حال تولید کد QR...</span>
+            <span style={{ color: "#666", fontSize: "14px" }}>
+              در حال تولید کد QR...
+            </span>
           </div>
         ) : qrDataUrl ? (
           <Space direction="vertical" size={24} style={{ width: "100%" }}>
             {/* QR Code Card */}
             <Card
               style={{
-                background: "linear-gradient(135deg, #667eea15 0%, #764ba215 100%)",
+                background:
+                  "linear-gradient(135deg, #667eea15 0%, #764ba215 100%)",
                 border: "none",
                 borderRadius: "16px",
                 boxShadow: "0 8px 24px rgba(102, 126, 234, 0.12)",
@@ -282,7 +308,7 @@ export default function QRCodeModal({ visible, url, onClose, title, serial }: QR
                   e.currentTarget.style.transform = "scale(1)";
                 }}
               >
-                <img
+                <QrImage
                   src={qrDataUrl}
                   alt="QR Code"
                   style={{
@@ -353,7 +379,9 @@ export default function QRCodeModal({ visible, url, onClose, title, serial }: QR
                     justifyContent: "center",
                   }}
                 >
-                  <LinkOutlined style={{ color: "#1890ff", fontSize: "14px" }} />
+                  <LinkOutlined
+                    style={{ color: "#1890ff", fontSize: "14px" }}
+                  />
                   <span
                     style={{
                       fontSize: "13px",
@@ -389,7 +417,13 @@ export default function QRCodeModal({ visible, url, onClose, title, serial }: QR
               fontSize: "14px",
             }}
           >
-            <QrcodeOutlined style={{ fontSize: "48px", marginBottom: "16px", display: "block" }} />
+            <QrcodeOutlined
+              style={{
+                fontSize: "48px",
+                marginBottom: "16px",
+                display: "block",
+              }}
+            />
             کد QR موجود نیست
           </div>
         )}

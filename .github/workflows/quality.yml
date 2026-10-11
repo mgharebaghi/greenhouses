@@ -1,0 +1,26 @@
+name: Source quality
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    env:
+      # Generate needs a syntactically valid URL. Tests stub Prisma and never connect.
+      DATABASE_URL: sqlserver://localhost:1433;database=ci;user=ci;password=ci;encrypt=false
+      SHADOW_DATABASE_URL: sqlserver://localhost:1433;database=ci_shadow;user=ci;password=ci;encrypt=false
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx prisma generate
+      - run: npm run check
+      - run: npm run format:check
+      - run: npm run build
+      - run: node scripts/check-build-output.mjs
+      - run: node scripts/smoke-build.mjs

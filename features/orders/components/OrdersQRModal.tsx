@@ -1,77 +1,35 @@
 "use client";
 
-import { Modal, Button, Tooltip, Select } from "antd";
+import PrintQrLabel from "@/shared/components/PrintQrLabel";
+import {
+  LABEL_SIZES,
+  PLANT_TYPE_OPTIONS,
+  QR_LABEL_SIZES,
+  parseLabelSize,
+} from "../domain/print-settings";
+import OrderCertificate from "./printing/OrderCertificate";
+
+import type { OrderDetails } from "../types/details";
+
+import { publicOrderUrl } from "@/shared/config/public-urls";
+
+import QRCodeCanvas from "@/shared/components/QRCodeCanvas";
+import DataLoadError from "@/shared/components/DataLoadError";
 import {
   CloseOutlined,
-  QrcodeOutlined,
   DownloadOutlined,
   FileTextOutlined,
+  QrcodeOutlined,
 } from "@ant-design/icons";
-import { useRef, useEffect, useState } from "react";
-import QRCodeCanvas from "@/shared/components/QRCodeCanvas";
+import { Button, Modal, Select, Tooltip } from "antd";
+import { useEffect, useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
-import { getOrderById } from "../services";
+import { getOrderById } from "../actions";
 
 interface OrdersQRModalProps {
   open: boolean;
   setOpen: (open: boolean) => void;
-  data: any | null;
-}
-
-const LABEL_SIZES = [
-  { label: "تنظیمات پرینتر ", value: "auto" },
-  { label: "۱۰ × ۱۰ میلی‌متر (مربعی کوچک)", value: "10mm 10mm" },
-  { label: "۱۵ × ۱۵ میلی‌متر (مربعی)", value: "15mm 15mm" },
-  { label: "۲۰ × ۲۰ میلی‌متر (مربعی)", value: "20mm 20mm" },
-  { label: "۲۵ × ۲۵ میلی‌متر (مربعی استاندارد)", value: "25mm 25mm" },
-  { label: "۳۰ × ۳۰ میلی‌متر (مربعی متوسط)", value: "30mm 30mm" },
-  { label: "۳۵ × ۳۵ میلی‌متر", value: "35mm 35mm" },
-  { label: "۴۰ × ۴۰ میلی‌متر (مربعی بزرگ)", value: "40mm 40mm" },
-  { label: "۵۰ × ۵۰ میلی‌متر", value: "50mm 50mm" },
-  { label: "۲۰ × ۱۰ میلی‌متر", value: "20mm 10mm" },
-  { label: "۲۵ × ۱۵ میلی‌متر", value: "25mm 15mm" },
-  { label: "۳۰ × ۲۰ میلی‌متر", value: "30mm 20mm" },
-  { label: "۳۵ × ۲۵ میلی‌متر", value: "35mm 25mm" },
-  { label: "۴۰ × ۲۰ میلی‌متر", value: "40mm 20mm" },
-  { label: "۴۰ × ۳۰ میلی‌متر", value: "40mm 30mm" },
-  { label: "۴۰ × ۶۰ میلی‌متر", value: "40mm 60mm" },
-  { label: "۴۵ × ۳۰ میلی‌متر", value: "45mm 30mm" },
-  { label: "۵۰ × ۲۵ میلی‌متر", value: "50mm 25mm" },
-  { label: "۵۰ × ۳۰ میلی‌متر", value: "50mm 30mm" },
-  { label: "۵۰ × ۴۰ میلی‌متر", value: "50mm 40mm" },
-  { label: "۵۵ × ۳۰ میلی‌متر", value: "55mm 30mm" },
-  { label: "۶۰ × ۳۰ میلی‌متر", value: "60mm 30mm" },
-  { label: "۶۰ × ۴۰ میلی‌متر", value: "60mm 40mm" },
-  { label: "۷۰ × ۴۰ میلی‌متر", value: "70mm 40mm" },
-  { label: "۷۰ × ۵۰ میلی‌متر", value: "70mm 50mm" },
-  { label: "۸۰ × ۵۰ میلی‌متر", value: "80mm 50mm" },
-  { label: "۱۰۰ × ۵۰ میلی‌متر", value: "100mm 50mm" },
-  { label: "۱۰۰ × ۸۰ میلی‌متر (بزرگ)", value: "100mm 80mm" },
-  { label: "۱۰۰ × ۱۵۰ میلی‌متر (لیبل پستی)", value: "100mm 150mm" },
-];
-
-const QR_LABLE_SIZE = [
-  { label: "۱۰ × ۱۰ میلی‌متر", value: "10mm" },
-  { label: "۲۰ × ۲۰ میلی‌متر", value: "20mm" },
-  { label: "۳۰ × ۳۰ میلی‌متر", value: "30mm" },
-  { label: "۴۰ × ۴۰ میلی‌متر", value: "40mm" },
-  { label: "۵۰ × ۵۰ میلی‌متر", value: "50mm" },
-  { label: "۶۰ × ۶۰ میلی‌متر", value: "60mm" },
-  { label: "تمام صفحه (Full)", value: "100%" },
-];
-
-const PLANT_TYPE_OPTIONS = [
-  { label: "—  (بدون انتخاب)", value: "" },
-  { label: "گیاه پایه (Root Stock)", value: "rootstock" },
-  { label: "پیوندک (Scion)", value: "scion" },
-  { label: "نشاء پیوندی (Grafted)", value: "grafted" },
-];
-
-function parseLabelSize(value: string): { width: string; height: string } {
-  if (value === "auto") return { width: "100mm", height: "100mm" };
-  const parts = value.trim().split(/\s+/);
-  if (parts.length === 2) return { width: parts[0], height: parts[1] };
-  return { width: parts[0], height: parts[0] };
+  data: Pick<OrderDetails, "ID"> | null;
 }
 
 function isAndroidTablet(): boolean {
@@ -96,8 +54,10 @@ export default function OrdersQRModal({
   setOpen,
   data,
 }: OrdersQRModalProps) {
-  const [fullData, setFullData] = useState<any>(null);
+  const [fullData, setFullData] = useState<OrderDetails | null>(null);
   const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState(false);
+  const [retry, setRetry] = useState(0);
   const [labelSize, setLabelSize] = useState("auto");
   const [qrSize, setQrSize] = useState("100%");
   const [plantType, setPlantType] = useState<string>("");
@@ -106,14 +66,29 @@ export default function OrdersQRModal({
   const labelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    let active = true;
     if (open && data?.ID) {
       setLoading(true);
-      getOrderById(data.ID).then((res) => {
-        setFullData(res);
-        setLoading(false);
-      });
+      setFullData(null);
+      setLoadError(false);
+      getOrderById(data.ID)
+        .then((res) => {
+          if (active) {
+            setFullData(res);
+            setLoadError(!res);
+          }
+        })
+        .catch(() => {
+          if (active) setLoadError(true);
+        })
+        .finally(() => {
+          if (active) setLoading(false);
+        });
     }
-  }, [open, data]);
+    return () => {
+      active = false;
+    };
+  }, [open, data?.ID, retry]);
 
   const handlePrintCertificate = useReactToPrint({
     contentRef: certificateRef,
@@ -280,13 +255,7 @@ export default function OrdersQRModal({
 
   if (!open) return null;
 
-  const qrUrl = fullData?.ID
-    ? `https://mygreenhouses.ir/public/scan/orders/${fullData.ID}`
-    : "#";
-
-  const qrFontSize = qrSize === "100%" ? "10px" : `calc(${qrSize} * 0.14)`;
-
-  const qrCodeWidth = qrSize === "100%" ? "100%" : qrSize;
+  const qrUrl = fullData?.ID ? publicOrderUrl(fullData.ID) : "#";
 
   // Label text shown under QR in print: OrderCode + (R) or (S) if plantType is selected
   const printOrderLabel = fullData?.OrderCode
@@ -311,6 +280,9 @@ export default function OrdersQRModal({
       }}
     >
       <div className="flex flex-col items-center p-8 bg-white min-h-[600px]">
+        {loadError && (
+          <DataLoadError onRetry={() => setRetry((value) => value + 1)} />
+        )}
         <h3 className="text-xl font-extrabold text-slate-800 mb-8 mt-2">
           گواهی دیجیتال سفارش
         </h3>
@@ -466,7 +438,7 @@ export default function OrdersQRModal({
                 <Select
                   value={qrSize}
                   onChange={setQrSize}
-                  options={QR_LABLE_SIZE}
+                  options={QR_LABEL_SIZES}
                   className="w-full dir-rtl"
                   popupClassName="dir-rtl font-iransans"
                   size="large"
@@ -511,582 +483,23 @@ export default function OrdersQRModal({
               background: "white",
             }}
           >
-            <div
-              ref={certificateRef}
-              style={{
-                direction: "rtl",
-                fontFamily: "tahoma",
-                width: "210mm",
-                height: "297mm",
-                background: "white",
-                WebkitPrintColorAdjust: "exact",
-                printColorAdjust: "exact",
-                transform: "scale(0.82)",
-                transformOrigin: "center center",
-                display: "flex",
-                flexDirection: "column",
-                position: "relative",
-                overflow: "hidden",
-                boxSizing: "border-box",
-                padding: "14mm",
-                flexShrink: 0,
-              }}
-            >
-              <div
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  right: 0,
-                  width: "220px",
-                  height: "220px",
-                  background: "#f8fafc",
-                  borderBottomLeftRadius: "100px",
-                  opacity: 0.6,
-                  zIndex: 0,
-                }}
-              />
-              <div
-                style={{
-                  position: "absolute",
-                  bottom: 0,
-                  left: 0,
-                  width: "180px",
-                  height: "180px",
-                  background: "#ecfdf5",
-                  borderTopRightRadius: "80px",
-                  opacity: 0.6,
-                  zIndex: 0,
-                }}
-              />
-              <div
-                style={{
-                  position: "absolute",
-                  inset: "10px",
-                  border: "2px solid #0f172a",
-                  pointerEvents: "none",
-                  zIndex: 1,
-                }}
-              />
-              <div
-                style={{
-                  position: "absolute",
-                  inset: "16px",
-                  border: "1px solid #cbd5e1",
-                  pointerEvents: "none",
-                  zIndex: 1,
-                }}
-              />
-
-              {/* HEADER */}
-              <div
-                style={{
-                  position: "relative",
-                  zIndex: 2,
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  borderBottom: "2px solid #0f172a",
-                  paddingBottom: "12px",
-                  marginBottom: "14px",
-                  flexShrink: 0,
-                }}
-              >
-                <div>
-                  <h1
-                    style={{
-                      fontSize: "26px",
-                      fontWeight: 900,
-                      color: "#0f172a",
-                      margin: 0,
-                      lineHeight: 1.2,
-                    }}
-                  >
-                    گواهی سفارش
-                  </h1>
-                  <p
-                    style={{
-                      fontSize: "16px",
-                      fontWeight: 700,
-                      color: "#065f46",
-                      margin: "6px 0",
-                    }}
-                  >
-                    فکور پیوند آریا
-                  </p>
-                  <div
-                    style={{
-                      width: "70px",
-                      height: "4px",
-                      background: "#059669",
-                      borderRadius: "999px",
-                    }}
-                  />
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    gap: "4px",
-                  }}
-                >
-                  <div
-                    style={{
-                      padding: "6px",
-                      border: "1px solid #e2e8f0",
-                      borderRadius: "10px",
-                      background: "white",
-                    }}
-                  >
-                    <QRCodeCanvas value={qrUrl} size={70} level="M" />
-                  </div>
-                  <span
-                    style={{
-                      fontSize: "10px",
-                      color: "#64748b",
-                      fontFamily: "monospace",
-                    }}
-                  >
-                    {fullData?.OrderCode}
-                  </span>
-                </div>
-              </div>
-
-              {/* MAIN */}
-              <div
-                style={{
-                  position: "relative",
-                  zIndex: 2,
-                  flex: 1,
-                  overflow: "hidden",
-                  display: "flex",
-                  flexDirection: "column",
-                }}
-              >
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr",
-                    gap: "10px",
-                    marginBottom: "14px",
-                  }}
-                >
-                  <div
-                    style={{
-                      borderRight: "4px solid #10b981",
-                      paddingRight: "10px",
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: "10px",
-                        color: "#64748b",
-                        marginBottom: "3px",
-                      }}
-                    >
-                      کد رهگیری
-                    </div>
-                    <div style={{ fontSize: "14px", fontWeight: 900 }}>
-                      {fullData?.OrderCode || "—"}
-                    </div>
-                  </div>
-                  <div
-                    style={{
-                      borderRight: "4px solid #94a3b8",
-                      paddingRight: "10px",
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: "10px",
-                        color: "#64748b",
-                        marginBottom: "3px",
-                      }}
-                    >
-                      تاریخ
-                    </div>
-                    <div style={{ fontSize: "14px", fontWeight: 900 }}>
-                      {fullData?.OrderDate
-                        ? new Date(fullData.OrderDate).toLocaleDateString(
-                            "fa-IR",
-                          )
-                        : "—"}
-                    </div>
-                  </div>
-                  <div
-                    style={{
-                      borderRight: "4px solid #94a3b8",
-                      paddingRight: "10px",
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: "10px",
-                        color: "#64748b",
-                        marginBottom: "3px",
-                      }}
-                    >
-                      مشتری
-                    </div>
-                    <div style={{ fontSize: "13px", fontWeight: 700 }}>
-                      {fullData?.Tbl_People_Tbl_Orders_CustomerIDToTbl_People
-                        ? `${fullData.Tbl_People_Tbl_Orders_CustomerIDToTbl_People.FirstName} ${fullData.Tbl_People_Tbl_Orders_CustomerIDToTbl_People.LastName}`
-                        : "—"}
-                    </div>
-                  </div>
-                  <div
-                    style={{
-                      borderRight: "4px solid #94a3b8",
-                      paddingRight: "10px",
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: "10px",
-                        color: "#64748b",
-                        marginBottom: "3px",
-                      }}
-                    >
-                      مدیر پروژه
-                    </div>
-                    <div style={{ fontSize: "13px", fontWeight: 700 }}>
-                      {fullData?.Tbl_People_Tbl_Orders_ProjectManagerToTbl_People
-                        ? `${fullData.Tbl_People_Tbl_Orders_ProjectManagerToTbl_People.FirstName} ${fullData.Tbl_People_Tbl_Orders_ProjectManagerToTbl_People.LastName}`
-                        : "—"}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Rootstock */}
-                <div
-                  style={{
-                    background: "#f8fafc",
-                    border: "1px solid #e2e8f0",
-                    borderRadius: "14px",
-                    padding: "14px",
-                    marginBottom: "12px",
-                    position: "relative",
-                    overflow: "hidden",
-                    flexShrink: 0,
-                  }}
-                >
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      right: 0,
-                      width: "5px",
-                      height: "100%",
-                      background: "#10b981",
-                    }}
-                  />
-                  <h2
-                    style={{
-                      fontSize: "14px",
-                      fontWeight: 900,
-                      color: "#064e3b",
-                      margin: "0 0 10px 0",
-                    }}
-                  >
-                    ۱ - بذر پایه
-                  </h2>
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "1fr 1fr",
-                      gap: "10px",
-                    }}
-                  >
-                    <div>
-                      <div
-                        style={{
-                          fontSize: "10px",
-                          color: "#94a3b8",
-                          marginBottom: "3px",
-                        }}
-                      >
-                        گیاه / واریته
-                      </div>
-                      <div style={{ fontSize: "13px", fontWeight: 700 }}>
-                        {fullData
-                          ?.Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage
-                          ?.Tbl_plantVariety?.Tbl_Plants?.CommonName || ""}{" "}
-                        -{" "}
-                        {fullData
-                          ?.Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage
-                          ?.Tbl_plantVariety?.VarietyName || "—"}
-                      </div>
-                    </div>
-                    <div>
-                      <div
-                        style={{
-                          fontSize: "10px",
-                          color: "#94a3b8",
-                          marginBottom: "3px",
-                        }}
-                      >
-                        تامین‌کننده
-                      </div>
-                      <div style={{ fontSize: "13px", fontWeight: 700 }}>
-                        {fullData
-                          ?.Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage
-                          ?.Tbl_suppliers
-                          ? fullData
-                              .Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage
-                              .Tbl_suppliers.CompanyName ||
-                            `${fullData.Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage.Tbl_suppliers.FirstName} ${fullData.Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage.Tbl_suppliers.LastName}`
-                          : "—"}
-                      </div>
-                    </div>
-                    <div>
-                      <div
-                        style={{
-                          fontSize: "10px",
-                          color: "#94a3b8",
-                          marginBottom: "3px",
-                        }}
-                      >
-                        کد بسته
-                      </div>
-                      <div
-                        style={{ fontSize: "13px", fontFamily: "monospace" }}
-                      >
-                        {fullData
-                          ?.Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage
-                          ?.SerialNumber || "—"}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Scion */}
-                <div
-                  style={{
-                    background: "#f8fafc",
-                    border: "1px solid #e2e8f0",
-                    borderRadius: "14px",
-                    padding: "14px",
-                    position: "relative",
-                    overflow: "hidden",
-                    flexShrink: 0,
-                  }}
-                >
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      right: 0,
-                      width: "5px",
-                      height: "100%",
-                      background: "#3b82f6",
-                    }}
-                  />
-                  <h2
-                    style={{
-                      fontSize: "14px",
-                      fontWeight: 900,
-                      color: "#1e3a8a",
-                      margin: "0 0 10px 0",
-                    }}
-                  >
-                    ۲ - بذر پیوندک
-                  </h2>
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "1fr 1fr",
-                      gap: "10px",
-                    }}
-                  >
-                    <div>
-                      <div
-                        style={{
-                          fontSize: "10px",
-                          color: "#94a3b8",
-                          marginBottom: "3px",
-                        }}
-                      >
-                        گیاه / واریته
-                      </div>
-                      <div style={{ fontSize: "13px", fontWeight: 700 }}>
-                        {fullData
-                          ?.Tbl_SeedPackage_Tbl_Orders_ScionIDToTbl_SeedPackage
-                          ?.Tbl_plantVariety?.Tbl_Plants?.CommonName || ""}{" "}
-                        -{" "}
-                        {fullData
-                          ?.Tbl_SeedPackage_Tbl_Orders_ScionIDToTbl_SeedPackage
-                          ?.Tbl_plantVariety?.VarietyName || "—"}
-                      </div>
-                    </div>
-                    <div>
-                      <div
-                        style={{
-                          fontSize: "10px",
-                          color: "#94a3b8",
-                          marginBottom: "3px",
-                        }}
-                      >
-                        تامین‌کننده
-                      </div>
-                      <div style={{ fontSize: "13px", fontWeight: 700 }}>
-                        {fullData
-                          ?.Tbl_SeedPackage_Tbl_Orders_ScionIDToTbl_SeedPackage
-                          ?.Tbl_suppliers
-                          ? fullData
-                              .Tbl_SeedPackage_Tbl_Orders_ScionIDToTbl_SeedPackage
-                              .Tbl_suppliers.CompanyName ||
-                            `${fullData.Tbl_SeedPackage_Tbl_Orders_ScionIDToTbl_SeedPackage.Tbl_suppliers.FirstName} ${fullData.Tbl_SeedPackage_Tbl_Orders_ScionIDToTbl_SeedPackage.Tbl_suppliers.LastName}`
-                          : "—"}
-                      </div>
-                    </div>
-                    <div>
-                      <div
-                        style={{
-                          fontSize: "10px",
-                          color: "#94a3b8",
-                          marginBottom: "3px",
-                        }}
-                      >
-                        کد بسته
-                      </div>
-                      <div
-                        style={{ fontSize: "13px", fontFamily: "monospace" }}
-                      >
-                        {fullData
-                          ?.Tbl_SeedPackage_Tbl_Orders_ScionIDToTbl_SeedPackage
-                          ?.SerialNumber || "—"}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* FOOTER */}
-              <div
-                style={{
-                  position: "relative",
-                  zIndex: 2,
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "flex-end",
-                  borderTop: "2px solid #0f172a",
-                  paddingTop: "12px",
-                  marginTop: "14px",
-                  flexShrink: 0,
-                }}
-              >
-                <div style={{ maxWidth: "55%" }}>
-                  <div
-                    style={{
-                      fontSize: "10px",
-                      color: "#94a3b8",
-                      fontWeight: 700,
-                      marginBottom: "4px",
-                    }}
-                  >
-                    OFFICIAL DOCUMENT
-                  </div>
-                  <div
-                    style={{
-                      fontSize: "11px",
-                      color: "#475569",
-                      lineHeight: 1.6,
-                    }}
-                  >
-                    این سند برای تایید اصالت سفارش صادر شده است.
-                  </div>
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    gap: "4px",
-                  }}
-                >
-                  <div
-                    style={{
-                      width: "120px",
-                      height: "40px",
-                      borderBottom: "1px dashed #cbd5e1",
-                      position: "relative",
-                    }}
-                  >
-                    <div
-                      style={{
-                        position: "absolute",
-                        inset: 0,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        opacity: 0.08,
-                        transform: "rotate(-12deg)",
-                        fontWeight: 900,
-                        fontSize: "11px",
-                      }}
-                    >
-                      APPROVED
-                    </div>
-                  </div>
-                  <div style={{ fontSize: "11px", fontWeight: 700 }}>
-                    امضا و مهر
-                  </div>
-                </div>
-              </div>
-            </div>
+            <OrderCertificate
+              certificateRef={certificateRef}
+              fullData={fullData}
+              qrUrl={qrUrl}
+            />
           </div>
         </div>
 
         {/* 2. Label — Dynamic Size */}
         {/* Hidden Print Content */}
         <div className="hidden">
-          <div
-            ref={labelRef}
-            style={{
-              width: "100%",
-              height: "100%",
-              padding: "1mm",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              boxSizing: "border-box",
-            }}
-          >
-            <QRCodeCanvas
-              value={qrUrl}
-              size={512}
-              level="L"
-              margin={0}
-              style={{
-                width: qrSize,
-                height: qrSize,
-                maxWidth: "100%",
-                maxHeight: "100%",
-                objectFit: "contain",
-                imageRendering: "pixelated",
-              }}
-            />
-            <div
-              style={{
-                textAlign: "center",
-                fontWeight: "900",
-                color: "#000",
-                lineHeight: "1.1",
-                marginTop: "0.3mm",
-                width: qrSize,
-                fontSize:
-                  qrSize === "100%"
-                    ? "8pt"
-                    : `${Math.max(3.5, Math.min(16, parseInt(qrSize) * 0.32))}pt`,
-                whiteSpace: "normal",
-                wordBreak: "break-all",
-                fontFamily: "tahoma",
-              }}
-            >
-              <div style={{ marginBottom: "0.2mm" }}>{printOrderLabel}</div>
-            </div>
-          </div>
+          <PrintQrLabel
+            labelRef={labelRef}
+            qrUrl={qrUrl}
+            qrSize={qrSize}
+            printOrderLabel={printOrderLabel}
+          />
         </div>
       </div>
     </Modal>
