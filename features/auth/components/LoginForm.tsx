@@ -3,6 +3,7 @@
 import { submitForm } from "@/shared/forms/submit";
 
 import { signIn } from "@/features/auth/actions";
+import SeedGrowthAnimation from "./SeedGrowthAnimation";
 import {
   CheckCircleFilled,
   LoadingOutlined,
@@ -55,7 +56,7 @@ export default function Login() {
     >
       {/* 
         ========================================
-        LEFT PANEL: The "Living Glass Ecosystem"
+        RIGHT PANEL: Seed growth story
         ========================================
       */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-[#0f172a] flex-col justify-center items-center p-8 xl:p-12 text-white z-10 transition-colors duration-1000 perspective-1000">
@@ -74,106 +75,10 @@ export default function Login() {
           ></div>
         </div>
 
-        {/* --- Glass Ecosystem Visual --- */}
-        <div className="relative z-10 w-full max-w-lg h-[450px] flex items-center justify-center mb-0 scale-90 xl:scale-100 transition-transform duration-700">
-          {/* Center Hub */}
-          <div className="absolute z-20 w-80 bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-6 shadow-2xl animate-fade-in-up">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center text-emerald-300 overflow-hidden p-1">
-                <Image
-                  src="/fakoor-logo.png"
-                  alt="Logo"
-                  width={40}
-                  height={40}
-                  className="opacity-90 object-contain"
-                />
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-slate-100">Fakoor OS</h3>
-                <span className="text-xs text-emerald-400 font-mono">
-                  v2.4.0 • Live
-                </span>
-              </div>
-            </div>
-            <div className="h-24 w-full bg-gradient-to-t from-emerald-500/10 to-transparent rounded-xl border-b border-white/5 relative overflow-hidden mb-4">
-              <svg
-                className="absolute bottom-0 left-0 w-full h-16 text-emerald-400"
-                preserveAspectRatio="none"
-                viewBox="0 0 100 50"
-              >
-                <path
-                  fill="url(#grad1)"
-                  fillOpacity="0.4"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  d="M0,50 L0,30 Q10,20 20,35 T40,25 T60,10 T80,30 T100,20 L100,50 Z"
-                />
-                <defs>
-                  <linearGradient id="grad1" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop
-                      offset="0%"
-                      style={{ stopColor: "rgb(52, 211, 153)", stopOpacity: 1 }}
-                    />
-                    <stop
-                      offset="100%"
-                      style={{ stopColor: "rgb(52, 211, 153)", stopOpacity: 0 }}
-                    />
-                  </linearGradient>
-                </defs>
-              </svg>
-            </div>
-            <div className="flex justify-between text-xs text-slate-400">
-              <span>Status</span>
-              <span className="text-emerald-400 font-bold">Optimal</span>
-            </div>
-          </div>
-
-          {/* Orbiting Satellites */}
-          <div className="absolute top-20 -right-4 z-10 w-48 bg-slate-900/40 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-xl animate-float-delayed animation-delay-1000">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs text-slate-400 uppercase tracking-wider">
-                Climate
-              </span>
-              <div className="w-2 h-2 bg-orange-400 rounded-full animate-pulse"></div>
-            </div>
-            <div className="flex items-end gap-2">
-              <span className="text-3xl font-bold text-white">24°</span>
-              <span className="text-sm text-slate-400 mb-1">Celsius</span>
-            </div>
-          </div>
-
-          <div className="absolute bottom-32 -left-8 z-30 w-52 bg-slate-900/40 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-xl animate-float-slow animation-delay-500">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs text-slate-400 uppercase tracking-wider">
-                Active Zones
-              </span>
-              <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-            </div>
-            <div className="flex gap-2">
-              <div className="flex-1 bg-blue-500/20 rounded-lg p-2 text-center border border-blue-500/10">
-                <span className="block text-xs text-blue-300">A1</span>
-                <span className="block text-sm font-bold text-white">ON</span>
-              </div>
-              <div className="flex-1 bg-blue-500/20 rounded-lg p-2 text-center border border-blue-500/10">
-                <span className="block text-xs text-blue-300">A2</span>
-                <span className="block text-sm font-bold text-white">ON</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="absolute bottom-10 right-0 z-0 w-44 bg-slate-800/20 backdrop-blur-md border border-white/5 rounded-2xl p-4 shadow-lg animate-float-reverse scale-90 opacity-70">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-6 h-6 rounded-full bg-lime-500/20 flex items-center justify-center text-lime-400 text-xs">
-                🌱
-              </div>
-              <span className="text-xs text-lime-300">Growth</span>
-            </div>
-            <span className="text-xl font-bold text-white">Flowering</span>
-          </div>
-        </div>
+        <SeedGrowthAnimation />
 
         {/* --- Content Section --- */}
-        <div className="relative z-10 w-full max-w-lg mt-8 animate-fade-in-up animation-delay-200 text-center lg:text-right px-4">
+        <div className="relative z-10 w-full max-w-lg mt-6 animate-fade-in-up animation-delay-200 text-center lg:text-right px-4">
           <h2 className="text-3xl xl:text-4xl font-black mb-4 text-white leading-tight drop-shadow-lg">
             سامانه مدیریت هوشمند گلخانه <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-teal-200">
@@ -225,7 +130,7 @@ export default function Login() {
 
       {/* 
         ========================================
-        RIGHT PANEL: The Glass Control Interface
+        LEFT PANEL: The Glass Control Interface
         ========================================
       */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 relative">
