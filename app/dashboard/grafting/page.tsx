@@ -8,10 +8,11 @@ import { ToolOutlined } from "@ant-design/icons";
 
 export default async function GraftingPage() {
   const operations = await getAllGraftingOperations();
+  if (operations.status === "error") throw new Error(operations.message);
   const formData = await getGraftingFormData();
 
   return (
-    <div className="p-6">
+    <div className="dashboard-page">
       <PageHeader
         title="عملیات پیوند زنی"
         subtitle="مدیریت عملیات پیوند "

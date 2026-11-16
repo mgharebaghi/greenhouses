@@ -1,0 +1,174 @@
+UHF Reader Demo Software User Manual
+1. Summarize
+1.1 UHF Reader DEMO 
+We are supply the DEMO software include “Mr915ApiV20.dll” and “UHF Reader DEMO.exe”two part，please copy this two file on same table；
+1.2 UHF Reader DEMO Run
+First use UHF reader via RS232 or RJ45 connect with PC，and run on PC“UHF Reader DEMO.exe”software，after run will show you the following interface：
+
+2 DEMO Reader Operate
+2.1 Connect with Reader：
+a) Serial Port connection： select Comm Port (according to real connection Port to select) and Baudrate（9600～115200 optional），Addr Code default as“Generic”（function demonstration only select default setting）
+                    
+Click“Connect”button to connection，if connection success，Connect button will change to be grey color and this button will be disable，and Disconnect button change to be click enable. Meanwhile the information bar will show below information if operate success：
+
+     Specification：after connect success will show the information including reader’s version number, current power, current frequency and numbers of  current working antennas. 
+b)  RJ45 connection（TCP/IP）
+   Reader connect with network cable，then input the reader’s IP address and port number（default IP address can be searched when RS232 connect this software） 
+    
+Click“Connect”button to connect，if correct connection，Connect button will change to be grey and button click disable, and Disconnect button will change to click enable。Meanwhile will show below information if success：
+
+Specification：after connect success will show the information including reader’s version number, current power, current frequency and numbers of  current working antennas.  
+2.2  Setting（query）reader power and frequency
+  2.2.1 Query reader’s power and frequency：click“Query”button，it will show the reader current power and frequency, as below  chart A：
+  2.2.2 Set reader’s power and frequency：first select power parameter and frequency（CHINA:ISM902-928MHz、AMERICA:ISM902-928MHz、EUROPEAN:ISM865-868MHz），then click“Set”button：see below chart B   
+           
+Chart A                          Chart B
+2.3 Antenna set and query
+  2.3.1 Query  working antenna：click“Query”button，it show reader current working antenna；
+ 2.3.2 set working antenna：select working antenna，click“Set”button
+          
+
+
+
+
+
+
+
+
+
+
+
+
+3  ISO18000-6B tag operate
+  Click navigation bar ，it will show following interface：
+
+
+
+
+
+3.1 Tag identify
+
+
+
+Select identity tag times（default as continue）, tag identify the time（default is 10ms）then click  “Start” button，reader get to tag identify status，when read the tag will show as below:
+
+                                6B identify and details record
+
+Read the tag total numbers
+Note：the details record information include the tag’s ID, read time, antenna code, and read times；
+“Clear Tag List” button is for clear the read tag’s record；
+“Clear Info List”button is for clear the information of operate;
+3.2 Tag read and write
+ 	Tag read：this function is base on ISO18000-6B tag’s ID to read the tag’s content，first must select one tag(identify the tag first, and then select)，select the tag’s content start address (Address）, data length（Data Length）, then click“Read Data”button，if read success，the data will be shown in the below information bar，as below chart：
+
+Remark：ASCII option is valid，read the data is ASCII code，if not valid then it is hex data format。
+Tag Write： this function is base on ISO180006B tag’s ID to write tag，first must select one tag（identify the tag first, and then select），select the tag’s content start address（Address）, data length（Data Length），in“Data Input”bar input the data want to write（can be Chinese character，number or letter），then click“Write Data”button，after write success，successful information will be show in the bar as below：  
+
+
+
+
+3.3 Tag lock operate
+   Query tag lock：select query address，then click“Query Lock”, if query success the information will show in the information bar；
+   Lock tag operate：select the address that want to lock，then click“Lock Tag”, if lock success the information bar will show below；
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+4  ISO18000-6C(EPC-GEN2) tag operate
+Click navigation bar ，it will show following interface：
+
+ 
+4.1 Tag Identify
+
+
+
+
+
+Select identity tag times（default as continue）, tag identify the time（default is 10ms）then click “Start” button，reader get to tag identify status，when read the tag will show as below: 
+
+EPC multi tag identify success and detail record
+
+Identify tag total quantity
+Note：the details record information include the tag’s ID, read time, antenna code, and read times；
+“Clear Tag List” button is for clear the read tag’s record；
+“Clear Info List”button is for clear the information of operate;
+4.2 EPC GEN2 read and write operate
+
+
+4.2.1 EPC-GEN2 read 
+   Select Membank（Membank）, option include“KILL PWD”、“ACCESS PWD”、“EPC CODE”、“TID CODE”
+“USER DATA”，then select address“Address”and data length“Data Length”，click“Read Data”button，if read success the data will show in the information bar as below：
+
+
+
+
+
+
+
+
+
+
+
+EPC read success
+4.2.2 EPC-GEN2 Write
+
+
+
+
+
+
+   Select membank（Membank）, option include“KILL PWD”、“ACCESS PWD”、“EPC CODE”、“TID CODE”
+“USER DATA”，（different tag with different memeory）then select address“Address” and data length“Data Length”，in“Data Input”bar input the write data（HEX format），click“Write Data”button，if write success the data will be show in the information bar（when write success the reader will send out short beep）as below：
+
+
+                           
+
+
+
+
+
+
+4.3 EPC-GEN2 Initialize 
+Put the tag in the reader reading range，then click“Initalize Tag Data”button，
+See below information bar to show the result：
+
+
+
+
+4.4 EPC-GEN2 tag lock
+Select the write bank“Bank”, then click“Lock Tag”button，if lock success the information bar will show below，as below：
+
+                          
+Note：once the tag locked, it can’t unlock, only can lock the bank. 
+4.5 EPC-GEN2 tag kill
+Select bank“Bank”to【KILL PWD】, in“Passeord”bar input kill password，then click“Kill Tag”button，if the kill success it will show you below information：
+
+                         
+Remark：if the tag password is 0, it can’t be kill，once the tag be kill it can’t be use any more
+
+DEMO software additional function（configuration parameter数）
+Click navigation bar ，it show below interface:
+
+
+  	In this interface user can set the antenna, power and frequency，reader’s address（for RS485 to form network），IP address，input and output port configuration operate：
+  	Button function：
+【Default】:default parameter；
+【Query】：query reader current parameter；
+【Set】：set reader parameter
+【Reset】：reader reset；
+【Query Device Info】query reader version information；
+【Clear list】clear show list information；
+
+
+
+

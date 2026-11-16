@@ -15,7 +15,7 @@ export default function GrowthStagesDashboard({
   const [loading, setMainLoading] = useState<boolean>(false);
 
   return (
-    <div className="w-full h-full p-6">
+    <div className="dashboard-page">
       <PageHeader
         title="مراحل رشد"
         subtitle="مدیریت مراحل رشد انواع گیاهان"

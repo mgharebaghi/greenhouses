@@ -8,7 +8,8 @@ import {
   DownloadOutlined,
   QrcodeOutlined,
 } from "@ant-design/icons";
-import { Button, Modal, Select, Tooltip } from "antd";
+import Modal from "@/shared/components/ResponsiveModal";
+import { Button, Select, Tooltip } from "antd";
 import { useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
 
@@ -146,13 +147,13 @@ export default function WorkerQRModal({
         },
       }}
     >
-      <div className="flex flex-col items-center p-8 bg-white">
+      <div className="flex min-w-0 flex-col items-center p-4 sm:p-8 bg-white">
         <h3 className="text-xl font-extrabold text-slate-800 mb-8 mt-2">
           چاپ برچسب پیوندزن
         </h3>
 
         {/* QR Display */}
-        <div className="relative group mb-8">
+        <div className="relative group mb-6 w-fit max-w-full">
           <div className="p-4 bg-white border-[3px] border-slate-100 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
             <QRCodeCanvas
               value={qrUrl}
@@ -163,7 +164,7 @@ export default function WorkerQRModal({
           <Tooltip title="دانلود تصویر QR">
             <button
               onClick={handleDownloadQR}
-              className="absolute -left-4 -bottom-4 w-12 h-12 bg-white border border-slate-100 rounded-full shadow-lg flex items-center justify-center text-slate-600 hover:text-emerald-600 hover:scale-110 transition-all z-10 cursor-pointer"
+              className="absolute left-1 bottom-1 sm:-left-4 sm:-bottom-4 w-10 h-10 sm:w-12 sm:h-12 bg-white border border-slate-100 rounded-full shadow-lg flex items-center justify-center text-slate-600 hover:text-emerald-600 hover:scale-110 transition-all z-10 cursor-pointer"
             >
               <DownloadOutlined className="text-xl" />
             </button>
@@ -171,7 +172,7 @@ export default function WorkerQRModal({
         </div>
 
         {/* Data Display */}
-        <div className="w-full bg-slate-50/50 border border-slate-100 rounded-3xl p-6 mb-8">
+        <div className="w-full bg-slate-50/50 border border-slate-100 rounded-2xl p-3 sm:rounded-3xl sm:p-6 mb-5 sm:mb-8">
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1 border-b border-slate-200 pb-2">
               <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
@@ -201,8 +202,8 @@ export default function WorkerQRModal({
         </div>
 
         {/* Print Settings */}
-        <div className="bg-slate-50/50 border border-slate-100 rounded-3xl p-6 w-full shadow-sm">
-          <div className="grid grid-cols-2 gap-5 mb-5">
+        <div className="bg-slate-50/50 border border-slate-100 rounded-2xl p-3 sm:rounded-3xl sm:p-6 w-full shadow-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
             {/* Plant Type Dropdown */}
             <div className="flex flex-col gap-2 sm:col-span-2">
               <div className="flex items-center gap-2 text-slate-500 mb-1">

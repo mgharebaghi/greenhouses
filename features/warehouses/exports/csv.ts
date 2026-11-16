@@ -1,3 +1,4 @@
+import { formatPersianDate } from "@/shared/dates/calendar";
 import type { WarehouseRecord } from "../types/record";
 export const headers = [
   { displayLabel: "شناسه", key: "ID" },
@@ -14,8 +15,8 @@ export const headers = [
 export async function warehousesCSVData(source: WarehouseRecord[]) {
   return source.map((item) => ({
     ...item,
-    WarehouseCreatedAtFormatted: item.WarehouseCreatedAt
-      ? new Date(item.WarehouseCreatedAt).toLocaleDateString("fa-IR")
-      : "",
+    WarehouseCreatedAtFormatted: formatPersianDate(item.WarehouseCreatedAt, {
+      fallback: "",
+    }),
   }));
 }

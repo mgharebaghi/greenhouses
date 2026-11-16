@@ -13,17 +13,14 @@ export async function createPerson(
 ): Promise<PersonActionResponse> {
   try {
     await requireSession();
-    const data = parseInput(
-      personInputSchema.omit({ PersonCode: true }),
-      input,
-    );
+    const data = parseInput(personInputSchema, input);
     const person = await serializableTransaction(async (tx) => {
-      const previous = await tx.tbl_People.findFirst({
+      const previous = await tx.tbl_People_Companies.findFirst({
         orderBy: { ID: "desc" },
         select: { PersonCode: true },
       });
       const PersonCode = nextPersonCode(previous?.PersonCode);
-      return tx.tbl_People.create({
+      return tx.tbl_People_Companies.create({
         data: { ...data, PersonCode },
         include: { Tbl_PeoplePosts: { select: { PostName: true, ID: true } } },
       });

@@ -1,5 +1,7 @@
 "use client";
 
+import { formatPersianDate } from "@/shared/dates/calendar";
+
 import { ActionFailure, runDeletion } from "@/shared/forms/delete-record";
 
 import type { OrderDetails } from "../types/details";
@@ -9,9 +11,6 @@ import InsertionRow from "@/shared/components/InsertionRow";
 import Table from "@/shared/components/Table";
 import TableActions from "@/shared/components/TableActions";
 import OrdersFormModal from "./OrdersFormModal";
-// User requested specific QR layout for orders
-// So I will create a specific OrdersQRModal later in the plan.
-// For now I'll use a placeholder.
 import { deleteOrder } from "@/features/orders/actions";
 import { EyeOutlined, QrcodeOutlined } from "@ant-design/icons";
 import { Button, Tooltip } from "antd";
@@ -24,7 +23,7 @@ interface OrdersTableProps {
   loading: boolean;
   setLoading: (loading: boolean) => void;
   setData: (data: OrderDetails[]) => void;
-  refreshData: () => void;
+  refreshData: () => void | Promise<void>;
 }
 
 export default function OrdersTable({
@@ -131,9 +130,7 @@ export default function OrdersTable({
       title: "تاریخ ثبت",
       key: "OrderDate",
       render: (_: unknown, record: OrderDetails) =>
-        record.OrderDate
-          ? new Date(record.OrderDate).toLocaleDateString("fa-IR")
-          : "—",
+        formatPersianDate(record.OrderDate),
     },
     {
       title: "عملیات",
@@ -176,9 +173,6 @@ export default function OrdersTable({
         setLoading={setLoading}
         data={formModal.data}
         refreshData={refreshData}
-        onSuccess={(id) => {
-          setQrModal({ open: true, data: { ID: id, OrderCode: "New Order" } });
-        }}
       />
 
       <OrdersQRModal

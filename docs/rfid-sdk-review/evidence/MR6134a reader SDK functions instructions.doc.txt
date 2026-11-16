@@ -1,0 +1,146 @@
+MR6134A 4-antennas reader SDK functions instructions
+
+DLL documents name：Mr915ApiV20.dll
+1 Reader management functions
+1.1ConnectReader
+Functions instructions |   ConnectReader (HANDLE &hPort,int nTransMode,int nNetPort,LPCTSTR strReaderIP,LPCTSTR strSerialNum); |  | Function |  Initialize equipment COMM connect and deploy reader 'baud rate and others parameters |  | Parameter | strSerialNum: Com serial Number hPort:PC connect reader' effective control code,nTransMode: communication mode choose(0-TCP communication;1-RS232 COMM communication),int nNetPort:TCP Commuication' internet interface No(Default:100),strReaderIP: reader' hardware IP address ( default:192.168.1.200) |  | Return Value | See attachment on  page 14 |  | 1.2Disconnect
+Function instructions |   Disconnect (HANDLE hPort) |  | Function |  Close comm,disconnect connect  |  | Parameter | hPort- Have opened interface control code |  | Return Value | See attachment on  page 14 |  | Example |  |  | 1.3 SetBaudRate
+Function
+instructions |  SetBaudRate(HANDLE hPort, USHORT usBaudRate, BYTE byReaderAddr) |  | Function | Set reader's baud rate |  | Parameter | usBaudRate：Baud rate code。0~4 separate show:9600、19200、38400、57600and 115200。
+byReaderAddr：reader address，Use for fixed reader RS485，Default 0XFF(handheld reader and module is invalid parameter) |  | Return Value | See attachment on  page 14 |  | Example |  |  | 1.4 Reset
+Function instructions |   ResetReader (HANDLE hPort, BYTE byReaderAddr) |  | Function | Reader Reset |  | Parameter | byReaderAddr：reader address，Use for fixed reader RS485，Default 0XFF(handheld reader and module is invalid parameter) |  | Return Value | See attachment on  page 14 |  | Example |  |  | 1.5 GetFirmwareVersion
+Function instructions |   GetFirmwareVersion (HANDLE hPort, BYTE &byMajor,BYTE &byMinor, BYTE byReaderAddr) |  | Function |  Read the reader's firmware version number |  | Parameter | byMajor: major version information
+byMinor：minor version information pointer |  | Return Value | See attachment on  page 14 |  | Example |  |  | 1.6 SetRf
+Functions instructions |  SetRf(HANDLE hPort,BYTE byPower,BYTE byFreqType,BYTE byReaderAddr) |  | Function | Set reader's power and frequency parameter |  | Parameter | byPower: power value,dereference 0-30,corresponding 0-30dBm
+byFreqType:dereference 0 as China standard(920MHz-925MHz),dereference 1as America standard(902M-928M) others are special type(i.e.868MHz),refer to special specification) |  | Return Value | See attachment on  page 14 |  | Example |  |  | 1.7 GetRf
+Function instructions |  GetRf(HANDLE hPort,BYTE &byPower,BYTE &byFreqType,BYTE byReaderAddr) |  | Function | Read the reader's current RF parameter |  | Parameters | byPower ：Power value pointer
+byFreqType：Frequency type printer |  | Return Value | See attachment on  page 14 |  | Example |  |  | 1.6 SetAntenna
+Function instructions |  SetAntenna(HANDLE hPort,BYTE byAntenna,BYTE byReaderAddr) |  | Function |  Set reader's power and frequency parameters |  | Parameters | byAntenna：antenna   No , get value as 0-4, suited 4 antenna interface at most  |  | Return value | See attachment on  page 14 |  | Example |  |  | 1.7 GetAntenna
+Functions instructions |  GetAntenna(HANDLE hPort,BYTE &byAntenna,BYTE byReaderAddr) |  | Function | Set reader ' current RF parameter |  | Parameter | byAntenna：antenna   No , get value as 0-4, suited 4 antenna interface at most  |  | Return Value | See attachment on  page 14 |  | Example |  |  | 1.8 GetInput
+Function instructions | GetInput(HANDLE hPort,INPUT_LEVEL &inValue,BYTE byReaderAddr); |  | Function | Inquiry reader ' imput interface level state |  | Parameters | INPUT_LEVEL structure:
+{
+	BYTE byLevel[8];	//	  input COMM level state,0-7 each unit suit to a input COMM,1 shows high level,0 shows low level(4-antennas reader only 0,1 two input COMM are effective)
+}
+ |  | Return Value | See attachment on  page 14 |  | Example |  |  | 1.9 SetOutPort
+Function instructions |  SetOutPort(HANDLE hPort, BYTE byPortNum, BYTE byLevel, BYTE byReaderAddr); |  | Function |  Set reader output COMM high-low level  |  | Parameters | byPortNum is COMM NO(0-3),byLevel is output level( 0 is low level,1 is high level) |  | Return Value | See attachment on  page 14 |  | Example |  |  | 2.0 GetParameter
+Function instructions | GetParameter(HANDLE hPort,BYTE byType,BYTE &byValue,BYTE byReaderAddr); |  | Function |  Inquiry  reader ' basical parameter' setting  |  | Parameter | By type is parameters setting type that need to inquiry ,including the following definitions:
+
+PARAM_INDICATE		0x01	//	Identification Hint 
+PARAM_READER_ADDR	0x02	//	Reader address-RS485 communication use
+
+byValue is related return parameters values
+PARAM_INDICAT Type ,byValue  ' the lowest binary digit  :  1 shows have "buzzer" hint settings, 0 shows no 'buzzer" hint.
+PARAM_READER_ADDR type. byValue is 0-240 value,shows reader' 485 Communication address code. |  | Return Value | See attachment on  page 14 |  | Example |  |  | 2.1 SetParameter
+Function Instructions | SetParameter(HANDLE hPort,BYTE byType,BYTE byValue,BYTE byReaderAddr); |  | Function | Setting reader' basical parameters |  | Parameters | By type is parameters setting type that need to inquiry ,including the following definitions:
+
+PARAM_INDICATE		0x01	//	Identification Hint 
+PARAM_READER_ADDR	0x02	//	Reader address-RS485 communication use
+
+byValue is related return parameters values
+PARAM_INDICAT Type ,byValue  ' the lowest binary digit  :  1 shows have "buzzer" hint settings, 0 shows no 'buzzer" hint.
+PARAM_READER_ADDR type. byValue is 0-240 value,shows reader' 485 Communication address code. |  | Return value | See attachment on  page 14 |  | Example |  |  | 2.2 GetNetSetting
+Function Instructions | GetNetSetting(HANDLE hPort,NET_SETTING &nsNetSetting,BYTE byReaderAddr); |  | Function | Inquiry reader' TCP internet communication COM ' IP address code ,subnet mask,Default Gateway,TCP com parameters |  | Parameters | NET_SETTING structure：
+{
+	BYTE byIpValue[4];	    //IPaddress
+	BYTE byMarkValue[4];	//subnet mask
+	BYTE byGateValue[4];  	//default gateway
+	int	 m_nPort;		    //Com No
+}
+ |  | Return Value | See attachment on  page 14 |  | Example |  |  | 2.3 SetNetSetting
+Function Instructions | SetNetSetting(HANDLE hPort,NET_SETTING nsNetSetting,BYTE byReaderAddr); |  | Function | Inquiry reader' TCP internet communication COM ' IP address code ,subnet mask,Default Gateway,TCP com parameters |  | Parameters | NET_SETTING structure：
+{
+	BYTE byIpValue[4];	    //IP address
+	BYTE byMarkValue[4];	//subnet mask
+	BYTE byGateValue[4];  	//Default gateway
+	int	 m_nPort;		    //COM No
+}
+ |  | Return Value | See attachment on  page 14 |  | Example |  |  | 
+2 ISO18000-6B tags operation Functions
+2.1 IsoMultiTagIdentify
+Function Instructions |  IsoMultiTagIdentify(HANDLE hPort,short &nCount, TAGS_CONTROL *taTags, BYTE byReaderAddr ) |  | Function | ISO18000-6B multi-tag identification contains repeat data filtration. Please use ClearIDBuffer functions to clearing reader’s internal buffer before restart new operation of multi-tag identification.  |  | Parameters | nCount：Reading tags' quantity this time ; ta Tags: Reading tags' data,then store in the form of Taglds
+TAGS_CONTROL Structure：
+{
+BYTE byyLabelType;		//	Tag type：1=ISO18000-6B tag， 2=ISO18000-6C/EPC tag
+BYTE byyAntenna;		//	Antennas No（Related multi-antennas reader）
+BYTE byyLabelID[8];		//	ISO18000-6B tags ID number
+BYTE byyLabelEPC[12];	//	ISO18000-6C/EPC tags' EPC code
+} |  | Return Values | See attachment on  page 14 |  | Example |  |  | 2.4 IsoReadWithID
+Function Instruction |  IsoReadWithID(HANDLE hPort, ReadControl  ReadCtrl, TAGDATA_CONTROL &tdData, BYTE ReaderAddr); |  | Function |  Reading appointed ID number' tags data, each time reading appointed address ' beginning 8bytes data  |  | Parameteres | ReadControl structure
+{
+BYTE TagID[8]
+BTYE byAddress
+BYTE byAntenna
+}
+TAGDATA_CONTROLstructure：
+{
+BYTE byyAntenna;		//	Antennas No（Related multi-antennas reader）
+
+BYTE byLabelData[8];	//	ISO18000-6B tags inside store data
+} |  | Return Value | See attachment on  page 14 |  | Example |  |  | 2.5 IsoWriteWithID
+Function Instructions |  IsoWriteWithID(HANDLE hPort, WriteControl WriteCtrl, BYTE ReaderAddr) |  | Function | Write data into appointed tags |  | Parameter | TagID，8 bytesUID；
+WriteControl structure
+{
+BYTE TagID[8]   //  Tags' ID
+BTYE byAddress // write into address
+BYTE byValue[4]   // Write into data .that only need to add the first byte |  | Return Value | See attachment on  page 14 |  | Example |  |  | 2.8 IsoBlockWrite
+Function Instructions |  IsoBlockWrite(HANDLE hPort, WriteControl WriteCtrl, BYTE ReaderAddr) |  | Function | Successive write 4 bytes contexts into appointed address  |  | Parameter | WriteControl structure
+{
+BYTE TagID[8]   // Tags' ID
+BTYE byAddress // write into address，must be  4bytes multiple
+
+BYTE byValue[4] //  write into data,4 bytes
+} |  | Return Value | See attachment on  page 14 |  | Example |  |  | 2.6 IsoLockTag
+Function Instruction |  IsoLockTag(HANDLE hPort ,BYTE byRomAddr, BYTE ReaderAddr) |  | Function  | Lock and write for appointed tags' address,once locked ,this address cannot unlock again |  | Parameters | iRomAddr， Need to lock writing' tags address  |  | Return value | See attachment on  page 14 |  | Example |  |  | 2.7 IsoQueryLock
+Function instruction |  IsoQueryLock(HANDLE hPort, BYTE byRomAddr,BYTE &byIsLocked, BYTE ReaderAddr) |  | Function | Query appointed address if is locked or not |  | Parameter | byRomAddr，Query address；byIsLocked，Return status，0 is not locked ,1 is locked |  | Return Value | See attachment on  page 14 |  | Example |  |  | 
+3 EPC GEN2 Tag Operation Function
+3.1 Gen2MultiTagIdentify
+Function Instruction |  Gen2MultiTagIdentify(HANDLE hPort, short &nCount, TAGS_CONTROL *taTags, BYTE byReaderAddr ) |  | Function | EPC GEN2 multi-tag identification contains repeat data filtration |  | Parameters | nCount: Reading tags' quantity this time ; ta Tags: Reading tags' data,then store in the form of Taglds
+TAGS_CONTROL structure：
+{
+BYTE byyLabelType;		//	Tag type：1=ISO18000-6B tag， 2=ISO18000-6C/EPC tag
+BYTE byyAntenna;		//	Antennas No（Related multi-antennas reader）
+BYTE byyLabelID[8];		//	ISO18000-6B tags' ID number
+BYTE byyLabelEPC[12];	//	ISO18000-6C/EPC tags' EPC code
+} |  | Return Value | See attachment on  page 14 |  | Example |  |  | 3.2 Gen2WriteEPC
+Function Instruction |  Gen2WriteEPC(HANDLE hPort , EPCWriteControl byWriteCtrl, BYTE ReaderAddr) |  | Function | EPC GEN2 tag:EPC write data,write 1 word(2 bytes) data on each time |  | Input Parameter | EPCWriteControl structure
+{
+BTYE byWordPtr // write into address，Word as a unit
+BYTE byValue[2] //  data written, 2 bytes
+} |  | Return Value | See attachment on  page 14 |  | Example |  |  | 3.3 Gen2LockTag
+Function Instruction |  Gen2LockTag(HANDLE hPort,BYTE byMemBank = 1, Byte ReaderAddr) |  | Function | Write and lock operation to EPC tag,write and lock one area each time |  | Input parameter | byMemBank lock area，0 is reserved area，1 is EPC area，2 is TID area，3 is user area |  | Return Value | See attachment on  page 14 |  | Example |  |  | 3.4 Gen2KillTag
+Function Instruction |  Gen2KillTag(HANDLE hPort ,unsigned int PassWord, BYTE ReaderAddr) |  | Function  | EPC GEN2 kill tags |  | Input parameter | PassWord，Totally have 32bytes kill password, Tags cannot killed if its all password are all 0 |  | Return | See attachment on  page 14 |  | Example |  |  | 3.5 Gen2InitEPCSize
+Function Instruction |  Gen2InitEPCSize(HANDLE hPort, BYTE byWordCount = 6, BYTE ReaderAddr) |  | Function | 并赋值为全0  Initialize EPC code length ,default initialization as 96bits(6 bytes), and all values are 0 |  | Input parameter | byWordCount， initialized number(1 word=2bytes) |  | Return Value | See attachment on  page 14 |  | Example |  |  | 3.7 Gen2ReadBlock
+Function Instruction |  Gen2ReadBlock(HANDLE hPort, EPC_READ_CONTROL epcReadCtrl,EPC_LABEL_VALUE &epcValue, BYTE ReaderAddr ) |  | Function |  Reading EPC tags' TID code,not all tags have TID code |  | Input  | ；；epcValue，Reading' data，：Seeing belows structure definition:
+EPC_READ_CONTROL 
+{ 
+	BYTE byMembank; // Membank，reading area（kill password and query password area is 0，EPC coding area is 1，TID area is 2，USEr area is 3）
+	BYTE byWordPtr;  // reading data address, word is a unit (Word=2 Byte)
+	BYTE byWordCnt;  //  (reading length(only are effective when operating in user area , when reading others area, no need to length
+}
+EPC_LABEL_VALUE
+{
+BYTE byKillPWD[4];  //  Tag ' kill password，4 bytes，2 word
+BYTE byAccessPWD[4];//  Tag' query password，4 bytes，2 word
+BYTE byLabelEPC[12];	//	Tag' EPC code ，6 word，12 bytes
+BYTE byLabelTID[8];	//	Tag'TID code，8bytes
+BYTE byMemoData[16];//	Tag' user data area(Can support 16 bytes,8 word at the most
+} |  | Return Value | See attachment on  page 14 |  | Example |  |  | 
+3.8 Gen2BlockWrite
+Function Instruction |  Gen2BlockWrite(HANDLE hPort,EPC_WRITE_CONTROL epcWriteCtrl , BYTE ReaderAddr ) |  | Function | EPC GEN2 tag block write |  | Parameters | epcValue data and parameter that need to wrte，Seeing belows structure definition:
+EPC_WRITE_CONTROL 
+{
+    BYTE byMembank; // writing area, kill password and query password area is 0,EPC code is 1,user area is 3
+BYTE byWordPtr;  // Writing into word address 0-7,only need to appointed write into user area
+BYTE byWordLen;  //Writing into data length,only need to appointed write into user area( the maximum related to tags' supporting length, normal tags only support the largest 2 bytes
+BYTE byKillPWD[4];  // Tag ' kill password，4 bytes，2 word
+BYTE byAccessPWD[4];// Tag' query password，4 bytes，2 word
+	BYTE byLabelEPC[12];	//Tag' EPC code ，6 word，12 bytes
+	BYTE byMemoData[16];//	Tag' user data area(Can support 16 bytes,8 word at the most
+} |  | Return Value | See attachment on  page 14 |  | Example |  |  | 
+4 Tags' data processing function
+4.2 ClearIDBuffer
+Function Instruction |  ClearIDBuffer(HANDLE hPort,BYTE byReaderAddr); |  | Function | Clear reader tags data buffer area,It can be used before multi-tags identification each time  |  | Parameters |  |  | Return Value | See attachment on  page 14 |  | Example | 参见实例2.1 |  | 4.3 QueryIDCount
+Function Instruction |  QueryIDCount(HANDLE hPort,BYTE &byCount,BYTE ReaderAddr); |  | Function | Query tags' quantity when buffering  |  | Parameters | Count， Return tags' quantity pointer |  | Return Value | See attachment on  page 14 |  | Example |  |  | 
+5 API  Returning parameters constant definition 
+
+FUCCESS_RETURN | 2001 | Operation successfully return,operation finish |  |  |  |  |  | ERR_NOTAG_RETURN | 2002 | No tag |  | ERR_HANDLE_VALUE | 2003 | Wrong COM Control Code |  | ERR_UDATA_LEN | 2004 | Appointed data length wrong |  | ERR_UDATA_ADDRESS | 2006 | Appointed data address wrong |  | ERR_RDATA_LEN | 2007 | To receiving data length is not suited  |  | ERR_SDATA_FAIL | 2008 |  data format wrong  |  | ERR_SCMND_FAIL | 2009 |  To send order fail |  | ERR_READ_FAIL | 2010 |  To read tags fail |  | ERR_WRITE_FAIL | 2011 | To write tags fail |  | ERR_LOCK_FAIL | 2012 |  To lock tags fail |  | ERR_EREASE_FAIL | 2013 | To erase tags fail |  | ERR_PORT_OPENED | 2014 | To open registering form fail |  | ERR_OPEN_REGSTER | 2015 | Interface have openned ,control code is not INVALID_HANDLE_VALUE |  | ERR_LOAD_INI_LOST | 2016 | Equipment messages cannot be found or reading fail,key parameters cannot be initialized |  | ERR_DEV_INIT_FAIL | 2017 | To initialize equipment fail |  | ERR_PORT_OPEN_FAIL | 2018 | Open interface fail |  | ERR_PORT_CLOSE_FAIL | 2019 |  Close interface fail |  |  |  |  |  | ERR_OUT_PARA_LEN | 2020 | Parameter' data length is beyond |  | ERR_GET_PARA_FAIL | 2021 |  Query equipment parameters fail |  | ERR_SET_PARA_FAIL | 2022 | Set equipment parameters fail |  |  |  |  |  | ERR_OTHER_FAIL | 2000 |  Others unknown wrong |  | 

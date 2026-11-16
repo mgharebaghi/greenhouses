@@ -1,12 +1,13 @@
 "use server";
+import { readError } from "@/server/actions/errors";
 import { requireSession } from "@/server/auth/require-session";
 
 import { prisma } from "@/server/db/prisma";
 import type { NurseryRoomRecord } from "../types/record";
 
 export async function getAllNurseryRooms(): Promise<NurseryRoomRecord[]> {
-  await requireSession();
   try {
+    await requireSession();
     const nurseryRooms = await prisma.tbl_NurseryRoom.findMany({
       orderBy: {
         ID: "desc",
@@ -22,16 +23,15 @@ export async function getAllNurseryRooms(): Promise<NurseryRoomRecord[]> {
     }));
     return safeNurseryRooms;
   } catch (error) {
-    console.error("Query failed", error);
-    throw new Error("دریافت اطلاعات انجام نشد. لطفاً دوباره تلاش کنید.");
+    throw readError(error);
   }
 }
 
 export async function getNurseryRoomById(
   id: number,
 ): Promise<NurseryRoomRecord | null> {
-  await requireSession();
   try {
+    await requireSession();
     const nurseryRoom = await prisma.tbl_NurseryRoom.findUnique({
       where: { ID: id },
     });
@@ -46,7 +46,6 @@ export async function getNurseryRoomById(
       LightHoursPerDay: nurseryRoom.LightHoursPerDay?.toNumber() ?? null,
     };
   } catch (error) {
-    console.error("Query failed", error);
-    throw new Error("دریافت اطلاعات انجام نشد. لطفاً دوباره تلاش کنید.");
+    throw readError(error);
   }
 }

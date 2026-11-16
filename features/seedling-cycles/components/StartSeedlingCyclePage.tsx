@@ -13,7 +13,7 @@ export default async function StartSeedlingCyclePage() {
   const greenhouses = await getGreenhousesForSelect();
 
   return (
-    <div className="p-6">
+    <div className="dashboard-page">
       <PageHeader
         title="شروع سیکل نشاء"
         subtitle="مدیریت عملیات انتقال سینی‌ها به گلخانه"

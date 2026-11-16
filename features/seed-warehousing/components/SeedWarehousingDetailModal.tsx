@@ -1,5 +1,7 @@
 "use client";
 
+import { formatPersianDate } from "@/shared/dates/calendar";
+
 import type { WarehouseTransactionDetails } from "../types/details";
 
 import DetailModal, { InfoCard } from "@/shared/components/DetailModal";
@@ -10,10 +12,6 @@ import {
   InfoCircleOutlined,
 } from "@ant-design/icons";
 import { Tag } from "antd";
-import dayjs from "dayjs";
-import jalaliday from "jalaliday";
-
-dayjs.extend(jalaliday);
 
 interface DetailModalProps {
   open: boolean;
@@ -27,11 +25,6 @@ export default function SeedWarehousingDetailModal({
   data,
 }: DetailModalProps) {
   if (!data) return null;
-
-  const formatDate = (date: string | Date | null | undefined) => {
-    if (!date) return "—";
-    return dayjs(date).calendar("jalali").locale("fa").format("YYYY/MM/DD");
-  };
 
   const trxType = data.TransactionType
     ? { text: "ورودی", color: "green" }
@@ -60,7 +53,9 @@ export default function SeedWarehousingDetailModal({
             },
             {
               label: "تاریخ تراکنش",
-              value: formatDate(data.TransactionDate),
+              value: formatPersianDate(data.TransactionDate, {
+                kind: "timestamp",
+              }),
             },
             { label: "تعداد بسته", value: data.PackageQuantity },
           ]}

@@ -17,6 +17,7 @@ import {
 import { Button } from "antd";
 import { download, generateCsv, mkConfig } from "export-to-csv";
 import { useState } from "react";
+import { supplierName } from "../domain/name";
 import { headers, suppliersCSVData } from "../exports/csv";
 import type { SupplierDTO } from "../types";
 import SupplierFormModal from "./SupplierFormModal";
@@ -70,8 +71,17 @@ export default function SuppliersTable({
     {
       title: "نام شرکت / شخص",
       key: "Name",
-      render: (_: unknown, r: SupplierDTO) =>
-        r.CompanyName || `${r.FirstName || ""} ${r.LastName || ""}`,
+      render: (_: unknown, r: SupplierDTO) => supplierName(r),
+    },
+    {
+      title: "نوع شخص",
+      key: "Legal",
+      render: (_: unknown, record: SupplierDTO) =>
+        record.Legal == null
+          ? "بدون شخص مرتبط"
+          : record.Legal
+            ? "حقوقی"
+            : "حقیقی",
     },
     { title: "برند", dataIndex: "BrandName", key: "BrandName" },
     { title: "شماره مجوز", dataIndex: "LicenseNumber", key: "LicenseNumber" },
@@ -90,7 +100,7 @@ export default function SuppliersTable({
               onClose: () => setDeleteModal(null),
               deleteLoading,
               id: record.ID,
-              name: record.CompanyName || record.FirstName || "تامین کننده",
+              name: supplierName(record),
               onDelete: () => handleDelete(record.ID),
               msg: deleteMsg,
             });
@@ -173,10 +183,7 @@ export default function SuppliersTable({
         <DetailModal
           open={viewModal}
           onClose={() => setViewModal(false)}
-          title={
-            viewRecord.CompanyName ||
-            `${viewRecord.FirstName || ""} ${viewRecord.LastName || ""}`
-          }
+          title={supplierName(viewRecord)}
           icon={<ShopOutlined />}
           gradientFrom="emerald"
           gradientTo="teal"
@@ -188,22 +195,27 @@ export default function SuppliersTable({
             items={[
               {
                 label: "نوع شخص",
-                value: viewRecord.Legal ? (
-                  <>
-                    <CheckCircleOutlined className="text-emerald-500 ml-1" />{" "}
-                    حقوقی
-                  </>
-                ) : (
-                  <>
-                    <UserOutlined className="text-blue-500 ml-1" /> حقیقی
-                  </>
-                ),
+                value:
+                  viewRecord.People_CompaniesID == null ? (
+                    "شخص مرتبط انتخاب نشده"
+                  ) : viewRecord.Legal ? (
+                    <>
+                      <CheckCircleOutlined className="text-emerald-500 ml-1" />{" "}
+                      حقوقی
+                    </>
+                  ) : (
+                    <>
+                      <UserOutlined className="text-blue-500 ml-1" /> حقیقی
+                    </>
+                  ),
               },
               { label: "نام شرکت", value: viewRecord.CompanyName },
               { label: "برند", value: viewRecord.BrandName },
               {
-                label: "نام شخص",
-                value: `${viewRecord.FirstName || ""} ${viewRecord.LastName || ""}`,
+                label: viewRecord.Legal ? "نام مدیرعامل" : "نام شخص",
+                value: [viewRecord.FirstName, viewRecord.LastName]
+                  .filter(Boolean)
+                  .join(" "),
               },
               { label: "شماره مجوز", value: viewRecord.LicenseNumber },
             ]}

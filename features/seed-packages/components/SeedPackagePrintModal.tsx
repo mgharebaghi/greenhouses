@@ -1,9 +1,13 @@
 "use client";
 
+import { formatPersianDate } from "@/shared/dates/calendar";
+import { useServerDay } from "@/shared/dates/ServerClock";
+
 import type { SeedPackageDetails } from "../types/details";
 
 import { CloseOutlined, PrinterOutlined } from "@ant-design/icons";
-import { Button, Modal } from "antd";
+import Modal from "@/shared/components/ResponsiveModal";
+import { Button } from "antd";
 import { useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 
@@ -19,6 +23,7 @@ export default function SeedPackagePrintModal({
   data,
 }: SeedPackagePrintModalProps) {
   const componentRef = useRef<HTMLDivElement>(null);
+  const today = useServerDay();
 
   const handlePrint = useReactToPrint({
     contentRef: componentRef,
@@ -46,16 +51,16 @@ export default function SeedPackagePrintModal({
       }
       width={600}
       centered
-      className="print-modal"
+      className="print-modal seed-package-preview"
     >
       <div className="flex flex-col gap-6 p-2">
         {/* Print Preview Area - Kept White intentionally to represent Paper */}
         <div
           ref={componentRef}
-          className="bg-white p-8 border-2 border-slate-100 dark:border-slate-800 rounded-xl relative z-10"
+          className="seed-package-sheet bg-white p-8 border-2 border-slate-100 dark:border-slate-800 rounded-xl relative z-10"
           dir="rtl"
         >
-          <div className="border-4 border-double border-emerald-800 p-6 relative overflow-hidden">
+          <div className="seed-package-sheet-frame border-4 border-double border-emerald-800 p-6 relative overflow-hidden">
             {/* Watermark/Background decoration */}
             <div className="absolute top-0 left-0 w-24 h-24 bg-emerald-100/50 -translate-x-12 -translate-y-12 rotate-45"></div>
             <div className="absolute bottom-0 right-0 w-24 h-24 bg-emerald-100/50 translate-x-12 translate-y-12 rotate-45"></div>
@@ -74,7 +79,7 @@ export default function SeedPackagePrintModal({
             </div>
 
             {/* Content Grid */}
-            <div className="grid grid-cols-2 gap-x-8 gap-y-4 mb-6">
+            <div className="seed-package-sheet-fields grid grid-cols-2 gap-x-8 gap-y-4 mb-6">
               <PrintRow label="شماره سریال" value={data.SerialNumber} />
               <PrintRow
                 label="تامین کننده"
@@ -99,11 +104,7 @@ export default function SeedPackagePrintModal({
               />
               <PrintRow
                 label="تاریخ بسته‌بندی"
-                value={
-                  data.PackagingDate
-                    ? new Date(data.PackagingDate).toLocaleDateString("fa-IR")
-                    : "—"
-                }
+                value={formatPersianDate(data.PackagingDate)}
               />
               <PrintRow label="درجه کیفی" value={data.QualityGrade} />
               <PrintRow
@@ -116,26 +117,18 @@ export default function SeedPackagePrintModal({
               />
               <PrintRow
                 label="تاریخ تولید"
-                value={
-                  data.ProductionDate
-                    ? new Date(data.ProductionDate).toLocaleDateString("fa-IR")
-                    : ""
-                }
+                value={formatPersianDate(data.ProductionDate, { fallback: "" })}
               />
               <PrintRow
                 label="تاریخ انقضا"
-                value={
-                  data.ExpirationDate
-                    ? new Date(data.ExpirationDate).toLocaleDateString("fa-IR")
-                    : ""
-                }
+                value={formatPersianDate(data.ExpirationDate, { fallback: "" })}
               />
             </div>
 
             {/* Footer */}
             <div className="mt-8 pt-4 border-t-2 border-emerald-800/20 flex justify-between items-end">
               <div className="text-xs text-slate-500">
-                <p>تاریخ چاپ: {new Date().toLocaleDateString("fa-IR")}</p>
+                <p>تاریخ چاپ: {formatPersianDate(today)}</p>
                 <p>این برگه به منزله سند اصالت کالا می‌باشد.</p>
               </div>
               <div className="text-center">
@@ -178,7 +171,7 @@ export default function SeedPackagePrintModal({
         </div>
 
         {/* Actions */}
-        <div className="flex justify-end gap-3 pt-2 border-t border-slate-100 dark:border-slate-700">
+        <div className="flex flex-wrap justify-end gap-3 pt-2 border-t border-slate-100 dark:border-slate-700">
           <Button
             onClick={handleClose}
             size="large"

@@ -32,7 +32,7 @@ export default function TableActions({
   viewTitle,
 }: TableActionsProps) {
   return (
-    <div className="flex gap-3 items-center">
+    <div className="flex min-w-0 flex-wrap items-center gap-1.5 sm:gap-2 [&>button]:shrink-0">
       {onView && (
         <button
           onClick={onView}

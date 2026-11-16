@@ -1,4 +1,5 @@
 "use server";
+import { readError } from "@/server/actions/errors";
 import { requireSession } from "@/server/auth/require-session";
 
 import { prisma } from "@/server/db/prisma";
@@ -7,58 +8,76 @@ import { peopleReadDTO } from "../schema";
 import { PersonActionResponse, PersonPostResponse } from "../types";
 
 export async function getPeople(): Promise<PersonActionResponse> {
-  await requireSession();
-  const people = await prisma.tbl_People.findMany({
-    include: {
-      Tbl_PeoplePosts: { select: { PostName: true, ID: true } },
-    },
-    orderBy: { ID: "desc" },
-  });
+  try {
+    await requireSession();
+    const people = await prisma.tbl_People_Companies.findMany({
+      include: {
+        Tbl_PeoplePosts: { select: { PostName: true, ID: true } },
+      },
+      orderBy: { ID: "desc" },
+    });
 
-  if (!people) {
+    const peopleParsed = z.array(peopleReadDTO).parse(people);
+
     return {
-      status: "error",
-      message: "جدول اشخاص خالی میباشد",
+      status: "ok",
+      message: "اشخاص با موفقیت دریافت شدند",
+      dta: peopleParsed,
     };
+  } catch (error) {
+    throw readError(error);
   }
+}
 
-  const peopleParsed = z.array(peopleReadDTO).parse(people);
-
-  return {
-    status: "ok",
-    message: "مالکین با موفقیت دریافت شد",
-    dta: peopleParsed,
-  };
+// Existing order and greenhouse foreign keys reference Tbl_People.
+export async function getLegacyPersonOptions() {
+  try {
+    await requireSession();
+    return await prisma.tbl_People.findMany({
+      select: { ID: true, FirstName: true, LastName: true, NationalCode: true },
+      orderBy: { ID: "desc" },
+    });
+  } catch (error) {
+    throw readError(error);
+  }
 }
 
 export async function getPersonsPosts(): Promise<PersonPostResponse> {
-  await requireSession();
-  const posts = await prisma.tbl_PeoplePosts.findMany({});
+  try {
+    await requireSession();
+    const posts = await prisma.tbl_PeoplePosts.findMany({});
 
-  if (!posts) {
+    if (!posts) {
+      return {
+        status: "error",
+        message: "جدول اشخاص خالی میباشد",
+      };
+    }
+
     return {
-      status: "error",
-      message: "جدول اشخاص خالی میباشد",
+      status: "ok",
+      message: "سمت ها با موفقیت دریافت شد",
+      dta: posts,
     };
+  } catch (error) {
+    throw readError(error);
   }
-
-  return {
-    status: "ok",
-    message: "سمت ها با موفقیت دریافت شد",
-    dta: posts,
-  };
 }
 
 export async function getLastPersonCode(): Promise<string> {
-  await requireSession();
-  const lastPerson = await prisma.tbl_People.findFirst({
-    orderBy: { ID: "desc" },
-    select: { PersonCode: true },
-  });
+  try {
+    await requireSession();
+    const lastPerson = await prisma.tbl_People_Companies.findFirst({
+      orderBy: { ID: "desc" },
+      select: { PersonCode: true },
+    });
 
-  if (!lastPerson) {
-    return "0";
+    if (!lastPerson) {
+      return "0";
+    }
+
+    return lastPerson.PersonCode || "0";
+  } catch (error) {
+    throw readError(error);
   }
-
-  return lastPerson.PersonCode || "0";
 }

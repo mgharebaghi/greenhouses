@@ -1,5 +1,7 @@
 "use client";
 
+import { formatPersianDate } from "@/shared/dates/calendar";
+
 import { ActionFailure, runDeletion } from "@/shared/forms/delete-record";
 
 import { csvRows } from "@/shared/exports/csv";
@@ -97,9 +99,7 @@ export default function GraftingTable({ initialData, formData }: Props) {
       title: "تاریخ پیوند",
       key: "GraftingDate",
       render: (_: unknown, record: GraftingOperationWithDetails) =>
-        record.GraftingDate
-          ? new Date(record.GraftingDate).toLocaleDateString("fa-IR")
-          : "---",
+        formatPersianDate(record.GraftingDate, { fallback: "---" }),
       sortable: true,
     },
     {

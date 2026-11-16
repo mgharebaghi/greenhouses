@@ -19,7 +19,7 @@ export default function WarehousesClientPage() {
   if (error) return <DataLoadError onRetry={() => void fetchData()} />;
 
   return (
-    <div className="p-6">
+    <div className="dashboard-page">
       <PageHeader
         title="مدیریت انبارها"
         subtitle="تعریف و مدیریت اطلاعات پایه انبارهای بذر"

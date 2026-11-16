@@ -1,3 +1,4 @@
+import { formatPersianDate } from "@/shared/dates/calendar";
 import type { getStartSeedlingCycles } from "../actions";
 import { StartSeedlingCycle } from "../types";
 
@@ -28,25 +29,19 @@ export async function startSeedlingCycleCSVData(
     OrderCode: item.Tbl_Orders?.OrderCode || "",
     SeedType: item.SeedType ? "پیوندک" : "پایه",
     GreenhouseName: item.Tbl_Greenhouses?.GreenhouseName || "",
-    GerminationRoomExitDate: item.GerminationRoomExitDate
-      ? new Date(
-          item.GerminationRoomExitDate as string | Date,
-        ).toLocaleDateString("fa-IR")
-      : "",
+    GerminationRoomExitDate: formatPersianDate(item.GerminationRoomExitDate, {
+      fallback: "",
+    }),
     NumberOfLostSeedlingFromGermination:
       item.NumberOfLostSeedlingFromGermination || 0,
-    GreenhouseEntryDate: item.GreenhouseEntryDate
-      ? new Date(item.GreenhouseEntryDate as string | Date).toLocaleDateString(
-          "fa-IR",
-        )
-      : "",
+    GreenhouseEntryDate: formatPersianDate(item.GreenhouseEntryDate, {
+      fallback: "",
+    }),
     NumberOfTrays: item.NumberOfTrays || 0,
     SalonName: item.SalonName || "",
-    GreenhouseExitDate: item.GreenhouseExitDate
-      ? new Date(item.GreenhouseExitDate as string | Date).toLocaleDateString(
-          "fa-IR",
-        )
-      : "",
+    GreenhouseExitDate: formatPersianDate(item.GreenhouseExitDate, {
+      fallback: "",
+    }),
     NumberOfLostSeedlingFromGreenhouse:
       item.NumberOfLostSeedlingFromGreenhouse || 0,
   }));

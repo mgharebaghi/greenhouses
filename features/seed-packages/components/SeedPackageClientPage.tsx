@@ -19,7 +19,7 @@ export default function SeedPackagePage() {
   if (error) return <DataLoadError onRetry={() => void fetchData()} />;
 
   return (
-    <div className="p-6">
+    <div className="dashboard-page">
       <PageHeader
         title="بسته‌های بذر"
         subtitle="مدیریت عملیات مربوط به بسته‌های بذر و اختصاص شماره سریال"

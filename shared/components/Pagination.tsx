@@ -23,6 +23,9 @@ export default function Pagination({
   if (total === 0) return null;
 
   const totalPages = Math.ceil(total / pageSize);
+  const pageSizes = [...new Set([5, 10, 20, 50, pageSize])].sort(
+    (a, b) => a - b,
+  );
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
@@ -36,39 +39,47 @@ export default function Pagination({
   };
 
   return (
-    <div className="px-4 py-3 bg-gradient-to-r from-slate-50/60 to-slate-100/60 dark:from-slate-800/60 dark:to-slate-900/60 border-t border-slate-200/60 dark:border-slate-700/60">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-2 opacity-50 hover:opacity-100 transition-opacity">
+    <nav
+      aria-label="صفحه‌بندی جدول"
+      className="border-t border-slate-200/60 bg-slate-50/70 px-3 py-2.5 dark:border-slate-700/60 dark:bg-slate-800/50 sm:px-4"
+    >
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+        <div className="flex items-center text-xs text-slate-600 dark:text-slate-400">
           {/* Minimal Total Count */}
           {showTotal ? (
-            <span className="text-xs text-slate-400">
+            <span>
               {showTotal(total, [
                 (current - 1) * pageSize + 1,
                 Math.min(current * pageSize, total),
               ])}
             </span>
           ) : (
-            <span className="text-xs text-slate-400 font-light">
+            <span dir="ltr">
               {`${(current - 1) * pageSize + 1}-${Math.min(current * pageSize, total)} / ${total}`}
             </span>
           )}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
           {showSizeChanger && (
             <select
+              aria-label="تعداد ردیف در هر صفحه"
               value={pageSize}
               onChange={handlePageSizeChange}
-              className="h-8 px-2 bg-transparent border-0 text-slate-400 dark:text-slate-500 text-xs focus:outline-none hover:text-emerald-500 dark:hover:text-emerald-400 cursor-pointer font-medium"
+              className="h-8 rounded-md border border-slate-200 bg-white px-2 text-xs text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
             >
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-              <option value={50}>50</option>
+              {pageSizes.map((value) => (
+                <option key={value} value={value}>
+                  {value}
+                </option>
+              ))}
             </select>
           )}
 
           <div className="flex items-center gap-1 bg-slate-100/50 dark:bg-slate-800/50 p-1 rounded-full">
             <button
+              type="button"
+              aria-label="صفحهٔ قبلی"
               disabled={current === 1}
               onClick={() => handlePageChange(current - 1)}
               className="h-8 w-8 flex items-center justify-center rounded-full text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-white dark:hover:bg-slate-700 hover:shadow-sm disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:shadow-none transition-all duration-200"
@@ -81,6 +92,8 @@ export default function Pagination({
             </div>
 
             <button
+              type="button"
+              aria-label="صفحهٔ بعدی"
               disabled={current >= totalPages}
               onClick={() => handlePageChange(current + 1)}
               className="h-8 w-8 flex items-center justify-center rounded-full text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-white dark:hover:bg-slate-700 hover:shadow-sm disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:shadow-none transition-all duration-200"
@@ -90,6 +103,6 @@ export default function Pagination({
           </div>
         </div>
       </div>
-    </div>
+    </nav>
   );
 }

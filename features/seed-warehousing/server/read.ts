@@ -1,4 +1,5 @@
 "use server";
+import { readError } from "@/server/actions/errors";
 import { requireSession } from "@/server/auth/require-session";
 
 import { prisma } from "@/server/db/prisma";
@@ -8,8 +9,8 @@ import type { WarehouseTransactionDetails } from "../types/details";
 export async function getAllSeedWarehousing(): Promise<
   WarehouseTransactionDetails[]
 > {
-  await requireSession();
   try {
+    await requireSession();
     const transactions = await prisma.tbl_WarehousesTransaction.findMany({
       include: {
         Tbl_SeedPackage: true,
@@ -21,16 +22,15 @@ export async function getAllSeedWarehousing(): Promise<
     });
     return serializeData(transactions);
   } catch (error) {
-    console.error("Query failed", error);
-    throw new Error("دریافت اطلاعات انجام نشد. لطفاً دوباره تلاش کنید.");
+    throw readError(error);
   }
 }
 
 export async function getSeedWarehousingById(
   id: number,
 ): Promise<WarehouseTransactionDetails | null> {
-  await requireSession();
   try {
+    await requireSession();
     const trx = await prisma.tbl_WarehousesTransaction.findUnique({
       where: { ID: id },
       include: {
@@ -40,7 +40,6 @@ export async function getSeedWarehousingById(
     });
     return serializeData(trx);
   } catch (error) {
-    console.error("Query failed", error);
-    throw new Error("دریافت اطلاعات انجام نشد. لطفاً دوباره تلاش کنید.");
+    throw readError(error);
   }
 }

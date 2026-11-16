@@ -19,7 +19,7 @@ export default function NurseryRoomsClientPage() {
   if (error) return <DataLoadError onRetry={() => void fetchData()} />;
 
   return (
-    <div className="p-6">
+    <div className="dashboard-page">
       <PageHeader
         title="اتاق‌های ریکاوری"
         subtitle="تعریف و مدیریت اطلاعات پایه اتاق‌های ریکاوری (نرسری)"

@@ -11,31 +11,36 @@ import { submitForm } from "../shared/forms/submit";
 import { InputValidationError, parseInput } from "../shared/validation/input";
 
 export const personInput = {
+  Legal: false,
   FirstName: "محمد",
   LastName: "محمدی",
   PersonCode: "1",
   NationalCode: "1234567890",
   PhoneNumber: "09123456789",
   EmailAddress: "a@b.co",
-  Profesion: "کارگر",
+  Profession: "کارگر",
   PostID: 1,
 };
 
 test("historical incomplete people remain readable; write rules validate syntax", () => {
   const historical = {
     ID: 9,
+    Legal: null,
     FirstName: "م",
     LastName: "",
     PersonCode: "1",
     NationalCode: "x",
     PhoneNumber: null,
     EmailAddress: "x",
-    Profesion: null,
+    Profession: null,
+    CompanyName: null,
+    CompanyEconomicCode: null,
+    CompanyRegistrationCode: null,
     Tbl_PeoplePosts: { ID: 1, PostName: null },
   };
   assert.equal(peopleReadDTO.parse(historical).EmailAddress, "x");
   assert.equal(personInputSchema.parse(personInput).EmailAddress, "a@b.co");
-  for (const email of ["x", "a@", ""])
+  for (const email of ["x", "a@"])
     assert.equal(
       personInputSchema.safeParse({ ...personInput, EmailAddress: email })
         .success,
@@ -46,6 +51,14 @@ test("historical incomplete people remain readable; write rules validate syntax"
       .EmailAddress,
     "a@b.co",
   );
+  const optional = personInputSchema.parse({
+    ...personInput,
+    EmailAddress: "",
+    Profession: undefined,
+  });
+  assert.equal(optional.EmailAddress, null);
+  assert.equal(optional.Profession, null);
+  assert.equal(optional.CompanyName, null);
 });
 
 test("write contracts strip IDs/relations and reject invalid selections", () => {

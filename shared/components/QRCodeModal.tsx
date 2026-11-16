@@ -7,7 +7,8 @@ import {
   PrinterOutlined,
   QrcodeOutlined,
 } from "@ant-design/icons";
-import { Alert, Button, Card, Modal, Space, Spin } from "antd";
+import Modal from "@/shared/components/ResponsiveModal";
+import { Alert, Button, Card, Space, Spin } from "antd";
 import QRCodeLib from "qrcode";
 import { useEffect, useRef, useState } from "react";
 

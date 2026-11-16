@@ -56,7 +56,11 @@ try {
   );
   assert.equal((await fetch(`${origin}/fakoor-logo.png`)).status, 200);
   assert.equal((await fetch(`${origin}/icon`)).status, 200);
-  for (const route of ["/dashboard/people", "/dashboard/orders"]) {
+  for (const route of [
+    "/dashboard/people",
+    "/dashboard/orders",
+    "/dashboard/suppliers",
+  ]) {
     const result = await fetch(`${origin}${route}`, { redirect: "manual" });
     assert.equal(result.status, 307);
     assert.equal(result.headers.get("location"), "/");

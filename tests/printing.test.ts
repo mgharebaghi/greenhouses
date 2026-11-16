@@ -10,6 +10,29 @@ import {
 } from "../features/orders/domain/print-settings";
 import type { OrderDetails } from "../features/orders/types/details";
 import PrintQrLabel from "../shared/components/PrintQrLabel";
+import FormFeedback from "../shared/components/FormFeedback";
+
+test("form feedback stays absent until there is a message", () => {
+  assert.equal(
+    renderToStaticMarkup(createElement(FormFeedback, { message: null })),
+    "",
+  );
+  assert.equal(
+    renderToStaticMarkup(
+      createElement(FormFeedback, {
+        message: { status: "error", message: "" },
+      }),
+    ),
+    "",
+  );
+  const html = renderToStaticMarkup(
+    createElement(FormFeedback, {
+      message: { status: "error", message: "تکمیل این فیلد الزامی است." },
+    }),
+  );
+  assert.match(html, /role="alert"/);
+  assert.match(html, /تکمیل این فیلد الزامی است/);
+});
 
 test("printer presets retain automatic size, supported millimeter sizes and full-size QR", () => {
   assert.equal(LABEL_SIZES[0].value, "auto");

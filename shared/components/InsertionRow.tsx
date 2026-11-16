@@ -25,13 +25,13 @@ export default function InsertionRow({
   return (
     <div
       dir="rtl"
-      className="w-full p-4 bg-gradient-to-r from-white/80 to-slate-50/80 dark:from-slate-900/80 dark:to-slate-950/80 backdrop-blur-sm border border-slate-200 dark:border-slate-700 rounded-tr-xl rounded-tl-xl shadow-sm transition-colors duration-300"
+      className="w-full min-w-0 p-3 sm:p-4 bg-gradient-to-r from-white/80 to-slate-50/80 dark:from-slate-900/80 dark:to-slate-950/80 backdrop-blur-sm border border-slate-200 dark:border-slate-700 rounded-tr-xl rounded-tl-xl shadow-sm transition-colors duration-300"
     >
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:flex-wrap md:items-center justify-between gap-3">
         {/* Stats Section */}
-        <div className="flex items-center gap-4">
+        <div className="flex min-w-0 flex-wrap items-center gap-3">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+            <div className="h-10 w-10 shrink-0 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
               <BarChartOutlined className="text-lg" />
             </div>
             <div>
@@ -54,12 +54,12 @@ export default function InsertionRow({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+        <div className="flex min-w-0 flex-col sm:flex-row sm:flex-wrap gap-2 w-full sm:w-auto">
           <GreenhouseButton
             text={`افزودن ${text}`}
             icon={<PlusOutlined />}
             onClick={insertOnclick}
-            className="h-9 px-4 text-sm w-full sm:w-auto whitespace-nowrap"
+            className="h-9 px-4 text-sm w-full sm:w-auto"
             type="button"
             disabled={btnDisabled}
           />
@@ -69,7 +69,7 @@ export default function InsertionRow({
             icon={<DownCircleOutlined />}
             onClick={csvOnclick}
             variant="secondary"
-            className="h-9 px-4 text-sm w-full sm:w-auto whitespace-nowrap"
+            className="h-9 px-4 text-sm w-full sm:w-auto"
             type="button"
           />
         </div>

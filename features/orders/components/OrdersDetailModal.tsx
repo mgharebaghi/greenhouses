@@ -1,5 +1,7 @@
 "use client";
 
+import { formatPersianDate } from "@/shared/dates/calendar";
+
 import type { OrderDetails } from "../types/details";
 
 import { publicOrderUrl } from "@/shared/config/public-urls";
@@ -24,11 +26,6 @@ export default function OrdersDetailModal({
   data,
 }: OrdersDetailModalProps) {
   if (!data) return null;
-
-  const formatDate = (date: string | Date | null | undefined) => {
-    if (!date) return "—";
-    return new Date(date).toLocaleDateString("fa-IR");
-  };
 
   const rootstockIdx =
     data.Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage;
@@ -83,7 +80,7 @@ export default function OrdersDetailModal({
                   ? `${data.OrderCount.toLocaleString()} عدد`
                   : "—",
               },
-              { label: "تاریخ ثبت", value: formatDate(data.OrderDate) },
+              { label: "تاریخ ثبت", value: formatPersianDate(data.OrderDate) },
             ]}
           />
 

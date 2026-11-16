@@ -1,9 +1,14 @@
 "use client";
 
+import { formatPersianDate, formatTehranTime } from "@/shared/dates/calendar";
+import { useServerDay, useServerTime } from "@/shared/dates/ServerClock";
 import {
   AppstoreOutlined,
   BorderOuterOutlined,
   CalendarOutlined,
+  CheckOutlined,
+  ClockCircleOutlined,
+  CloseOutlined,
   ContainerOutlined,
   DatabaseOutlined,
   DownOutlined,
@@ -23,10 +28,10 @@ import {
   ToolOutlined,
   UsergroupAddOutlined,
 } from "@ant-design/icons";
-import { Drawer } from "antd";
+import { Drawer, message } from "antd";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { unstable_rethrow, usePathname } from "next/navigation";
 import NProgress from "nprogress";
 import { useState } from "react";
 
@@ -46,11 +51,10 @@ export default function DashboardMenu({
   onClose: () => void;
   onSignOut: () => Promise<void>;
 }) {
-  const route = useRouter();
   const pathname = usePathname();
-  const [expandedMenus, setExpandedMenus] = useState<{
-    [key: string]: boolean;
-  }>({});
+  const time = useServerTime();
+  const today = useServerDay();
+  const [expandedTitle, setExpandedTitle] = useState<string | null>();
 
   const menuItems: MenuItem[] = [
     {
@@ -127,18 +131,24 @@ export default function DashboardMenu({
     },
     {
       icon: <ContainerOutlined />,
-      title: "کاشت بذور",
-      page: "/dashboard/seed-planting",
-    },
-    {
-      icon: <RetweetOutlined />,
-      title: "شروع سیکل نشاء",
-      page: "/dashboard/start-seedling-cycle",
-    },
-    {
-      icon: <ToolOutlined />,
-      title: "پیوند زنی",
-      page: "/dashboard/grafting",
+      title: "فرآیند تولید نشای پیوندی",
+      submenu: [
+        {
+          title: "کاشت بذور پایه و پیوندک",
+          page: "/dashboard/seed-planting",
+          icon: <ContainerOutlined />,
+        },
+        {
+          title: "رشد نشاء های پایه و پیوندک",
+          page: "/dashboard/start-seedling-cycle",
+          icon: <RetweetOutlined />,
+        },
+        {
+          title: "پیوند زنی",
+          page: "/dashboard/grafting",
+          icon: <ToolOutlined />,
+        },
+      ],
     },
     {
       icon: <MedicineBoxOutlined />,
@@ -147,233 +157,243 @@ export default function DashboardMenu({
     },
   ];
 
-  // Accordion behavior
-  const toggleMenu = (title: string) => {
-    setExpandedMenus((prev) => {
-      const isCurrentlyOpen = !!prev[title];
-      if (isCurrentlyOpen) return {}; // Close if clicking the open one
-      return { [title]: true }; // Open the new one and close others
-    });
-  };
+  const activeGroup = menuItems.find((item) =>
+    item.submenu?.some((sub) => pathname === sub.page),
+  )?.title;
+  const openGroup = expandedTitle === undefined ? activeGroup : expandedTitle;
 
-  const isSubmenuItemActive = (submenu?: { title: string; page: string }[]) => {
-    if (!submenu) return false;
-    return submenu.some((sub) => pathname === sub.page);
+  const navigate = (page: string) => {
+    if (page !== pathname) NProgress.start();
+    setExpandedTitle(undefined);
+    onClose();
   };
 
   const handleLogout = async () => {
     onClose();
-    await onSignOut();
+    try {
+      await onSignOut();
+    } catch (error) {
+      unstable_rethrow(error);
+      void message.error("خروج از حساب انجام نشد. لطفاً دوباره تلاش کنید.");
+    }
   };
 
-  // Helper for rendering icons with consistent style
-  const MenuIcon = ({
-    icon,
-    active,
-  }: {
-    icon: React.ReactNode;
-    active: boolean;
-  }) => (
-    <div
-      className={`h-9 w-9 rounded-xl flex items-center justify-center text-lg transition-all duration-300
-        ${
-          active
-            ? "bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md scale-110"
-            : "bg-emerald-50 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-800/60 group-hover:scale-105"
-        }`}
+  const focusStyle =
+    "focus-visible:outline-2 focus-visible:outline-emerald-500 focus-visible:-outline-offset-2";
+  // Ant Design's unlayered link reset overrides Tailwind's background utilities.
+  const currentPageStyle =
+    "bg-emerald-800! font-bold text-white! hover:bg-emerald-700!";
+  const currentPageBadge = (
+    <span
+      aria-hidden
+      className="inline-flex shrink-0 items-center gap-1 rounded-md bg-white/15 px-1.5 py-1 text-[10px] leading-none whitespace-nowrap text-white"
     >
-      {icon}
-    </div>
+      <CheckOutlined />
+      <span className="max-[340px]:sr-only">صفحهٔ فعلی</span>
+    </span>
   );
 
   return (
     <Drawer
+      aria-label="منوی داشبورد"
       placement="right"
       onClose={onClose}
       open={open}
-      width={320} // Slightly wider for better breathing room
+      width="min(22rem, 100vw)"
       closable={false}
       styles={{
-        body: { padding: 0 },
-        mask: { backdropFilter: "blur(6px)", background: "rgba(0, 0, 0, 0.2)" },
+        body: { padding: 0, overflow: "hidden", minHeight: 0 },
+        mask: {
+          backdropFilter: "blur(5px)",
+          background: "rgba(2, 28, 23, 0.38)",
+        },
       }}
-      className="!bg-transparent"
     >
-      <div className="flex flex-col h-full bg-gradient-to-br from-white via-slate-50 to-emerald-50/30 dark:from-slate-900 dark:via-slate-900 dark:to-emerald-950/30 transition-colors duration-300">
-        {/* User Profile Header - Enhanced Design */}
-        <div className="relative pt-8 pb-6 px-6 bg-gradient-to-br from-emerald-600 to-teal-700 dark:from-emerald-800 dark:to-teal-900 text-white overflow-hidden shrink-0 rounded-b-[2rem] shadow-xl z-20">
-          {/* Background Decorations */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-emerald-400/20 rounded-full blur-xl -ml-5 -mb-5 pointer-events-none"></div>
-
-          <div className="relative z-10 flex flex-col items-center text-center">
-            <div className="relative mb-3 group cursor-pointer">
-              <div className="absolute -inset-1 bg-gradient-to-r from-emerald-300 to-teal-300 rounded-full blur opacity-40 group-hover:opacity-60 transition duration-300"></div>
-              <Image
-                src="/Images/Logo.png"
-                alt="Logo"
-                width={64}
-                height={64}
-                className="relative rounded-full border-2 border-white dark:border-slate-700 shadow-lg object-cover bg-white"
-              />
-              <span
-                className="absolute bottom-0 right-0 h-4 w-4 bg-lime-400 border-2 border-emerald-700 rounded-full"
-                title="آنلاین"
-              ></span>
-            </div>
-
-            <h3 className="font-bold text-lg text-white mb-0.5 tracking-tight">
-              مدیر سیستم
-            </h3>
-            <p className="text-emerald-100 text-xs opacity-90 font-light">
+      <div
+        dir="rtl"
+        className="dashboard-menu flex h-full min-h-0 flex-col bg-linear-to-b from-emerald-50 via-slate-50 to-white dark:from-emerald-950 dark:via-slate-900 dark:to-slate-950"
+      >
+        <header className="flex shrink-0 items-center gap-3 border-b border-emerald-800/70 bg-linear-to-bl from-emerald-950 via-emerald-900 to-teal-800 px-4 py-3 shadow-sm dark:border-emerald-700/50">
+          <Image
+            src="/fakoor-logo.png"
+            alt=""
+            width={36}
+            height={36}
+            className="size-9 shrink-0 rounded-xl bg-white object-contain p-1 ring-1 ring-white/25"
+          />
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm leading-5 font-bold text-white">
               فکور پیوند آریا
             </p>
+            <p className="truncate text-xs leading-4 text-emerald-100/90">
+              مدیر سیستم
+            </p>
           </div>
-
-          {/* Close Button Absolute */}
           <button
+            type="button"
             onClick={onClose}
-            className="absolute top-4 left-4 h-8 w-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-all backdrop-blur-sm border border-white/10"
+            aria-label="بستن منو"
+            className={`grid size-9 shrink-0 cursor-pointer place-items-center rounded-xl border border-white/15 bg-white/8 text-emerald-50 transition-colors hover:border-white/35 hover:bg-white/20 ${focusStyle}`}
           >
-            <RightOutlined className="text-xs" />
+            <CloseOutlined aria-hidden />
           </button>
-        </div>
+        </header>
 
-        {/* Menu Items - Scrollable Area */}
-        <div className="flex-1 overflow-y-auto px-4 py-6 space-y-2 custom-scrollbar">
-          {menuItems.map((item, index) => {
-            const hasSubmenu = !!item.submenu;
-            const isExpanded = expandedMenus[item.title];
-            const isActive = item.page
-              ? pathname === item.page
-              : isSubmenuItemActive(item.submenu);
+        <nav
+          aria-label="صفحات داشبورد"
+          className="dashboard-menu-list min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain px-3 py-3.5 sm:px-4"
+        >
+          <ul className="space-y-2">
+            {menuItems.map((item, index) => {
+              const page = item.page;
+              const isExpanded = openGroup === item.title;
+              const isActive = page
+                ? pathname === page
+                : activeGroup === item.title;
+              const submenuId = `dashboard-submenu-${index}`;
+              const itemStyle = `group flex min-h-12 w-full items-center gap-3 rounded-xl px-2.5 py-1.5 text-start text-sm transition-colors ${focusStyle}`;
+              const mainItemStyle = isActive
+                ? page
+                  ? currentPageStyle
+                  : "border-s-[3px] border-emerald-600 bg-emerald-100 font-bold text-emerald-950! hover:bg-emerald-200 dark:border-emerald-400 dark:bg-emerald-900/85 dark:text-emerald-50! dark:hover:bg-emerald-800"
+                : "font-semibold text-slate-800! hover:bg-emerald-50! hover:text-emerald-950! dark:text-slate-100! dark:hover:bg-emerald-900/45! dark:hover:text-emerald-100!";
+              const itemContent = (
+                <>
+                  <span
+                    aria-hidden
+                    className={`grid size-8 shrink-0 place-items-center rounded-lg text-base transition-colors ${isActive ? "bg-emerald-700 text-white dark:bg-emerald-600" : "bg-emerald-50 text-emerald-800 ring-1 ring-emerald-200/70 group-hover:bg-emerald-100 dark:bg-emerald-950 dark:text-emerald-200 dark:ring-emerald-800/70 dark:group-hover:bg-emerald-900"}`}
+                  >
+                    {item.icon}
+                  </span>
+                  <span className="min-w-0 flex-1 break-words">
+                    {item.title}
+                  </span>
+                </>
+              );
 
-            return (
-              <div
-                key={index}
-                className={`select-none transition-all duration-500 ${isExpanded ? "mb-4 bg-emerald-50/30 dark:bg-emerald-900/10 rounded-3xl ring-1 ring-emerald-100/50 dark:ring-emerald-800/20 pb-2" : ""}`}
-              >
-                {/* Main Item */}
-                <div
-                  onClick={() => {
-                    if (hasSubmenu) toggleMenu(item.title);
-                    else {
-                      NProgress.start();
-                      onClose();
-                      route.push(item.page!);
-                    }
-                  }}
-                  className={`group relative flex items-center justify-between p-3 rounded-2xl cursor-pointer transition-all duration-300 border
-                        ${
-                          isActive
-                            ? "bg-white dark:bg-slate-800 border-emerald-200 dark:border-emerald-800 shadow-lg shadow-emerald-100/50 dark:shadow-none scale-[1.02]"
-                            : "bg-transparent border-transparent hover:bg-white dark:hover:bg-slate-800 hover:shadow-sm hover:border-slate-100 dark:hover:border-slate-700"
-                        }
-                    `}
+              return (
+                <li
+                  key={item.title}
+                  className={`rounded-[13px] border shadow-xs transition-colors ${isActive || isExpanded ? "border-emerald-300/75 bg-white dark:border-emerald-800 dark:bg-slate-900" : "border-slate-200/85 bg-white/90 hover:border-emerald-300 dark:border-slate-700/80 dark:bg-slate-900/80 dark:hover:border-emerald-700"}`}
                 >
-                  <div className="flex items-center gap-3">
-                    <MenuIcon icon={item.icon} active={isActive} />
-                    <span
-                      className={`font-medium text-sm transition-colors ${isActive ? "text-emerald-900 dark:text-emerald-400" : "text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-200"}`}
+                  {page ? (
+                    <Link
+                      href={page}
+                      onNavigate={() => navigate(page)}
+                      aria-current={isActive ? "page" : undefined}
+                      className={`${itemStyle} ${mainItemStyle}`}
                     >
-                      {item.title}
-                    </span>
-                  </div>
-
-                  {/* Indicators */}
-                  <div className="flex items-center">
-                    {isActive && !hasSubmenu && (
-                      <div className="h-2 w-2 rounded-full bg-emerald-500 mr-2 animate-pulse"></div>
-                    )}
-
-                    {hasSubmenu && (
-                      <DownOutlined
-                        className={`text-xs text-slate-400 transition-transform duration-300 ${isExpanded ? "rotate-180 text-emerald-500" : ""}`}
-                      />
-                    )}
-                  </div>
-                </div>
-
-                {/* Submenu */}
-                <div
-                  className={`overflow-hidden transition-all duration-500 ease-in-out ${isExpanded ? "max-h-screen opacity-100" : "max-h-0 opacity-0"}`}
-                >
-                  <div className="relative pt-2 pb-2 pl-2 pr-4 mt-2 mb-2 bg-slate-50/50 dark:bg-slate-800/40 border border-slate-100/50 dark:border-slate-700/30 rounded-2xl mx-1 shadow-inner">
-                    {item.submenu?.map((sub, subIdx) => {
-                      const isSubActive = pathname === sub.page;
-                      return (
-                        <Link
-                          key={subIdx}
-                          href={sub.page}
-                          onClick={() => {
-                            NProgress.start();
-                            onClose();
-                          }}
-                          className={`relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 mb-1 last:mb-0
-                                        ${
-                                          isSubActive
-                                            ? "bg-white dark:bg-slate-700 text-emerald-800 dark:text-emerald-300 font-bold shadow-sm border border-emerald-100/50 dark:border-slate-600"
-                                            : "text-slate-600 dark:text-slate-400 hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-white/60 dark:hover:bg-slate-700/50 hover:shadow-sm"
-                                        }
-                                    `}
+                      {itemContent}
+                      {isActive ? (
+                        currentPageBadge
+                      ) : (
+                        <RightOutlined
+                          aria-hidden
+                          className="rotate-180 text-[11px] text-emerald-700 opacity-45 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100 dark:text-emerald-300"
+                        />
+                      )}
+                    </Link>
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        aria-expanded={isExpanded}
+                        aria-controls={submenuId}
+                        onClick={() =>
+                          setExpandedTitle(isExpanded ? null : item.title)
+                        }
+                        className={`cursor-pointer ${itemStyle} ${mainItemStyle}`}
+                      >
+                        {itemContent}
+                        <span
+                          aria-hidden
+                          className={`grid size-6 shrink-0 place-items-center rounded-md text-[10px] transition-colors ${isExpanded ? "bg-emerald-200/80 text-emerald-900 dark:bg-emerald-800 dark:text-emerald-100" : "bg-slate-100 text-slate-500 group-hover:bg-emerald-100 group-hover:text-emerald-800 dark:bg-slate-800 dark:text-slate-300 dark:group-hover:bg-emerald-900 dark:group-hover:text-emerald-100"}`}
                         >
-                          {/* Icon Indicator */}
-                          <div
-                            className={`text-base transition-all duration-300 ${isSubActive ? "text-emerald-600 dark:text-emerald-400 scale-110" : "text-slate-400 dark:text-slate-500 group-hover:text-emerald-500"}`}
-                          >
-                            {sub.icon}
-                          </div>
+                          <DownOutlined
+                            className={`motion-safe:transition-transform ${isExpanded ? "rotate-180" : ""}`}
+                          />
+                        </span>
+                      </button>
+                      <ul
+                        id={submenuId}
+                        hidden={!isExpanded}
+                        className="ms-7 me-2 mt-1 mb-2 space-y-0.5 rounded-e-lg border-s-2 border-emerald-300 bg-emerald-50/65 p-1.5 dark:border-emerald-700 dark:bg-emerald-950/55"
+                      >
+                        {item.submenu?.map((sub) => {
+                          const current = pathname === sub.page;
+                          return (
+                            <li key={sub.page}>
+                              <Link
+                                href={sub.page}
+                                onNavigate={() => navigate(sub.page)}
+                                aria-current={current ? "page" : undefined}
+                                className={`group/submenu flex min-h-9 items-center gap-2 rounded-lg border px-2 py-1.5 text-[13px] transition-colors ${focusStyle} ${current ? `border-emerald-800 shadow-xs ${currentPageStyle}` : "border-transparent text-slate-700! hover:border-emerald-300 hover:bg-emerald-100! hover:text-emerald-950! focus-visible:bg-emerald-100! dark:text-slate-300! dark:hover:border-emerald-600 dark:hover:bg-emerald-900! dark:hover:text-white! dark:focus-visible:bg-emerald-900!"}`}
+                              >
+                                <span
+                                  aria-hidden
+                                  className={`grid size-5 shrink-0 place-items-center rounded-md transition-colors ${current ? "text-emerald-50" : "text-emerald-700 group-hover/submenu:bg-white group-hover/submenu:text-emerald-900 dark:text-emerald-300 dark:group-hover/submenu:bg-emerald-800 dark:group-hover/submenu:text-white"}`}
+                                >
+                                  {sub.icon}
+                                </span>
+                                <span className="min-w-0 flex-1 break-words">
+                                  {sub.title}
+                                </span>
+                                {current ? (
+                                  currentPageBadge
+                                ) : (
+                                  <RightOutlined
+                                    aria-hidden
+                                    className="rotate-180 text-[10px] text-emerald-700 opacity-0 transition-opacity group-hover/submenu:opacity-100 group-focus-visible/submenu:opacity-100 dark:text-emerald-200"
+                                  />
+                                )}
+                              </Link>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
 
-                          <span className="text-sm">{sub.title}</span>
-
-                          {/* Active Dot */}
-                          {isSubActive && (
-                            <div className="absolute left-3 w-1.5 h-1.5 rounded-full bg-emerald-500 ring-2 ring-emerald-100 dark:ring-emerald-900"></div>
-                          )}
-                        </Link>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Footer Area - Date & Action */}
-        <div className="p-5 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md border-t border-slate-100 dark:border-slate-800">
-          {/* Current Time Widget */}
-          <div className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-slate-800 dark:to-slate-800 rounded-xl p-3 border border-emerald-100/50 dark:border-slate-700 mb-3 flex items-center justify-between">
-            <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-500">
-              <CalendarOutlined />
-              <span className="text-xs font-medium" suppressHydrationWarning>
-                {new Date().toLocaleDateString("fa-IR")}
-              </span>
-            </div>
-            <div
-              className="text-emerald-800 dark:text-slate-300 font-bold text-sm tracking-widest numbers-fa"
-              suppressHydrationWarning
+        <footer className="shrink-0 space-y-2 border-t border-emerald-100 bg-white/90 px-3 pt-2.5 pb-[max(0.625rem,env(safe-area-inset-bottom))] sm:px-4 dark:border-slate-800 dark:bg-slate-950">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-xl border border-emerald-100 bg-emerald-50/75 px-2.5 py-1.5 dark:border-emerald-900 dark:bg-emerald-950/60">
+            <span
+              aria-hidden
+              className="grid size-8 shrink-0 place-items-center rounded-lg bg-white text-emerald-700 shadow-xs dark:bg-emerald-900 dark:text-emerald-200"
             >
-              {new Date().toLocaleTimeString("fa-IR", {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </div>
+              <CalendarOutlined />
+            </span>
+            <time
+              dateTime={today}
+              className="flex-1 text-xs font-semibold text-slate-700 dark:text-slate-200"
+            >
+              {formatPersianDate(today, { format: "D MMMM YYYY" })}
+            </time>
+            <span
+              className="numbers-fa flex items-center gap-1.5 rounded-lg bg-white px-2 py-1 text-xs font-bold text-emerald-900 tabular-nums shadow-xs dark:bg-emerald-900 dark:text-emerald-100"
+              aria-label="ساعت تهران"
+            >
+              <ClockCircleOutlined aria-hidden />
+              <bdi>{formatTehranTime(time)}</bdi>
+            </span>
           </div>
 
-          {/* Logout Button */}
           <button
+            type="button"
             onClick={handleLogout}
-            className="w-full group relative flex items-center justify-center gap-2 h-11 bg-white dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-900/10 border border-slate-200 dark:border-slate-700 hover:border-rose-200 dark:hover:border-rose-800 rounded-xl transition-all duration-300 shadow-sm hover:shadow"
+            className={`group flex min-h-10 w-full cursor-pointer items-center gap-2.5 rounded-xl border border-rose-200 bg-rose-50/65 px-2.5 py-1.5 text-start text-sm font-semibold text-rose-800 transition-colors hover:border-rose-300 hover:bg-rose-100 dark:border-rose-900/70 dark:bg-rose-950/35 dark:text-rose-300 dark:hover:bg-rose-950/80 ${focusStyle}`}
           >
-            <div className="p-1.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 group-hover:bg-rose-100 dark:group-hover:bg-rose-900/20 group-hover:text-rose-500 transition-colors">
-              <LogoutOutlined />
-            </div>
-            <span className="text-sm font-medium text-slate-600 dark:text-slate-300 group-hover:text-rose-600 dark:group-hover:text-rose-400">
-              خروج از حساب کاربری
-            </span>
+            <LogoutOutlined
+              aria-hidden
+              className="grid size-8 shrink-0 place-items-center rounded-lg bg-rose-100 transition-colors group-hover:bg-rose-200 dark:bg-rose-900/50 dark:group-hover:bg-rose-900"
+            />
+            خروج از حساب کاربری
           </button>
-        </div>
+        </footer>
       </div>
     </Drawer>
   );

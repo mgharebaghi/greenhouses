@@ -18,7 +18,7 @@ export async function createOrder(input: unknown): Promise<OrderCreateRes> {
         CustomerID: data.CustomerID,
         SupplierID: data.SupplierID,
         ProjectManager: data.ProjectManager,
-        OrderDate: data.OrderDate ? new Date(data.OrderDate) : undefined,
+        OrderDate: data.OrderDate,
         OrderCount: data.OrderCount,
         RootstockID: data.RootstockID,
         ScionID: data.ScionID,

@@ -1,8 +1,8 @@
 import {
   optionalCount,
   optionalId,
-  optionalNumber,
   optionalText,
+  sqlDecimal,
 } from "@/shared/validation/input";
 import { z } from "zod";
 export const varietyInputSchema = z.object({
@@ -12,10 +12,10 @@ export const varietyInputSchema = z.object({
   DaysToSprout: optionalCount,
   DaysToSeedling: optionalCount,
   DaysToMaturity: optionalCount,
-  IdealTempMin: optionalNumber,
-  IdealTempMax: optionalNumber,
-  IdealHumidityMin: optionalNumber,
-  IdealHumidityMax: optionalNumber,
+  IdealTempMin: sqlDecimal(6, 2).nullish(),
+  IdealTempMax: sqlDecimal(6, 2).nullish(),
+  IdealHumidityMin: sqlDecimal(6, 2).nullish(),
+  IdealHumidityMax: sqlDecimal(6, 2).nullish(),
   LightRequirement: optionalText(100),
   Notes: optionalText(500),
 });

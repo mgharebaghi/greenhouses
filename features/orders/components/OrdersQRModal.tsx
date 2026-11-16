@@ -1,5 +1,7 @@
 "use client";
 
+import { formatPersianDate } from "@/shared/dates/calendar";
+
 import PrintQrLabel from "@/shared/components/PrintQrLabel";
 import {
   LABEL_SIZES,
@@ -21,7 +23,8 @@ import {
   FileTextOutlined,
   QrcodeOutlined,
 } from "@ant-design/icons";
-import { Button, Modal, Select, Tooltip } from "antd";
+import Modal from "@/shared/components/ResponsiveModal";
+import { Button, Select, Tooltip } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
 import { getOrderById } from "../actions";
@@ -279,23 +282,23 @@ export default function OrdersQRModal({
         content: { borderRadius: "24px", padding: "0", overflow: "hidden" },
       }}
     >
-      <div className="flex flex-col items-center p-8 bg-white min-h-[600px]">
+      <div className="flex min-w-0 flex-col items-center p-4 sm:p-8 bg-white">
         {loadError && (
           <DataLoadError onRetry={() => setRetry((value) => value + 1)} />
         )}
-        <h3 className="text-xl font-extrabold text-slate-800 mb-8 mt-2">
+        <h3 className="text-center text-lg sm:text-xl font-extrabold text-slate-800 mb-5 sm:mb-8 mt-2">
           گواهی دیجیتال سفارش
         </h3>
 
         {/* QR Display */}
-        <div className="relative group mb-8">
+        <div className="relative group mb-6 w-fit max-w-full">
           <div className="p-4 bg-white border-[3px] border-slate-100 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
             <QRCodeCanvas value={qrUrl} size={220} className="qr-code-canvas" />
           </div>
           <Tooltip title="دانلود تصویر QR">
             <button
               onClick={handleDownloadQR}
-              className="absolute -left-4 -bottom-4 w-12 h-12 bg-white border border-slate-100 rounded-full shadow-lg flex items-center justify-center text-slate-600 hover:text-emerald-600 hover:scale-110 transition-all z-10 cursor-pointer"
+              className="absolute left-1 bottom-1 sm:-left-4 sm:-bottom-4 w-10 h-10 sm:w-12 sm:h-12 bg-white border border-slate-100 rounded-full shadow-lg flex items-center justify-center text-slate-600 hover:text-emerald-600 hover:scale-110 transition-all z-10 cursor-pointer"
             >
               <DownloadOutlined className="text-xl" />
             </button>
@@ -303,7 +306,7 @@ export default function OrdersQRModal({
         </div>
 
         {/* Data Display */}
-        <div className="w-full bg-slate-50/50 border border-slate-100 rounded-3xl p-6 mb-8">
+        <div className="w-full bg-slate-50/50 border border-slate-100 rounded-2xl p-3 sm:rounded-3xl sm:p-6 mb-5 sm:mb-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5">
             <div className="flex flex-col gap-1 border-b border-slate-200 pb-2">
               <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
@@ -319,7 +322,7 @@ export default function OrdersQRModal({
               </span>
               <span className="text-sm font-bold text-slate-800">
                 {fullData?.OrderDate
-                  ? new Date(fullData.OrderDate).toLocaleDateString("fa-IR")
+                  ? formatPersianDate(fullData.OrderDate)
                   : "—"}
               </span>
             </div>
@@ -327,7 +330,7 @@ export default function OrdersQRModal({
               <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
                 مشتری
               </span>
-              <span className="text-sm font-bold text-slate-800 truncate">
+              <span className="text-sm font-bold text-slate-800 [overflow-wrap:anywhere]">
                 {fullData?.Tbl_People_Tbl_Orders_CustomerIDToTbl_People
                   ? `${fullData.Tbl_People_Tbl_Orders_CustomerIDToTbl_People.FirstName} ${fullData.Tbl_People_Tbl_Orders_CustomerIDToTbl_People.LastName}`
                   : "—"}
@@ -337,13 +340,13 @@ export default function OrdersQRModal({
               <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
                 مدیر پروژه
               </span>
-              <span className="text-sm font-bold text-slate-800 truncate">
+              <span className="text-sm font-bold text-slate-800 [overflow-wrap:anywhere]">
                 {fullData?.Tbl_People_Tbl_Orders_ProjectManagerToTbl_People
                   ? `${fullData.Tbl_People_Tbl_Orders_ProjectManagerToTbl_People.FirstName} ${fullData.Tbl_People_Tbl_Orders_ProjectManagerToTbl_People.LastName}`
                   : "—"}
               </span>
             </div>
-            <div className="col-span-1 md:col-span-2 flex items-center justify-between bg-white/60 rounded-xl p-3 border border-slate-100">
+            <div className="col-span-1 md:col-span-2 flex items-center justify-between gap-3 flex-wrap bg-white/60 rounded-xl p-3 border border-slate-100">
               <div className="flex flex-col gap-0.5">
                 <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">
                   بذر پایه (Rootstock)
@@ -381,7 +384,7 @@ export default function OrdersQRModal({
           </Button>
 
           {/* Label */}
-          <div className="bg-slate-50/50 border border-slate-100 rounded-3xl p-6 shadow-sm">
+          <div className="bg-slate-50/50 border border-slate-100 rounded-2xl p-3 sm:rounded-3xl sm:p-6 shadow-sm">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
               {/* Plant Type Dropdown */}
               <div className="flex flex-col gap-2 sm:col-span-2">
@@ -466,7 +469,7 @@ export default function OrdersQRModal({
         {/* ===== HIDDEN PRINT AREAS ===== */}
 
         {/* 1. Certificate — A4 */}
-        <div style={{ position: "fixed", left: "-9999px", top: 0 }}>
+        <div className="dialog-print-only">
           <style>{`
                         @media print {
                             @page { margin: 0; size: A4 portrait; }

@@ -1,3 +1,5 @@
+import type { ActionResult } from "@/shared/contracts/action-result";
+
 export type CycleOrderOption = {
   value: number;
   label: string | null;
@@ -45,10 +47,6 @@ export interface StartSeedlingCycleInput {
   NumberOfLostSeedlingFromGreenhouse?: number;
 }
 
-export type StartSeedlingCycleCreateRes = {
-  status: "ok" | "error";
-  message: string;
-  id?: number;
-};
+export type StartSeedlingCycleCreateRes = ActionResult & { id?: number };
 
 export type * from "./record";

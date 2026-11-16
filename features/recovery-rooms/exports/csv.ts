@@ -1,3 +1,4 @@
+import { formatPersianDate } from "@/shared/dates/calendar";
 import { RecoveryRoomListItem } from "../types";
 
 export const headers = [
@@ -21,12 +22,8 @@ export const recoveryRoomCSVData = (data: RecoveryRoomListItem[]) => {
       CustomerName: customer
         ? `${customer.FirstName} ${customer.LastName}`
         : "—",
-      EntryDate: item.RecoveryEntryDate
-        ? new Date(item.RecoveryEntryDate).toLocaleDateString("fa-IR")
-        : "—",
-      ExitDate: item.RecoveryExitDate
-        ? new Date(item.RecoveryExitDate).toLocaleDateString("fa-IR")
-        : "—",
+      EntryDate: formatPersianDate(item.RecoveryEntryDate),
+      ExitDate: formatPersianDate(item.RecoveryExitDate),
       GraftedLossCount: item.GraftedLossCount || 0,
     };
   });

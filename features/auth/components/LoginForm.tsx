@@ -1,5 +1,15 @@
 "use client";
 
+import FormFeedback from "@/shared/components/FormFeedback";
+
+import {
+  Checkbox,
+  Form,
+  FormAppearance,
+  FormItem,
+  Input,
+} from "@/shared/components/FormControls";
+
 import { submitForm } from "@/shared/forms/submit";
 
 import { signIn } from "@/features/auth/actions";
@@ -10,7 +20,7 @@ import {
   LockOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { Checkbox, Form, Input } from "antd";
+
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -20,7 +30,6 @@ export default function Login() {
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
   const [form] = Form.useForm();
-  const [focusedField, setFocusedField] = useState<string | null>(null);
 
   const handleSubmit = async (values: {
     username: string;
@@ -52,7 +61,7 @@ export default function Login() {
   return (
     <div
       dir="rtl"
-      className="min-h-screen w-full flex font-IransansR overflow-hidden bg-[#f0fdf4] dark:bg-slate-950 transition-colors duration-500"
+      className="min-h-dvh w-full flex font-IransansR overflow-x-clip bg-[#f0fdf4] dark:bg-slate-950 transition-colors duration-500"
     >
       {/* 
         ========================================
@@ -139,7 +148,7 @@ export default function Login() {
 
         <div className="w-full max-w-[460px] relative z-10">
           {/* THE GLASS CARD */}
-          <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl rounded-[2.5rem] p-8 sm:p-12 shadow-[0_30px_60px_-15px_rgba(16,185,129,0.1)] dark:shadow-none border border-white/60 dark:border-slate-700/50 relative overflow-hidden animate-fade-in-up">
+          <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-5 sm:rounded-[2.5rem] sm:p-12 shadow-[0_30px_60px_-15px_rgba(16,185,129,0.1)] dark:shadow-none border border-white/60 dark:border-slate-700/50 relative overflow-hidden animate-fade-in-up">
             {/* Top Accent Light */}
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-emerald-400/50 to-transparent"></div>
 
@@ -163,118 +172,74 @@ export default function Login() {
               </p>
             </div>
 
-            <Form
-              form={form}
-              layout="vertical"
-              onFinish={handleSubmit}
-              requiredMark={false}
-              size="large"
-              className="space-y-6"
-            >
-              <Form.Item
-                name="username"
-                rules={[{ required: true, message: "نام کاربری الزامی است" }]}
-                className="mb-0"
+            <FormAppearance>
+              <Form
+                form={form}
+                layout="vertical"
+                onFinish={handleSubmit}
+                requiredMark={false}
+                size="large"
+                className="space-y-6"
               >
-                <div
-                  className={`relative transition-all duration-300 rounded-2xl ${focusedField === "username" ? "bg-white dark:bg-slate-800 ring-4 ring-emerald-500/10 border-emerald-500/50" : error ? "bg-red-50 border-red-200" : "bg-white/50 dark:bg-slate-800/50 border-white/50 dark:border-slate-600/50 hover:bg-white dark:hover:bg-slate-800"} border shadow-sm`}
+                <FormItem
+                  name="username"
+                  rules={[{ required: true, message: "نام کاربری الزامی است" }]}
+                  className="mb-0"
                 >
                   <Input
-                    prefix={
-                      <UserOutlined
-                        className={`text-lg ml-3 transition-colors ${focusedField === "username" ? "text-emerald-600" : "text-slate-400"}`}
-                      />
-                    }
+                    prefix={<UserOutlined className="text-slate-500" />}
                     placeholder="نام کاربری"
-                    className="!bg-transparent !border-none !shadow-none h-14 text-base font-medium text-slate-700 dark:text-slate-200 placeholder:text-slate-400/80"
-                    onFocus={() => setFocusedField("username")}
-                    onBlur={() => setFocusedField(null)}
+                    autoComplete="username"
                   />
-                </div>
-              </Form.Item>
-              <Form.Item
-                name="password"
-                rules={[{ required: true, message: "رمز عبور الزامی است" }]}
-                className="mb-2"
-              >
-                <div
-                  className={`relative transition-all duration-300 rounded-2xl ${focusedField === "password" ? "bg-white dark:bg-slate-800 ring-4 ring-emerald-500/10 border-emerald-500/50" : error ? "bg-red-50 border-red-200" : "bg-white/50 dark:bg-slate-800/50 border-white/50 dark:border-slate-600/50 hover:bg-white dark:hover:bg-slate-800"} border shadow-sm`}
+                </FormItem>
+                <FormItem
+                  name="password"
+                  rules={[{ required: true, message: "رمز عبور الزامی است" }]}
+                  className="mb-2"
                 >
                   <Input.Password
-                    prefix={
-                      <LockOutlined
-                        className={`text-lg ml-3 transition-colors ${focusedField === "password" ? "text-emerald-600" : "text-slate-400"}`}
-                      />
-                    }
+                    prefix={<LockOutlined className="text-slate-500" />}
                     placeholder="رمز عبور"
-                    className="!bg-transparent !border-none !shadow-none h-14 text-base font-medium text-slate-700 dark:text-slate-200 placeholder:text-slate-400/80"
-                    onFocus={() => setFocusedField("password")}
-                    onBlur={() => setFocusedField(null)}
+                    autoComplete="current-password"
                   />
+                </FormItem>
+                <div className="flex items-center justify-between pt-1">
+                  <FormItem
+                    name="remember"
+                    valuePropName="checked"
+                    initialValue={true}
+                    noStyle
+                  >
+                    <Checkbox>مرا به خاطر بسپار</Checkbox>
+                  </FormItem>
+                  <a
+                    href="#"
+                    className="text-xs font-bold text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 transition-colors hover:underline"
+                  >
+                    فراموشی رمز عبور؟
+                  </a>
                 </div>
-              </Form.Item>
-              <div className="flex items-center justify-between pt-1">
-                <Form.Item
-                  name="remember"
-                  valuePropName="checked"
-                  initialValue={true}
-                  noStyle
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={`relative w-full h-14 rounded-2xl font-bold text-lg text-white shadow-[0_10px_20px_rgba(16,185,129,0.2)] dark:shadow-none transition-all duration-300 transform hover:-translate-y-1 active:scale-[0.98] ${loading ? "bg-slate-300 cursor-not-allowed shadow-none" : "bg-gradient-to-r from-emerald-500 to-teal-500 hover:shadow-[0_20px_40px_rgba(16,185,129,0.3)]"}`}
                 >
-                  <Checkbox className="text-slate-500 dark:text-slate-400 text-xs font-bold hover:text-slate-700 dark:hover:text-slate-200 transition-colors">
-                    مرا به خاطر بسپار
-                  </Checkbox>
-                </Form.Item>
-                <a
-                  href="#"
-                  className="text-xs font-bold text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 transition-colors hover:underline"
-                >
-                  فراموشی رمز عبور؟
-                </a>
-              </div>
-              <button
-                type="submit"
-                disabled={loading}
-                className={`relative w-full h-14 rounded-2xl font-bold text-lg text-white shadow-[0_10px_20px_rgba(16,185,129,0.2)] dark:shadow-none transition-all duration-300 transform hover:-translate-y-1 active:scale-[0.98] ${loading ? "bg-slate-300 cursor-not-allowed shadow-none" : "bg-gradient-to-r from-emerald-500 to-teal-500 hover:shadow-[0_20px_40px_rgba(16,185,129,0.3)]"}`}
-              >
-                <span
-                  className={`flex items-center justify-center  gap-2 ${loading ? "opacity-0" : "opacity-100"} cursor-pointer`}
-                >
-                  ورود به سیستم
-                </span>
-                {loading && (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <LoadingOutlined className="text-2xl animate-spin text-white" />
-                  </div>
-                )}
-              </button>
-              <div
-                className={`transition-all duration-500 ease-out overflow-hidden ${error ? "max-h-24 opacity-100 pt-4" : "max-h-0 opacity-0 pt-0"}`}
-              >
-                <div className="bg-red-50/90 backdrop-blur-md border border-red-100 rounded-xl p-4 flex items-center gap-4 text-red-600 shadow-sm">
-                  <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center shrink-0">
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      className="text-red-500 stroke-current stroke-2"
-                    >
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <line x1="12" y1="8" x2="12" y2="12"></line>
-                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                    </svg>
-                  </div>
-                  <div className="flex-1">
-                    <div className="text-xs font-bold text-red-700 mb-0.5">
-                      خطای ورودی
+                  <span
+                    className={`flex items-center justify-center  gap-2 ${loading ? "opacity-0" : "opacity-100"} cursor-pointer`}
+                  >
+                    ورود به سیستم
+                  </span>
+                  {loading && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <LoadingOutlined className="text-2xl animate-spin text-white" />
                     </div>
-                    <div className="text-xs font-medium opacity-90">
-                      {error}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Form>
+                  )}
+                </button>
+                <FormFeedback
+                  message={error ? { status: "error", message: error } : null}
+                />
+              </Form>
+            </FormAppearance>
           </div>
           <div className="mt-8 text-center animate-fade-in-up animation-delay-200">
             <p className="text-slate-400 dark:text-slate-500 text-xs font-medium">

@@ -1,3 +1,4 @@
+import { formatPersianDate } from "@/shared/dates/calendar";
 import { GraftingOperationWithDetails } from "../types";
 
 export type GraftingFlattened = {
@@ -20,9 +21,7 @@ export async function graftingCSVData(
   return data.map((item) => ({
     ID: item.ID,
     OrderCode: item.Tbl_Orders?.OrderCode || "",
-    GraftingDate: item.GraftingDate
-      ? new Date(item.GraftingDate).toLocaleDateString("fa-IR")
-      : "",
+    GraftingDate: formatPersianDate(item.GraftingDate, { fallback: "" }),
     Technician: item.Tbl_People
       ? `${item.Tbl_People.FirstName} ${item.Tbl_People.LastName}`
       : "",

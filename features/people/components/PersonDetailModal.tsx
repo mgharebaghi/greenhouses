@@ -35,11 +35,29 @@ export default function PersonDetailModal({
         title="اطلاعات کلی"
         color="#10b981"
         items={[
-          { label: "نام", value: data.FirstName },
-          { label: "نام خانوادگی", value: data.LastName },
-          { label: "کد شخص", value: data.PersonCode },
-          { label: "کد ملی", value: data.NationalCode },
-          { label: "تخصص", value: data.Profesion },
+          { label: "نوع شخص", value: data.Legal ? "حقوقی" : "حقیقی" },
+          ...(data.Legal
+            ? [
+                { label: "نام شرکت", value: data.CompanyName },
+                { label: "کد اقتصادی شرکت", value: data.CompanyEconomicCode },
+                {
+                  label: "شماره ثبت شرکت",
+                  value: data.CompanyRegistrationCode,
+                },
+              ]
+            : [
+                { label: "نام", value: data.FirstName },
+                { label: "نام خانوادگی", value: data.LastName },
+              ]),
+          {
+            label: data.Legal ? "کد شخص حقوقی" : "کد شخص حقیقی",
+            value: data.PersonCode,
+          },
+          {
+            label: data.Legal ? "شناسه ملی" : "کد ملی",
+            value: data.NationalCode,
+          },
+          { label: "تخصص", value: data.Profession },
           { label: "پست پیشنهادی", value: data.PostName },
         ]}
       />

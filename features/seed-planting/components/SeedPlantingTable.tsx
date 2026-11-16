@@ -1,5 +1,7 @@
 "use client";
 
+import { formatPersianDate } from "@/shared/dates/calendar";
+
 import { ActionFailure, runDeletion } from "@/shared/forms/delete-record";
 
 import type { getSeedPlantings as SeedPlantingsQuery } from "@/features/seed-planting/actions";
@@ -24,13 +26,9 @@ import {
   InfoCircleOutlined,
 } from "@ant-design/icons";
 import { Button } from "antd";
-import dayjs from "dayjs";
 import { download, generateCsv, mkConfig } from "export-to-csv";
-import jalaliday from "jalaliday";
 import { useState } from "react";
 import SeedPlantingFormModal from "./SeedPlantingFormModal";
-
-dayjs.extend(jalaliday);
 
 interface SeedPlantingTableProps {
   data: SeedPlantingDetails[];
@@ -160,7 +158,7 @@ export default function SeedPlantingTable({
       key: "PlantingDate",
       render: (val: string) => (
         <span className="text-slate-600">
-          {val ? dayjs(val).calendar("jalali").format("YYYY/MM/DD") : "-"}
+          {formatPersianDate(val, { fallback: "-" })}
         </span>
       ),
     },
@@ -222,9 +220,12 @@ export default function SeedPlantingTable({
 
   const refreshData = async () => {
     setMainLoading(true);
-    const newData = await getSeedPlantings();
-    setMainData(newData);
-    setMainLoading(false);
+    try {
+      const newData = await getSeedPlantings();
+      setMainData(newData);
+    } finally {
+      setMainLoading(false);
+    }
   };
 
   const handleExportCsv = () => {
@@ -300,19 +301,11 @@ export default function SeedPlantingTable({
                 { label: "نام واریته", value: getVarietyName(viewRecord) },
                 {
                   label: "تاریخ کاشت",
-                  value: viewRecord.PlantingDate
-                    ? dayjs(viewRecord.PlantingDate)
-                        .calendar("jalali")
-                        .format("YYYY/MM/DD")
-                    : "—",
+                  value: formatPersianDate(viewRecord.PlantingDate),
                 },
                 {
                   label: "تاریخ جوانه زنی",
-                  value: viewRecord.GerminationDate
-                    ? dayjs(viewRecord.GerminationDate)
-                        .calendar("jalali")
-                        .format("YYYY/MM/DD")
-                    : "—",
+                  value: formatPersianDate(viewRecord.GerminationDate),
                 },
                 {
                   label: "تعداد کاشت",
@@ -373,19 +366,11 @@ export default function SeedPlantingTable({
                       },
                       {
                         label: "تاریخ تولید",
-                        value: seedPkg.ProductionDate
-                          ? dayjs(seedPkg.ProductionDate)
-                              .calendar("jalali")
-                              .format("YYYY/MM/DD")
-                          : "—",
+                        value: formatPersianDate(seedPkg.ProductionDate),
                       },
                       {
                         label: "تاریخ انقضا",
-                        value: seedPkg.ExpirationDate
-                          ? dayjs(seedPkg.ExpirationDate)
-                              .calendar("jalali")
-                              .format("YYYY/MM/DD")
-                          : "—",
+                        value: formatPersianDate(seedPkg.ExpirationDate),
                       },
                       {
                         label: "درصد خلوص",

@@ -1,8 +1,10 @@
 "use client";
 
+import { formatPersianDate } from "@/shared/dates/calendar";
+
 import { runDeletion, ActionFailure } from "@/shared/forms/delete-record";
 
-import type { SeedPackageRecord } from "@/features/seed-packages/types/record";
+import type { SeedPackageDetails } from "@/features/seed-packages/types/details";
 import type { WarehouseRecord } from "@/features/warehouses/types/record";
 
 import { csvRows } from "@/shared/exports/csv";
@@ -16,20 +18,16 @@ import Table from "@/shared/components/Table";
 import TableActions from "@/shared/components/TableActions";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import { Button, Tag, Tooltip, message } from "antd";
-import dayjs from "dayjs";
 import { download, generateCsv, mkConfig } from "export-to-csv";
-import jalaliday from "jalaliday";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { headers, seedWarehousingCSVData } from "../exports/csv";
 import SeedWarehousingDetailModal from "./SeedWarehousingDetailModal";
 import SeedWarehousingFormModal from "./SeedWarehousingFormModal";
 
-dayjs.extend(jalaliday);
-
 interface Props {
   data: WarehouseTransactionDetails[];
-  seedPackages: SeedPackageRecord[];
+  seedPackages: SeedPackageDetails[];
   warehouses: WarehouseRecord[];
 }
 
@@ -144,7 +142,7 @@ export default function SeedWarehousingTable({
       dataIndex: "TransactionDate",
       key: "TransactionDate",
       render: (date: Date | string | null) =>
-        date ? dayjs(date).calendar("jalali").format("YYYY/MM/DD") : "-",
+        formatPersianDate(date, { kind: "timestamp", fallback: "-" }),
     },
     {
       title: "عملیات",

@@ -200,10 +200,11 @@ model Session {
 }
 
 model Tbl_PeoplePosts {
-  ID         Int          @id(map: "PK_Tbl_PeoplePosts") @default(autoincrement())
-  PostNumber Int?
-  PostName   String?      @db.NVarChar(100)
-  Tbl_People Tbl_People[]
+  ID                   Int                    @id(map: "PK_Tbl_PeoplePosts") @default(autoincrement())
+  PostNumber           Int?
+  PostName             String?                @db.NVarChar(100)
+  Tbl_People           Tbl_People[]
+  Tbl_People_Companies Tbl_People_Companies[]
 }
 
 model Tbl_Orders {
@@ -265,7 +266,7 @@ model Tbl_StartSeedlingCycle {
 
 model Tbl_Suppliers {
   ID                   Int                    @id(map: "PK_Tbl_suppliers") @default(autoincrement())
-  Legal                Boolean?
+  People_CompaniesID   Int?
   CompanyName          String?                @db.NVarChar(150)
   BrandName            String?                @db.NVarChar(150)
   SupplierCountry      String?                @db.NVarChar(150)
@@ -279,6 +280,7 @@ model Tbl_Suppliers {
   Tbl_Orders           Tbl_Orders[]
   Tbl_SeedlingPlanting Tbl_SeedlingPlanting[]
   Tbl_SeedPackage      Tbl_SeedPackage[]
+  Tbl_People_Companies Tbl_People_Companies?  @relation(fields: [People_CompaniesID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_suppliers_Tbl_People_Companies")
 }
 
 model Tbl_GraftingOperation {
@@ -306,4 +308,22 @@ model Tbl_GraftWorkers {
   GraftWorkerID         Int?
   Tbl_GraftingOperation Tbl_GraftingOperation? @relation(fields: [GraftingOperationID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_GraftWorkers_Tbl_GraftingOperation")
   Tbl_People            Tbl_People?            @relation(fields: [GraftWorkerID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_GraftWorkers_Tbl_People")
+}
+
+model Tbl_People_Companies {
+  ID                      Int              @id(map: "PK_Tbl_People01") @default(autoincrement())
+  Legal                   Boolean?
+  PersonCode              String?          @db.NVarChar(6)
+  PostID                  Int?
+  FirstName               String?          @db.NVarChar(150)
+  LastName                String?          @db.NVarChar(150)
+  NationalCode            String?          @db.NVarChar(11)
+  PhoneNumber             String?          @db.NVarChar(150)
+  EmailAddress            String?          @db.NVarChar(50)
+  Profession              String?          @db.NVarChar(150)
+  CompanyName             String?          @db.NVarChar(150)
+  CompanyEconomicCode     String?          @db.NVarChar(50)
+  CompanyRegistrationCode String?          @db.NVarChar(50)
+  Tbl_PeoplePosts         Tbl_PeoplePosts? @relation(fields: [PostID], references: [ID], onDelete: NoAction, onUpdate: NoAction, map: "FK_Tbl_People01_Tbl_PeoplePosts")
+  Tbl_Suppliers           Tbl_Suppliers[]
 }

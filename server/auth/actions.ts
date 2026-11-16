@@ -7,7 +7,7 @@ import { redirect } from "next/navigation";
 import { CreateSession, DeleteSession, ReadSession } from "./session";
 import { signInInputSchema } from "@/features/auth/schema";
 import { parseInput } from "@/shared/validation/input";
-import { actionError } from "../actions/errors";
+import { actionError, readError } from "../actions/errors";
 
 export type SignInResult = {
   status: "ok" | "error";
@@ -66,7 +66,9 @@ export async function signIn(input: unknown): Promise<SignInResult> {
 }
 
 export async function requireAuth(route: string) {
-  const session = await ReadSession();
+  const session = await ReadSession().catch((error: unknown) => {
+    throw readError(error);
+  });
 
   if (session?.status === "ok" && (route === "/" || route === "/login"))
     redirect("/dashboard");
@@ -84,7 +86,9 @@ export async function requireAuth(route: string) {
 }
 
 export async function removeAuth() {
-  await DeleteSession();
+  await DeleteSession().catch((error: unknown) => {
+    throw readError(error);
+  });
 
   redirect("/");
 }

@@ -1,10 +1,17 @@
-import { PrismaClient } from "@/app/generated/prisma/client";
+import { Prisma, PrismaClient } from "@/app/generated/prisma/client";
+import generatedClient from "@/app/generated/prisma/package.json";
 import "server-only";
 
-const globalForPrisma = global as unknown as {
-  prisma: PrismaClient | undefined;
+const globalForPrisma = globalThis as typeof globalThis & {
+  greenhousePrisma?: { generation: string; client: PrismaClient };
 };
+const isDevelopment = process.env.NODE_ENV !== "production";
+// Prisma generates a package name containing the schema hash.
+const generation = `${generatedClient.name}:${Prisma.prismaVersion.client}`;
+const cached = isDevelopment ? globalForPrisma.greenhousePrisma : undefined;
 
-export const prisma = globalForPrisma.prisma ?? new PrismaClient();
+export const prisma =
+  cached?.generation === generation ? cached.client : new PrismaClient();
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+if (isDevelopment)
+  globalForPrisma.greenhousePrisma = { generation, client: prisma };

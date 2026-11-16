@@ -1,8 +1,5 @@
-import dayjs from "dayjs";
-import jalaliday from "jalaliday";
+import { formatPersianDate } from "@/shared/dates/calendar";
 import type { GreenhouseDetails } from "../types";
-
-dayjs.extend(jalaliday);
 
 export type GreenhouseRawArray = GreenhouseDetails[];
 
@@ -26,7 +23,7 @@ export async function greenhousesCSVData(
     GreenhouseType: item.GreenhouseType,
     AreaSqM: item.AreaSqM,
     ConstructionDate: item.ConstructionDate
-      ? dayjs(item.ConstructionDate).calendar("jalali").format("YYYY/MM/DD")
+      ? formatPersianDate(item.ConstructionDate)
       : null,
     Owner: item.Tbl_People
       ? `${item.Tbl_People.FirstName} ${item.Tbl_People.LastName}`

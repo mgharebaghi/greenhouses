@@ -5,6 +5,8 @@ export type PeopleRawArray = Awaited<ReturnType<typeof getPeople>>;
 export type PersonCsvRow = {
   FirstName: string | null;
   LastName: string | null;
+  CompanyName: string | null;
+  PersonType: string;
   EmailAddress: string | null;
   PhoneNumber: string | null;
   Profesion: string | null;
@@ -19,9 +21,11 @@ export async function peopleCSVData(
   return data.map((item: PeopleReadDTO) => ({
     FirstName: item.FirstName,
     LastName: item.LastName,
+    CompanyName: item.CompanyName,
+    PersonType: item.Legal ? "حقوقی" : "حقیقی",
     EmailAddress: item.EmailAddress,
     PhoneNumber: item.PhoneNumber,
-    Profesion: item.Profesion,
+    Profesion: item.Profession,
     PersonCode: item.PersonCode,
     PostName: item.PostName,
   }));
@@ -33,4 +37,6 @@ export const headers = [
   { displayLabel: "آدرس ایمیل", key: "EmailAddress" },
   { displayLabel: "شماره تماس", key: "PhoneNumber" },
   { displayLabel: "تخصص", key: "Profesion" },
+  { displayLabel: "نوع شخص", key: "PersonType" },
+  { displayLabel: "نام شرکت", key: "CompanyName" },
 ];

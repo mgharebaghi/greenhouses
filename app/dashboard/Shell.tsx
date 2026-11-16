@@ -8,6 +8,8 @@ import { Content } from "antd/es/layout/layout";
 import { useState } from "react";
 
 import ThemeToggle from "@/shared/components/ThemeToggle";
+import { formatPersianDate, formatTehranTime } from "@/shared/dates/calendar";
+import { useServerDay, useServerTime } from "@/shared/dates/ServerClock";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 
@@ -44,16 +46,18 @@ export default function DashboardShell({
   const [openDrawer, setOpenDrawer] = useState(false);
   const pathname = usePathname();
   const currentTitle = PAGE_TITLES[pathname] || "سامانه گلخانه";
+  const time = useServerTime();
+  const today = useServerDay();
 
   return (
-    <Layout className="h-dvh flex flex-col bg-gradient-to-br from-emerald-50/50 via-white to-lime-50/50">
+    <Layout className="h-dvh min-w-0 overflow-hidden flex flex-col bg-gradient-to-br from-emerald-50/50 via-white to-lime-50/50">
       {/* Light Header */}
       {/* Distinct Modern Header with Themed Gradient & Stronger Depth */}
-      <header className="sticky top-0 z-50 h-[90px] bg-white/95 dark:bg-slate-900/90 backdrop-blur-2xl border-b border-emerald-200/80 dark:border-slate-700/80 shadow-[0_4px_20px_-2px_rgba(16,185,129,0.15),0_10px_40px_-10px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_20px_-2px_rgba(0,0,0,0.5)] transition-all duration-300">
+      <header className="relative z-50 h-16 shrink-0 sm:h-[90px] bg-white/95 dark:bg-slate-900/90 backdrop-blur-2xl border-b border-emerald-200/80 dark:border-slate-700/80 shadow-[0_4px_20px_-2px_rgba(16,185,129,0.15),0_10px_40px_-10px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_20px_-2px_rgba(0,0,0,0.5)] transition-all duration-300">
         <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-400 opacity-80 dark:opacity-60"></div>
-        <div className="h-full px-3 sm:px-6 flex items-center justify-between mx-auto max-w-[1920px] pt-2">
+        <div className="h-full min-w-0 px-2.5 sm:px-6 flex items-center justify-between gap-2 mx-auto max-w-[1920px] pt-1 sm:pt-2">
           {/* Left: Menu + Brand Identity */}
-          <div className="flex items-center gap-2 sm:gap-5">
+          <div className="flex min-w-0 items-center gap-2 sm:gap-5">
             <button
               onClick={() => setOpenDrawer(true)}
               className="group relative h-10 w-10 rounded-xl bg-white/60 dark:bg-slate-800/60 border border-emerald-100 dark:border-slate-700 hover:border-emerald-400 dark:hover:border-emerald-500 hover:bg-white dark:hover:bg-slate-800 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all duration-300 flex items-center justify-center text-emerald-800/70 dark:text-slate-300 cursor-pointer shadow-sm flex-shrink-0"
@@ -63,7 +67,7 @@ export default function DashboardShell({
             </button>
 
             {/* Brand Section */}
-            <div className="flex items-center gap-2 sm:gap-3 select-none">
+            <div className="flex min-w-0 items-center gap-2 sm:gap-3 select-none">
               <div className="relative h-10 w-10 sm:h-12 sm:w-12 flex items-center justify-center rounded-xl bg-white dark:bg-slate-800 shadow-[0_4px_15px_-3px_rgba(0,0,0,0.1)] dark:shadow-none border border-emerald-50 dark:border-slate-700 overflow-hidden p-1.5 flex-shrink-0">
                 <Image
                   src="/fakoor-logo.png"
@@ -86,29 +90,17 @@ export default function DashboardShell({
           </div>
 
           {/* Right: Functional Widgets & Profile */}
-          <div className="flex items-center gap-3 sm:gap-4">
+          <div className="flex shrink-0 items-center gap-2 sm:gap-4">
             {/* Theme Toggle */}
             <ThemeToggle />
 
             {/* Date/Time Widget (Useful) */}
             <div className="hidden md:flex flex-col items-end mr-2 px-3 border-r-2 border-slate-100 dark:border-slate-700">
-              <span
-                className="text-slate-900 dark:text-slate-200 font-bold text-sm tracking-widest leading-none numbers-fa transition-colors"
-                suppressHydrationWarning
-              >
-                {new Date().toLocaleTimeString("fa-IR", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
+              <span className="text-slate-900 dark:text-slate-200 font-bold text-sm tracking-widest leading-none numbers-fa transition-colors">
+                {formatTehranTime(time)}
               </span>
-              <span
-                className="text-slate-400 dark:text-slate-500 text-[10px] font-medium mt-1 leading-none transition-colors"
-                suppressHydrationWarning
-              >
-                {new Date().toLocaleDateString("fa-IR", {
-                  day: "numeric",
-                  month: "long",
-                })}
+              <span className="text-slate-400 dark:text-slate-500 text-[10px] font-medium mt-1 leading-none transition-colors">
+                {formatPersianDate(today, { format: "D MMMM" })}
               </span>
             </div>
 
@@ -120,7 +112,7 @@ export default function DashboardShell({
         </div>
       </header>
 
-      <Content className="flex-1 min-h-screen relative bg-gradient-to-br from-emerald-50 via-lime-50 to-white dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 overflow-hidden transition-colors duration-500">
+      <Content className="flex-1 min-h-0 min-w-0 relative bg-gradient-to-br from-emerald-50 via-lime-50 to-white dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 overflow-hidden transition-colors duration-500">
         {/* Animated Background Patterns */}
         <div className="absolute inset-0 opacity-30 dark:opacity-10 pointer-events-none overflow-hidden">
           <div className="absolute top-0 left-0 w-96 h-96 bg-emerald-200 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
@@ -137,7 +129,7 @@ export default function DashboardShell({
           }}
         ></div>
 
-        <div className="relative z-10 w-full h-full overflow-auto">
+        <div className="dashboard-scroll relative z-10 h-full min-w-0 w-full overflow-x-hidden overflow-y-auto">
           {children}
         </div>
 

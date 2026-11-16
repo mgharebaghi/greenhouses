@@ -4,6 +4,7 @@ import {
   optionalNumber,
   optionalText,
   recordIdSchema,
+  sqlInteger,
 } from "@/shared/validation/input";
 import { z } from "zod";
 export const seedPlantingInputSchema = z.object({
@@ -11,10 +12,10 @@ export const seedPlantingInputSchema = z.object({
   GreenhouseID: optionalId,
   SeedType: z.boolean(),
   PlantingDate: optionalDate,
-  SeedPlantingNumber: z.number().int().nonnegative(),
-  TrayNumber: z.number().int().nonnegative(),
-  CellPerTrayNumber: z.number().int().nonnegative(),
-  CellHeight: z.number().int().nonnegative(),
+  SeedPlantingNumber: sqlInteger.nonnegative(),
+  TrayNumber: sqlInteger.nonnegative(),
+  CellPerTrayNumber: sqlInteger.nonnegative(),
+  CellHeight: sqlInteger.nonnegative(),
   TrayMaterial: optionalText(50),
   PlantingBed: optionalText(50),
   PlantingBedRatio: optionalNumber,

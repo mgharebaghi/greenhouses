@@ -9,8 +9,21 @@ import { seedPackageInputSchema } from "../features/seed-packages/schema";
 import { supplierInputSchema } from "../features/suppliers/schema";
 import { warehouseInputSchema } from "../features/warehouses/schema";
 import { createGraftingOperationSchema } from "../features/grafting/schema";
-import { toDate } from "../shared/forms/date-value";
-import DateObject from "react-date-object";
+import { seedWarehousingInputSchema } from "../features/seed-warehousing/schema";
+import {
+  formatPersianDate,
+  formatTehranTime,
+  getTehranDay,
+  pickerDateToISO,
+  toCalendarDate,
+} from "../shared/dates/calendar";
+import {
+  calendarDateSchema,
+  parseInput,
+  InputValidationError,
+  sqlDecimal,
+  sqlInteger,
+} from "../shared/validation/input";
 
 const contracts: {
   schema: z.ZodType;
@@ -26,7 +39,11 @@ const contracts: {
   },
   {
     schema: supplierInputSchema,
-    valid: { Legal: true, CompanyName: "شرکت" },
+    valid: {
+      People_CompaniesID: 1,
+      CompanyName: "شرکت",
+      ContactTel: "02112345678",
+    },
     field: "CompanyName",
     limit: 150,
   },
@@ -118,10 +135,86 @@ test("grafting rejects duplicate people, fractional counts and oversized tool de
   );
 });
 
-test("the shared date adapter preserves picker dates and native dates, and handles empty values", () => {
-  const date = new Date("2026-10-11T12:30:00.000Z");
-  assert.equal(toDate(date)?.getTime(), date.getTime());
-  assert.equal(toDate(new DateObject(date))?.getTime(), date.getTime());
-  assert.equal(toDate(date.toISOString())?.getTime(), date.getTime());
-  assert.equal(toDate(null), null);
+test("the date picker and SQL DATE contract preserve the same day across time zones", () => {
+  const value = new Date("2026-11-15T00:00:00.000Z");
+  const pickerDate = toCalendarDate(value);
+  assert.equal(pickerDate?.format("YYYY/MM/DD"), "۱۴۰۵/۰۸/۲۴");
+  assert.equal(pickerDateToISO(pickerDate), "2026-11-15");
+  assert.deepEqual(
+    calendarDateSchema.parse(pickerDateToISO(pickerDate)),
+    value,
+  );
+  assert.deepEqual(
+    calendarDateSchema.parse("2026-11-15T00:00:00+03:30"),
+    value,
+  );
+  assert.equal(formatPersianDate(value.toISOString()), "۱۴۰۵/۰۸/۲۴");
+  assert.equal(pickerDateToISO(null), null);
+  assert.equal(formatPersianDate(""), "—");
+  assert.equal(calendarDateSchema.safeParse("2026-02-30").success, false);
+});
+
+test("write boundaries preserve numbers and identifiers and localize type errors", () => {
+  const schema = z.object({
+    WeightGram: sqlDecimal(8, 2),
+    SeedCount: sqlInteger.nonnegative(),
+    SerialNumber: z.string(),
+  });
+  const input = { WeightGram: 17.25, SeedCount: 0, SerialNumber: "0017" };
+  assert.deepEqual(parseInput(schema, input), input);
+  assert.equal(
+    schema.safeParse({ ...input, WeightGram: 17.251 }).success,
+    false,
+  );
+  assert.equal(
+    schema.safeParse({ ...input, SeedCount: 2147483648 }).success,
+    false,
+  );
+  assert.throws(
+    () => parseInput(schema, { ...input, WeightGram: "17.25", SeedCount: 0.5 }),
+    (error) => {
+      assert.ok(error instanceof InputValidationError);
+      assert.deepEqual(error.fieldErrors.WeightGram, ["عدد معتبر وارد کنید."]);
+      assert.deepEqual(error.fieldErrors.SeedCount, ["عدد صحیح وارد کنید."]);
+      return true;
+    },
+  );
+});
+
+test("warehouse timestamps and the dashboard clock use the Tehran calendar day", () => {
+  const base = {
+    SeedPackageID: 1,
+    WarehouseID: 1,
+    TransactionType: true,
+    PackageQuantity: 1,
+  };
+  const beforeMidnight = new Date("2026-11-14T20:29:00.000Z");
+  const midnight = new Date("2026-11-14T20:30:00.000Z");
+  assert.equal(getTehranDay(beforeMidnight), "2026-11-14");
+  assert.equal(getTehranDay(midnight), "2026-11-15");
+  assert.equal(formatTehranTime(midnight.getTime()), "۰۰:۰۰");
+  assert.equal(
+    formatPersianDate(midnight, { kind: "timestamp" }),
+    "۱۴۰۵/۰۸/۲۴",
+  );
+  assert.equal(
+    pickerDateToISO(toCalendarDate(midnight, "timestamp")),
+    "2026-11-15",
+  );
+  assert.deepEqual(
+    seedWarehousingInputSchema.parse({ ...base, TransactionDate: "2026-11-15" })
+      .TransactionDate,
+    midnight,
+  );
+  assert.deepEqual(
+    seedWarehousingInputSchema.parse({
+      ...base,
+      TransactionDate: beforeMidnight.toISOString(),
+    }).TransactionDate,
+    beforeMidnight,
+  );
+  assert.equal(
+    seedWarehousingInputSchema.parse(base).TransactionDate,
+    undefined,
+  );
 });

@@ -1,5 +1,7 @@
 "use client";
 
+import { formatPersianDate } from "@/shared/dates/calendar";
+
 import { publicOrderUrl } from "@/shared/config/public-urls";
 
 import DetailModal, { InfoCard } from "@/shared/components/DetailModal";
@@ -31,11 +33,6 @@ export default function RecoveryRoomDetailModal({
     ? `${customer.FirstName} ${customer.LastName}`
     : "—";
 
-  const formatDate = (date: string | Date | null | undefined) => {
-    if (!date) return "—";
-    return new Date(date).toLocaleDateString("fa-IR");
-  };
-
   return (
     <DetailModal
       open={open}
@@ -64,7 +61,7 @@ export default function RecoveryRoomDetailModal({
                 },
                 {
                   label: "تاریخ پیوند‌زنی",
-                  value: formatDate(op?.GraftingDate),
+                  value: formatPersianDate(op?.GraftingDate),
                 },
               ]}
             />
@@ -77,11 +74,11 @@ export default function RecoveryRoomDetailModal({
               items={[
                 {
                   label: "تاریخ ورود",
-                  value: formatDate(data.RecoveryEntryDate),
+                  value: formatPersianDate(data.RecoveryEntryDate),
                 },
                 {
                   label: "تاریخ خروج",
-                  value: formatDate(data.RecoveryExitDate),
+                  value: formatPersianDate(data.RecoveryExitDate),
                 },
                 {
                   label: "مجموع کل تلفات",

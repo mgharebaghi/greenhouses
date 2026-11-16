@@ -3,6 +3,7 @@ import { actionError } from "@/server/actions/errors";
 import { requireSession } from "@/server/auth/require-session";
 import { parseInput } from "@/shared/validation/input";
 import { seedPackageInputSchema } from "../schema";
+import { seedPackageExpiration } from "../domain/expiration";
 
 import { prisma } from "@/server/db/prisma";
 import { revalidatePath } from "next/cache";
@@ -19,20 +20,17 @@ export async function createSeedPackage(input: unknown) {
         GerminationRate: data.GerminationRate,
         PurityPercent: data.PurityPercent,
         PackageNumber: data.PackageNumber,
-        ProductionDate: data.ProductionDate
-          ? new Date(data.ProductionDate)
-          : undefined,
-        ExpirationDate: data.ExpirationDate
-          ? new Date(data.ExpirationDate)
-          : undefined,
+        ProductionDate: data.ProductionDate,
+        ExpirationDate: seedPackageExpiration(
+          data.ProductionDate,
+          data.ProductionCalendar,
+        ),
         QualityGrade: data.QualityGrade,
         SerialNumber: data.SerialNumber,
         PackageType: data.PackageType,
         SeedCount: data.SeedCount,
         WeightGram: data.WeightGram,
-        PackagingDate: data.PackagingDate
-          ? new Date(data.PackagingDate)
-          : undefined,
+        PackagingDate: data.PackagingDate,
         IsCertified: data.IsCertified,
       },
     });

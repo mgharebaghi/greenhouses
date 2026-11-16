@@ -5,13 +5,23 @@ import { prisma } from "@/server/db/prisma";
 import { parseInput, recordIdSchema } from "@/shared/validation/input";
 import { revalidatePath } from "next/cache";
 import { warehouseInputSchema } from "../schema";
+import { resolveManagerName } from "./manager";
 
 export async function updateWarehouse(id: number, input: unknown) {
   try {
     await requireSession();
     const recordId = parseInput(recordIdSchema, id);
-    const data = parseInput(warehouseInputSchema, input);
-    await prisma.tbl_Warehouses.update({ where: { ID: recordId }, data });
+    const { WarehouseManagerID, ...data } = parseInput(
+      warehouseInputSchema,
+      input,
+    );
+    await prisma.tbl_Warehouses.update({
+      where: { ID: recordId },
+      data: {
+        ...data,
+        WarehouseManagerName: await resolveManagerName(WarehouseManagerID),
+      },
+    });
     revalidatePath("/dashboard/warehouses");
     return { status: "ok" as const, message: "اطلاعات با موفقیت ویرایش شد." };
   } catch (error) {

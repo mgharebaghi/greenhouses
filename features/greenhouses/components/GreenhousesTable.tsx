@@ -1,3 +1,4 @@
+import { formatPersianDate } from "@/shared/dates/calendar";
 import {
   getGreenhouses,
   deleteGreenhouse,
@@ -16,15 +17,11 @@ import {
   ShopOutlined,
 } from "@ant-design/icons";
 import { Button } from "antd";
-import dayjs from "dayjs";
 import { download, generateCsv, mkConfig } from "export-to-csv";
-import jalaliday from "jalaliday";
 import { useState } from "react";
 import { greenhousesCSVData } from "../exports/csv";
 import type { GreenhouseDetails } from "../types";
 import GreenhouseFormModal from "./GreenhouseFormModal";
-
-dayjs.extend(jalaliday);
 
 interface GreenHousesTableProps {
   data: GreenhouseDetails[];
@@ -115,7 +112,7 @@ export default function GreenhousesTable({
       key: "ConstructionDate",
       render: (val: string) => (
         <span className="text-slate-600">
-          {val ? dayjs(val).calendar("jalali").format("YYYY/MM/DD") : "-"}
+          {formatPersianDate(val, { fallback: "-" })}
         </span>
       ),
     },
@@ -267,11 +264,7 @@ export default function GreenhousesTable({
               items={[
                 {
                   label: "تاریخ احداث",
-                  value: viewRecord.ConstructionDate
-                    ? dayjs(viewRecord.ConstructionDate)
-                        .calendar("jalali")
-                        .format("YYYY/MM/DD")
-                    : "—",
+                  value: formatPersianDate(viewRecord.ConstructionDate),
                 },
                 {
                   label: "آدرس",

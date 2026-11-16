@@ -1,0 +1,223 @@
+UHF Reader Communication Protocol
+ TOC \o "1-3" \h \z \u 
+
+Brief Instruction
+Communication protocol means that PC machine operates the stipulations of communication protocol of the reader through the communication interface.
+RS485  interface  supports RS232 communication protocol in the data link layer, but it has protocol extend.
+Communication protocol adopts data format of asynchronism communication protocol which is face to byte,. It stipulates that the data frames the PC machine issues to reader must be command, and the data frames from the reader must be response. The command or response data frames must become long bytes and adopt group package and check sum methods  to check out afterward.
+The longest command or response data frames  is 128bytes.
+1 communication protocol configuration
+		 SHAPE  \* MERGEFORMAT 
+Picture one：communication  protocol configuration
+Communication protocol adopts administrative levels configuration like the following picture indicated, including  physical  layer, data link layer and application layer.
+1．1 1Physicle layer 
+The physical layer completes the sending and receiving of bit, and needs to meet the criterion of RS232,the special design demand is like the following:
+one stat bie, eight data bits, one stop bit and no even and odd.
+Communication band rate is designed to 9600bps,19200bps,38400bps,37600bps and 115200bps.After the line on reader repositions, the star band rate is 9600bps,.The communication band rate of the reader can be changed through the PC machine to send command. .When the PC machine and the reader transmission makes mmistakes, the ban rate of reader will revert to 9600bps.
+1．2 Data link layer
+Data link layer stipulates the types and data format of command and response frames in speciality
+The types of frames includes command frame, ,response  frame and r response frame. That reader commands   to complete
+
+1．2．1 the format definition of command frame
+	
+Command frame is the data frame when mainframe operate reader,the format is like the following table indicated”
+Head | Addr | Len | Cmd  | Parameter | … | Parameter | Check |  | 0x0A | 1 byte | n+2 | 1 byte | Byte 1 |  | Byte n | cc |  | 
+Head is the frame symbol,defines 0x0A
+Addr is the address of reader,generally from 20 to 240,225(OXFF)is communal address,254(OXFE)is broadcasting address. Reader receives the command of  iits own assress, communal address and broadcasting address, but never reverts the command of broadcasting  address 
+Len is length area ,means the middle byte NO.after lengthe area
+Cmd is command NO. area.。
+Parameter is the area of the command frame.
+Check is the araa of check sum ,it stipulates the checkout range is the check sum of all the bytes from star frame to parameter.Reader needs to calculate the check sum to check mistake after receiving the command frame.
+1．2．2 format definition of response frame 
+	Response frame is the data frame that reader returns to mainframe.Response frame includes the data that reader needs to collect,the format definition is like the following table indicated”
+Head | Addr | Len | Status | Response  | … | Response | Check |  | 0x0A | 1 byte | n+2 | 1 byte | Byte 1 |  | Byte n | cc |  | 
+Head is head type,,response frame itype is fixed to be OXED
+Addr is the own address of reader
+Len is length, means the middle bytes after the length 
+Status means  the result by the operation stipulated by command,0means right carrying-off. While other indicate abnormity.
+Response is the data from the response frame.
+Check is the check sum area,it stipulates the checkout range is the check sum of all bytes from head to parameter,PC machine needs to calculate the check sum to check mistake after receiving the command frame.
+The check sum of bytes, PC machine needs to calculate the check sum to check mistake after receiving the command frame.
+The stipulation to get the data is like the following table indicated:Status
+Sequence number | value | Name | Narration interposed |  | 1 | 0x00 | ERR_NONE | Successful completion the command |  |  | 0x01 | ERR_ GENERAL_ERR | General mistake |  |  | 0x02 | ERR_PAR_SET_FAILED | Fail to sset parameter |  |  | 0x03 | ERR_PAR_GET_FAILED | Fail to read parameter |  |  | 0x04 | ERR_NO_TAG | No tag |  |  | 0x05 | ERR_READ_FAILED | Fail to read tag |  |  | 0x06 | ERR_WRITE_FAILED | Fail to read-in tag |  |  | 0x07 | ERR_LOCK_FAILED | Fail to stipulate tag |  |  | 0x08 | ERR_ERASE_FAILED | 标签fail to erasuretag |  |  | 0x09 |  |  |  |  | 0x0A |  |  |  |  | 0xFE | ERR_CMD_ERR | Nonsupport by command or parameter exceed the rang |  |  | 0xFF | ERR_UNDEFINED | Undefinition mistake |  | 
+2 command frame definition
+2.1 system to set command
+2.1.1 Set Baud Rate
+	Set the communication band rate of reader RS232
+Head | Addr | Len | Cmd  | Parameter | Check |  | 0x0A |  | 0x03 | 0x20 | baudrate | cc |  | bandrate parameter is needed to set. The special parameter meanings are : 0x00，9600bps；0x01，19200bps；0x02，38400bps；0x03，57600bps；0x04，115200bps。
+  After reader receives command frame,,it will return to the response frame of no data with the primary bandrate,then amend the reader parameter to communicate with the new bandrate.
+
+2.1.2 Reset Reader
+	Command frame of reset reader
+Head | Addr | Len | Cmd  | Check |  | 0x0A |  | 0x02 | 0x21 | cc |  | After reader receives this command,it will returns to the response frame of no data first, then the reader resets
+2.1.3 Get Firmware Version
+	The command frame to read the software edition of the reader 
+Head | Addr | Len | Cmd  | Check |  | 0x0A |  | 0x02 | 0x22 | cc |  | 	When reader receives this command frame, it will return to the response frame,, the command data in the response frame is BootLoader or the firmware version,.The format of the response frame I is like the following table indicated.
+Head | Addr | Len | Status | Response | Response | Check |  | 0x0B |  | 0x04 | 0x00 | Major | Minor | cc |  | Major is the major vertion of firmware program
+Mainor  is the minor version of the firmware program
+2.1.4 Set_RF
+Set command frame of reader frequency parameter.
+Head | Addr | Len | Cmd  | Parameter1 | Parameter2 | Check |  | 0x0A |  | 0x04 | 0x25 |  |  | cc |  | 	Parameter1 is RF：canclespan is 0～30；
+    Parameter2 is frequency sype：cancle span is（00 is ISM920—905MHz, 01 is ISM902—928MHz, 02 is ISM865—868MHz,）
+After reader receives this command frame, it will amend the magnitude of power of the RF and returns to the response frame with no data.
+2.1.5 Get_RF
+Query reader RF parameter。
+	Head | Addr | Len | Cmd  | Check |  | 0x0A |  | 0x02 | 0x26 | cc |  | 	After the reader receives thiscommand frame of reader，it will return to the response frame，the format of the responseframe is like following table indicated：
+Head | Addr | Len | Status | POWER | Freq | Check |  | 0x0B |  | 0x04 | 0x00 |  |  | cc |  | 	POWER is the present RF value of reader。
+	Freq is the present frequency type of reader（00 is ISM920—905MHz, 01 is ISM902—928MHz, 02 is ISM865—868MHz,）
+
+2.1.6 Get Work Antenna
+    Query the command frame of work antenna of the reader。
+Head | Addr | Len | Cmd  | Check |  | 0x0A |  | 0x02 | 0x28 | cc |  | After the reader receives this command frame，it will return to the response frame，the format of the response frame is like following table indicated：
+Head | Addr | Len | Status | Antenna | Check |  | 0x0B |  | 0x03 | 0x00 |  | cc |  | 
+2.1.7 Set Work Antenna
+Set command frame of FR work antenna.
+Head | Addr | Len | Cmd  | Parameter | Check |  | 0x0A |  | 0x03 | 0x27 | antenna | cc |  | 	Antenna is the work antenna parameter needs to set.,adopted digital mask off code design.,when the 	DD-D7 is or 1 ,,meaning that the corresponding antenna isi on or off working.
+	After reader receives this command frame,it will return to the response frame with no data,and amend the FR work parameter.
+
+2.2 ISO18000-6B tag operation command
+2.2.1 Iso Multi Tag Identify
+ISO18000 multi tag identify.
+Head | Addr | Len | Cmd  | Check |  | 0x0A |  | 0x02 | 0x60 | cc |  | After reader receives this command frame,it will make multi-tag identify,then return the tag number.,the tag data will be saved in the FR storage..The response frame r format is like the fo;;owing table indicated.
+Head | Addr | Len | Status | Response | Check |  | 0x0B |  | 0x03 | 0x00 | TagCount | cc |  | Tag count i
+2.2.2 Iso Multi Tag Read
+ISO18000 multi taf users datas  read
+	Head | Addr | Len | Cmd  | Parameter | Check |  | 0x0A |  | 0x02 | 0x61 | Start Addr | cc |  | Star addr is for the users datas need to read.
+After readers receive the command frame,it will make multi tag users datas reading,and read the 8 bytes data from the star address of every tag .After indentification,,it will return the tag number of this time ,and the tag data will be saved in the FR storage.the response frame format is like the following table indicated:
+
+Head | Addr | Len | Status | Response | Check |  | 0x0B |  | 0x03 | 0x00 | TagCount | cc |  | 
+2.2.3 Iso Write
+ISO18000 ttag single byte write
+Head | Addr | Len | Cmd  | Parameter | Parameter | Check |  | 0x0A |  | 0x04 | 0x62 | Addr | Value | cc |  | Addr is the tag address needs to write
+Value is the data needs to write
+The reader will return to the response frame with on data.
+
+2.2.4 Iso Read With UID
+Read the data in the condition of knowing UID
+Head | Addr | Len | Cmd  | Parameter | Parameter | Check |  | 0x0A |  | 0x0B | 0x63 | UID(8byte) | Addr | cc |  | Addr is the star address,UID is the ID NO.of the known tag.The reader will return 9 bytes data.
+
+	Head | Addr | Len | Status | Response | Check |  | 0x0B |  | 0x0B | 0x00 | 9byte | cc |  | In the returning datas ,the first byte is antenna number and the latter 8 bytes are data.
+2.2.5  Iso Write With UID
+In the condition of knowing UID,write tag data
+Head | Addr | Len | Cmd  | Parameter | Parameter | Parameter | Check |  | 0x0A |  | 0x0B | 0x64 | UID(8byte) | Addr | Value | cc |  | Address is the tag address f needs to write
+Value is  the data needs to write
+UID is the ID number of the knowing tag
+The reader returns to the response rame with no data.
+2.2.6  Iso Lock
+	。
+ISO18000 tag lock
+	Head | Addr | Len | Cmd  | Parameter | Check |  | 0x0A |  | 0x02 | 0x65 | Addr | cc |  | Address is the address for the tag needs to lock
+2.2.7  Iso Query Lock
+	Iso18000lB locking inquiry。
+ISO18000 query lock
+	Head | Addr | Len | Cmd  | Parameter | Check |  | 0x0A |  | 0x02 | 0x66 | Addr | cc |  | Address is the tag address needs to query.
+The response frame format format is like the following table indicated:
+Head | Addr | Len | Status | Response | Check |  | 0x0B |  | 0x03 | 0x00 | Lock Status | cc |  | Lock status,0 means unlocked,1 means locked
+2.2.8 Iso Block Write
+ISO18000 tag block (four bytes)write
+Head | Addr | Len | Cmd  | Parameter | Parameter | Check |  | 0x0A |  | 0x02 | 0x67 | Addr | Value（4bytes） | cc |  | Addr is the tag address needs to write,it must be 
+Value is the data needs to write
+The reader returns to the response frame with no data
+
+2.2.9 Iso Single Tag Read
+	
+ISO18000 single tag read
+	Head | Addr | Len | Cmd  | Parameter | Check |  | 0x0A |  | 0x03 | 0x68 | Addr | cc |  | 	Addr is the star address,,when the address is 0,ithe reader reads UID.The reader returns 9 bytes data
+	Head | Addr | Len | Status | Response | Check |  | 0x0B |  | 0x0B | 0x00 | 9byte | cc |  | 	In the returning datas,the first byte is antenna number,the latter 8bytes are data.
+
+2.3 EPC GEN2 tag work command
+2.3.1 Gen2 Multi Tag Identify
+	EPC Gen2multi tag identify
+Head | Addr | Len | Cmd  | Check |  | 0x0A |  | 0x02 | 0x80 | cc |  | After the reader rexeives the command frame,it makes EPC,GEN2 multi tag operate,then return the tag number of this time after identification.The tag data will be saved in the storage .The response frame format  is like the following table indicated.
+Head | Addr | Len | Status | Response | Check |  | 0x0B |  | 0x03 | 0x00 | TagCount | cc |  | TagCount 
+2.3.2 Gen2 EPC Write
+	EPC Gen2 EPC write
+
+Head | Addr | Len | Cmd  | Parameter | Parameter | Check |  | 0x0A |  | 0x02 | 0x81 | World Addr | Value（2bytes） | cc |  | 	
+    World addr is thewoed address needs to write(0~5) 
+Value is the byte data needs to write
+After the reader receives the command,it will write  the EPC coding with a word(two bytes)
+Generally , now he EPC tag and EPC coding are six bytes(96 digit)
+Reader returns to the response frame with no data.
+2.3.3 Gen2 Lock
+	EPC Gen2 taqg data lock
+	Head | Addr | Len | Cmd  | Parameter | Check |  | 0x0A |  | 0x02 | 0x82 | MemBank | cc |  | Mem Band is the tag area needs to lock,,it must be 2 when lock the EPC
+The reader will return to the response frame with no data.
+2.3.4 Gen2 Kill
+	EPC Gen2tag kill
+
+Head | Addr | Len | Cmd  | Parameter | Check |  | 0x0A |  | 0x02 | 0x83 | Password | cc |  | Password means kill the code
+The reader returns to the response frame with no data.
+2.3.5 Gen2 Init
+
+EPC Gen2 tag specification initialization。
+EPC Gen2 tag specification initialization
+Head | Addr | Len | Cmd  | Parameter | Check |  | 0x0A |  | 0x03 | 0x84 | BitCount | cc |  | BitCount is the EPC digit  need s to initialize 
+The reader returns to the response frame with no data
+2.3.6 Gen2 Read
+Head | Addr | Len | Cmd  | Parameter | Parameter | Parameter | Check |  | 0x0A |  | 0x05 | 0x85 | Membank | Word Addr | WordCnt | cc |  | 
+2.3.7 Gen2 Write
+	EPC Gen2 discretional area write 
+
+Head | Addr | Len | Cmd  | Parameter | Parameter | Parameter | Check |  | 0x0A |  | 0x06 | 0x86 | Membank | World Addr | Value（2bytes） | cc |  | 	Word Addr is the word address needs to write in(0~5)
+Value is the two bytes datas need to write in.
+After the reader receives the command, it will write a word(two bytes)in the appointed address.The reader returns to the response frame with no data,.
+2.3.8 Gen2 Block Write
+Head | Addr | Len | Cmd  | Parameter | Parameter | Parameter | Check |  | 0x0A |  | 0x02 | 0x87 | Membank | World Addr | Value（2bytes） | cc |  | 
+2.4 Buffer management command
+2.4.1 Get ID And Delete
+	
+Get the tag data from the buffer ,then delete the data.
+Head | Addr | Len | Cmd  | Parameter | Check |  | 0x0A |  | 0x03 | 0x40 | Count | cc |  | Count is the data number that wants to get,the largest is 18.The response frame is like the following table indicated:
+Head | Addr | Len | Status  | Response | Response | Check |  | 0x0B |  | 14*n+3 | 0x00 | Count | Data(14*n) | cc |  | 	Count is the uploading number,of this time,data means tag data.14 bytes make a group fo tag data,the first byte of the group means tag type,the second means antenna number,and the llatter 12 bytes mean tag data.
+2.4.2 Get ID
+	Get the tag data from the buffer,the keep the data.
+Head | Addr | Len | Cmd  | Check |  | 0x0A |  | 0x03 | 0x41 | cc |  | Count is the tag number needs to get.The response frame is like the following table indicated:
+Head | Addr | Len | Status  | Response | Check |  | 0x0B |  | 17 | 0x00 | Data(14) | cc |  | 2.4.3 Get ID ACK
+After the reader receives the command of Feedback of successful data getting,delete the data that transimited before
+Head | Addr | Len | Cmd  | Check |  | 0x0A |  | 0x03 | 0x42 | cc |  | 	The reader deletes one group of ID that transmited,and transmits another group data of ID.
+If no data in the determent storage,the reader will returns to the response frame with no data
+	2.4.4 Query ID Count
+	Query ID count
+	Head | Addr | Len | Cmd  | Check |  | 0x0A |  | 0x03 | 0x43 | cc |  | The response frame format is like the following table indicated:
+Head | Addr | Len | Status | Response | Check |  | 0x0B |  | 0x03 | 0x00 | Count | cc |  | 
+Count is the tag number in the buffer
+2.4.5 Clear ID Buffer
+	Clean the buffer
+	Head | Addr | Len | Cmd  | Check |  | 0x0A |  | 0x03 | 0x44 | cc |  | 	The reader returns the response frame with no data.
+
+3 Technical Support
+	Welcome to contact with us when there is any question in using it,we will do our best to service you.。
+
+
+4  Addenda command index table
+Sequence number | Command code | Name | Narration interposed |  | System setting  command (0x60 ~ 0x7F) |  |  | 0x20 | Set Baudrate | Set communication bandrate |  |  | 0x21 | Reset Reader | Reset reader |  |  | 0x22 | Get Firmware Version | Read the software version OF readers |  |  | 0x23 | Set Parameter | Set the single work parameter of readers |  |  | 0x24 | Get Parameter | Read the single parameter of readers |  |  | 0x25 | Set_RF | Set the FR poeder of readers |  |  | 0x26 | Get RF | Get RF poeder of readers |  |  | 0x27 | Set Work Antenna | Set the work antenna of readers |  |  | 0x28 | Query Battery | Query buttery quantity（handset） |  | Tag operation command (0x68~0x9F) |  |  | 0x60 | Iso Multi Tag Identify | ISO18000 multi tag ID NO. searching  |  |  | 0x61 | Iso Multi Tag Read | ISO18000 multi tag 8 bytes data reading  |  |  | 0x62 | Iso Write | ISO18000 single tag single byte writing  |  |  | 0x63 | Iso Read With UID | ISO18000 reads according the ID NO.  |  |  | 0x64 | Iso Write With UID | ISO18000 wtites according the ID NO. |  |  | 0x65 | Iso Lock | ISO18000single tag lock |  |  | 0x66 | Iso Query Lock | ISO18000single tag query lock  |  |  | 0x67 | Iso Block Write | ISO18000 single teag read and write |  |  | 0x68 | Iso Single Tag Read | ISO18000single tag read |  |  |  |  | 0x80 | Gen2 Multi Tag Identify | EPC GEN2 multi tag EPC read |  |  | 0x81 | Gen2 EPC Write | EPC GEN2 single tag EPC single byte |  |  | 0x82 | Gen2 Lock | EPC GEN2 single tag lock |  |  | 0x83 | Gen2 Kill | EPC GEN2 single tag kill |  |  | 0x84 | Gen2 Init | EPC GEN2 single tag EPC digit lock  |  |  | 0x85 | Gen2 Read | EPC GEN2 single tag read |  |  | 0x86 | Gen2 Write | EPC GEN2 single tag write |  |  | 0x87 | Gen2 BlockWrite | EPC GEN2 single tag block write |  | Buffer management command 0x40~0x4F） |  |  | 0x40 | Get ID And Delete | Distill tag data and kill buffer pickup |  |  | 0x41 | Get ID | Distill tag data and keep buffer pickup  |  |  | 0x42 | Get ID ACK | feedback of  right distilling tag data |  |  | 0x43 | Query ID Count | Query tag data NO.in the buffer  |  |  | 0x44 | Clear ID Buffer | Clean the buffer |  | 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Link layer
+
+Physical layer
+
+Application layer
+
+
+

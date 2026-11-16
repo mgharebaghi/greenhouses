@@ -19,19 +19,15 @@ export async function createSeedPlanting(input: unknown) {
       OrderID: Number(data.OrderID),
       GreenhouseID: data.GreenhouseID ? Number(data.GreenhouseID) : null,
       SeedType: Boolean(data.SeedType), // 0 or 1
-      PlantingDate: data.PlantingDate ? new Date(data.PlantingDate) : null,
+      PlantingDate: data.PlantingDate ?? null,
       SeedPlantingNumber: Number(data.SeedPlantingNumber),
       TrayNumber: Number(data.TrayNumber),
       CellPerTrayNumber: Number(data.CellPerTrayNumber),
       CellHeight: Number(data.CellHeight),
       TrayMaterial: data.TrayMaterial,
       PlantingBed: data.PlantingBed,
-      PlantingBedRatio: data.PlantingBedRatio
-        ? Number(data.PlantingBedRatio)
-        : null,
-      GerminationDate: data.GerminationDate
-        ? new Date(data.GerminationDate)
-        : null,
+      PlantingBedRatio: data.PlantingBedRatio ?? null,
+      GerminationDate: data.GerminationDate ?? null,
       TechnicianID: data.TechnicianID ? Number(data.TechnicianID) : null,
     };
 

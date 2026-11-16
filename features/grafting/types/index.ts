@@ -6,6 +6,7 @@ import type { OrderRecord } from "@/features/orders/types/record";
 import type { PersonRecord } from "@/features/people/types/record";
 import { z } from "zod";
 import { createGraftingOperationSchema } from "../schema";
+import type { FieldErrors } from "@/shared/contracts/action-result";
 
 export type GraftingCreateDTO = z.infer<typeof createGraftingOperationSchema>;
 
@@ -42,6 +43,7 @@ export type GraftingActionResponse = {
   status: "ok" | "error";
   message: string;
   id?: number;
+  fieldErrors?: FieldErrors;
 };
 
 export type * from "./record";

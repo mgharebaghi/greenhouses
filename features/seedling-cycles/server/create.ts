@@ -3,11 +3,14 @@ import { actionError } from "@/server/actions/errors";
 import { requireSession } from "@/server/auth/require-session";
 import { parseInput } from "@/shared/validation/input";
 import { startSeedlingCycleSchema } from "../schema";
+import type { StartSeedlingCycleCreateRes } from "../types";
 
 import { prisma } from "@/server/db/prisma";
 import { revalidatePath } from "next/cache";
 
-export async function createStartSeedlingCycle(input: unknown) {
+export async function createStartSeedlingCycle(
+  input: unknown,
+): Promise<StartSeedlingCycleCreateRes> {
   try {
     await requireSession();
     const data = parseInput(startSeedlingCycleSchema, input);

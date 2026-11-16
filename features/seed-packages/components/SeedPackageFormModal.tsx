@@ -1,26 +1,31 @@
-import { getPlantVarieties } from "@/features/plant-varieties/actions";
+import { loadFormOptions } from "@/shared/forms/load-options";
 import {
-  createSeedPackage,
-  updateSeedPackage,
-} from "@/features/seed-packages/actions";
+  DatePicker,
+  Form,
+  FormActions,
+  FormGrid,
+  FormItem,
+  Input,
+  InputNumber,
+  Radio,
+  Select,
+  Switch,
+} from "@/shared/components/FormControls";
+import { getPlantVarieties } from "@/features/plant-varieties/actions";
+import { createSeedPackage, getSeedPackageExpiration, updateSeedPackage } from "@/features/seed-packages/actions";
 import { getSuppliers } from "@/features/suppliers/actions";
-import FormFeedback from "@/shared/components/FormFeedback";
+import { supplierName } from "@/features/suppliers/domain/name";
 import Modal from "@/shared/components/FormModal";
 import GreenhouseButton from "@/shared/components/GreenhouseButton";
 import { applyFieldErrors } from "@/shared/forms/field-errors";
-import { submitForm } from "@/shared/forms/submit";
-import type { FormValues } from "@/shared/forms/types";
-import { CloseOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
-import { Form, Input, InputNumber, Select, Switch } from "antd";
+import { refreshSavedForm, submitForm } from "@/shared/forms/submit";
+import { PlusOutlined } from "@ant-design/icons";
+import { pickerDateToISO, toCalendarDate, type DateCalendar } from "@/shared/dates/calendar";
+
 import { useEffect, useState } from "react";
 import type { z } from "zod";
 import { seedPackageInputSchema } from "../schema";
 import type { SeedPackageDetails } from "../types/details";
-
-import DatePicker from "@/shared/components/PersianDatePicker";
-import DateObject from "react-date-object";
-import persian from "react-date-object/calendars/persian";
-import persian_fa from "react-date-object/locales/persian_fa";
 
 interface SeedPackageInsUpModalProps {
   open: boolean;
@@ -39,23 +44,29 @@ export default function SeedPackageInsUpModal({
 }: SeedPackageInsUpModalProps) {
   const [form] = Form.useForm();
   const [internalLoading, setInternalLoading] = useState(false);
+  const [calendarSystem, setCalendarSystem] = useState<DateCalendar>("persian");
+  const [productionCalendar, setProductionCalendar] = useState<DateCalendar>("persian");
+  const [expirationLoading, setExpirationLoading] = useState(false);
   const [message, setMessage] = useState<{
     status: "ok" | "error";
     message: string;
   } | null>(null);
 
-  const [suppliers, setSuppliers] = useState<
-    { value: number; label: string }[]
-  >([]);
-  const [varieties, setVarieties] = useState<
-    { value: number; label: string }[]
-  >([]);
+  const [suppliers, setSuppliers] = useState<{ value: number; label: string }[]>([]);
+  const [varieties, setVarieties] = useState<{ value: number; label: string }[]>([]);
 
   const isEditMode = !!data;
+  const productionDate = Form.useWatch("ProductionDate", form);
+  const productionDay = pickerDateToISO(toCalendarDate(productionDate));
+  const savedProduction = pickerDateToISO(toCalendarDate(data?.ProductionDate));
+  const savedExpiration = pickerDateToISO(toCalendarDate(data?.ExpirationDate));
 
   useEffect(() => {
+    let cancelOptions: (() => void) | undefined;
     if (open) {
-      fetchOptions();
+      setCalendarSystem("persian");
+      setProductionCalendar("persian");
+      cancelOptions = loadFormOptions(fetchOptions, setMessage);
       setMessage(null);
       if (isEditMode && data) {
         form.setFieldsValue({
@@ -64,29 +75,14 @@ export default function SeedPackageInsUpModal({
           CropVariety: data.CropVariety,
           GerminationRate: data.GerminationRate,
           PurityPercent: data.PurityPercent,
-          ProductionDate: data.ProductionDate
-            ? new DateObject(new Date(data.ProductionDate)).convert(
-                persian,
-                persian_fa,
-              )
-            : null,
-          ExpirationDate: data.ExpirationDate
-            ? new DateObject(new Date(data.ExpirationDate)).convert(
-                persian,
-                persian_fa,
-              )
-            : null,
+          ProductionDate: data.ProductionDate ?? null,
+          ExpirationDate: data.ExpirationDate ?? null,
           QualityGrade: data.QualityGrade,
           SerialNumber: data.SerialNumber,
           PackageType: data.PackageType,
           SeedCount: data.SeedCount,
           WeightGram: data.WeightGram,
-          PackagingDate: data.PackagingDate
-            ? new DateObject(new Date(data.PackagingDate)).convert(
-                persian,
-                persian_fa,
-              )
-            : null,
+          PackagingDate: data.PackagingDate ?? null,
           PackageNumber: data.PackageNumber,
           IsCertified: data.IsCertified,
         });
@@ -94,19 +90,46 @@ export default function SeedPackageInsUpModal({
         form.resetFields();
       }
     }
+    return cancelOptions;
   }, [open, data, isEditMode, form]);
 
-  const fetchOptions = async () => {
-    const [suppliersData, varietiesData] = await Promise.all([
-      getSuppliers(),
-      getPlantVarieties(),
-    ]);
+  useEffect(() => {
+    if (!open) return;
+    if (productionDay === savedProduction && savedExpiration) {
+      form.setFieldValue("ExpirationDate", savedExpiration);
+      setExpirationLoading(false);
+      return;
+    }
+    form.setFieldValue("ExpirationDate", null);
+    if (!productionDay) {
+      setExpirationLoading(false);
+      return;
+    }
+
+    let current = true;
+    setExpirationLoading(true);
+    void getSeedPackageExpiration({
+      ProductionDate: productionDay,
+      ProductionCalendar: productionCalendar,
+    }).then((expiration) => {
+      if (current) form.setFieldValue("ExpirationDate", expiration);
+    }).catch(() => {
+      if (current) setMessage({ status: "error", message: "محاسبهٔ تاریخ انقضا انجام نشد. تاریخ تولید را بررسی کنید." });
+    }).finally(() => {
+      if (current) setExpirationLoading(false);
+    });
+    return () => { current = false; };
+  }, [open, form, productionDay, productionCalendar, savedProduction, savedExpiration]);
+
+  const fetchOptions = async (isCurrent: () => boolean) => {
+    const [suppliersData, varietiesData] = await Promise.all([getSuppliers(), getPlantVarieties()]);
 
     if (suppliersData) {
+      if (!isCurrent()) return;
       setSuppliers(
         suppliersData.map((s) => ({
           value: s.ID,
-          label: s.CompanyName || `${s.FirstName} ${s.LastName}`,
+          label: supplierName(s),
         })),
       );
     }
@@ -121,36 +144,19 @@ export default function SeedPackageInsUpModal({
     }
   };
 
-  const handleFinish = async (
-    values: FormValues<z.infer<typeof seedPackageInputSchema>>,
-  ) => {
+  const handleFinish = async (values: z.input<typeof seedPackageInputSchema>) => {
     await submitForm(
       async () => {
         setInternalLoading(true);
         setLoading(true);
         setMessage(null);
 
-        const dataToSubmit = {
-          ...values,
-          ProductionDate:
-            values.ProductionDate instanceof DateObject
-              ? values.ProductionDate.toDate()
-              : undefined,
-          ExpirationDate:
-            values.ExpirationDate instanceof DateObject
-              ? values.ExpirationDate.toDate()
-              : undefined,
-          PackagingDate:
-            values.PackagingDate instanceof DateObject
-              ? values.PackagingDate.toDate()
-              : undefined,
-        };
-
+        const input = { ...values, ProductionCalendar: productionCalendar };
         let res;
         if (isEditMode && data?.ID) {
-          res = await updateSeedPackage(data.ID, dataToSubmit);
+          res = await updateSeedPackage(data.ID, input);
         } else {
-          res = await createSeedPackage(dataToSubmit);
+          res = await createSeedPackage(input);
         }
 
         setLoading(false);
@@ -161,7 +167,7 @@ export default function SeedPackageInsUpModal({
           setMessage({ status: "ok", message: res.message });
           setTimeout(() => {
             setOpen(false);
-            refreshData();
+            void refreshSavedForm(refreshData);
             if (!isEditMode) {
               form.resetFields();
             }
@@ -186,398 +192,219 @@ export default function SeedPackageInsUpModal({
     }
   };
 
-  const inputStyleClass = `rounded-xl border-2 border-slate-200 dark:border-slate-700 transition-all shadow-sm hover:shadow w-full dark:bg-slate-800 dark:text-white dark:placeholder-slate-500 ${
-    isEditMode
-      ? "hover:border-amber-300 dark:hover:border-amber-700 focus:border-amber-400 dark:focus:border-amber-600"
-      : "hover:border-emerald-300 dark:hover:border-emerald-700 focus:border-emerald-400 dark:focus:border-emerald-600"
-  }`;
-
   // Header colors
-  const headerGradient = isEditMode
-    ? "from-amber-50 via-orange-50/80 to-white dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 border-amber-100 dark:border-slate-700"
-    : "from-emerald-50 via-lime-50/80 to-white dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 border-emerald-100 dark:border-slate-700";
-
-  const closeBtnClass = `absolute top-5 left-5 h-9 w-9 rounded-xl bg-white dark:bg-slate-800 border transition-all flex items-center justify-center shadow-sm hover:shadow ${
-    isEditMode
-      ? "hover:bg-amber-50 dark:hover:bg-amber-900/20 border-amber-200 dark:border-slate-600 hover:border-amber-300 dark:hover:border-amber-700 text-amber-600 dark:text-amber-500 hover:text-amber-700"
-      : "hover:bg-emerald-50 dark:hover:bg-emerald-900/20 border-emerald-200 dark:border-slate-600 hover:border-emerald-300 dark:hover:border-emerald-700 text-emerald-600 dark:text-emerald-500 hover:text-emerald-700"
-  }`;
-
-  const iconGradient = isEditMode
-    ? "from-amber-500 via-amber-600 to-orange-600"
-    : "from-emerald-500 via-emerald-600 to-emerald-700";
-
-  const pulseColor = isEditMode ? "bg-amber-400" : "bg-emerald-400";
-  const dotColor = isEditMode ? "bg-orange-400" : "bg-lime-400";
-
-  const inputStyle = { height: "46px", fontSize: "14px" };
 
   return (
     <Modal
       open={open}
-      onCancel={handleClose}
+      onClose={handleClose}
       destroyOnHidden
-      width={900}
-      className="!p-0"
-      styles={{
-        content: {
-          padding: 0,
-          borderRadius: "1.25rem",
-          overflow: "hidden",
-          boxShadow:
-            "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-        },
-      }}
+      heading={isEditMode ? "ویرایش بسته بذر" : "افزودن بسته بذر جدید"}
+      description={isEditMode ? `ویرایش اطلاعات بسته: ${data?.SerialNumber}` : "اطلاعات بسته را با دقت وارد کنید"}
+      icon={<PlusOutlined />}
+      editing={isEditMode}
     >
-      {/* Header */}
-      <div
-        className={`relative px-6 py-6 bg-gradient-to-br border-b ${headerGradient}`}
-      >
-        <button
-          onClick={handleClose}
-          className={closeBtnClass}
-          aria-label="بستن"
-        >
-          <CloseOutlined className="text-sm" />
-        </button>
+      <Form form={form} layout="vertical" onFinish={handleFinish} requiredMark={false}>
+        <FormGrid title="هویت بسته و تأمین‌کننده" columns={3}>
+          <FormItem
+            name="SupplierID"
+            label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">تأمین کننده</span>}
+            className="mb-0"
+          >
+            <Select
+              options={suppliers}
+              placeholder="انتخاب کنید"
+              showSearch
+              optionFilterProp="label"
 
-        <div className="flex items-center gap-4">
-          <div className="relative">
-            <div
-              className={`h-14 w-14 rounded-2xl bg-gradient-to-br shadow-lg flex items-center justify-center text-white ${iconGradient}`}
-            >
-              {isEditMode ? (
-                <EditOutlined className="text-2xl" />
-              ) : (
-                <PlusOutlined className="text-2xl" />
-              )}
-            </div>
-            <div
-              className={`absolute -bottom-1 -right-1 h-5 w-5 rounded-full border-2 border-white dark:border-slate-800 ${dotColor}`}
-            ></div>
-          </div>
-          <div>
-            <h3
-              className={`font-bold text-2xl ${isEditMode ? "text-amber-900 dark:text-slate-100" : "text-emerald-900 dark:text-slate-100"}`}
-            >
-              {isEditMode ? "ویرایش بسته بذر" : "افزودن بسته بذر جدید"}
-            </h3>
-            <p
-              className={`text-sm mt-1 flex items-center gap-1.5 ${isEditMode ? "text-amber-600/80 dark:text-slate-400" : "text-emerald-600/80 dark:text-slate-400"}`}
-            >
-              <span
-                className={`h-1.5 w-1.5 rounded-full animate-pulse ${pulseColor}`}
-              ></span>
-              {isEditMode
-                ? `ویرایش اطلاعات بسته: ${data?.SerialNumber}`
-                : "اطلاعات بسته را با دقت وارد کنید"}
-            </p>
-          </div>
-        </div>
-      </div>
+              loading={suppliers.length === 0}
+            />
+          </FormItem>
 
-      {/* Body */}
-      <div className="px-6 py-6 bg-gradient-to-br from-white to-slate-50/30 dark:from-slate-900 dark:to-slate-950 max-h-[70vh] overflow-y-auto">
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleFinish}
-          requiredMark={false}
-        >
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            <Form.Item
-              name="SupplierID"
-              label={
-                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                  تأمین کننده
-                </span>
-              }
-              className="mb-0"
-            >
-              <Select
-                options={suppliers}
-                placeholder="انتخاب کنید"
-                showSearch
-                optionFilterProp="label"
-                size="large"
-                className="w-full"
-                style={{ height: "46px" }}
-                loading={suppliers.length === 0}
-              />
-            </Form.Item>
+          <FormItem
+            name="ProducerCompany"
+            label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">شرکت تولید کننده</span>}
+            className="mb-0"
+          >
+            <Input placeholder="نام شرکت" />
+          </FormItem>
 
-            <Form.Item
-              name="ProducerCompany"
-              label={
-                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                  شرکت تولید کننده
-                </span>
-              }
-              className="mb-0"
-            >
-              <Input
-                placeholder="نام شرکت"
-                size="large"
-                className={inputStyleClass}
-                style={inputStyle}
-              />
-            </Form.Item>
+          <FormItem
+            name="CropVariety"
+            label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">واریته</span>}
+            className="mb-0"
+          >
+            <Select
+              options={varieties}
+              placeholder="انتخاب کنید"
+              showSearch
+              optionFilterProp="label"
 
-            <Form.Item
-              name="CropVariety"
-              label={
-                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                  واریته
-                </span>
-              }
-              className="mb-0"
-            >
-              <Select
-                options={varieties}
-                placeholder="انتخاب کنید"
-                showSearch
-                optionFilterProp="label"
-                size="large"
-                className="w-full"
-                style={{ height: "46px" }}
-                loading={varieties.length === 0}
-              />
-            </Form.Item>
+              loading={varieties.length === 0}
+            />
+          </FormItem>
 
-            <Form.Item
-              name="SerialNumber"
-              label={
-                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                  شماره سریال <span className="text-rose-500">*</span>
-                </span>
-              }
-              rules={[
-                { required: true, message: "لطفا شماره سریال را وارد کنید" },
+          <FormItem
+            name="SerialNumber"
+            label={
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                شماره سریال <span className="text-rose-500">*</span>
+              </span>
+            }
+            rules={[{ required: true, message: "لطفا شماره سریال را وارد کنید" }]}
+            className="mb-0"
+          >
+            <Input placeholder="مثال: PKG-1001" />
+          </FormItem>
+
+          <FormItem
+            name="PackageNumber"
+            label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">تعداد بسته ها</span>}
+            className="mb-0"
+          >
+            <InputNumber placeholder="عدد" controls={false} />
+          </FormItem>
+
+          <FormItem
+            name="PackageType"
+            label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">نوع بسته‌بندی</span>}
+            className="mb-0"
+          >
+            <Input placeholder="مثال: پاکت, قوطی..." />
+          </FormItem>
+        </FormGrid>
+
+        <FormGrid title="مقدار و کیفیت بذر" columns={3}>
+          <FormItem
+            name="SeedCount"
+            label={
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">تعداد بذر در هر بسته</span>
+            }
+            className="mb-0"
+          >
+            <InputNumber placeholder="عدد" controls={false} />
+          </FormItem>
+
+          <FormItem
+            name="WeightGram"
+            label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">وزن هر بسته (گرم)</span>}
+            className="mb-0"
+          >
+            <InputNumber placeholder="گرم" controls={false} />
+          </FormItem>
+
+          <FormItem
+            name="GerminationRate"
+            label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">نرخ جوانه زنی (%)</span>}
+            className="mb-0"
+          >
+            <InputNumber placeholder="%" controls={false} max={100} min={0} />
+          </FormItem>
+
+          <FormItem
+            name="PurityPercent"
+            label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">درصد خلوص (%)</span>}
+            className="mb-0"
+          >
+            <InputNumber placeholder="%" controls={false} max={100} min={0} />
+          </FormItem>
+
+          <FormItem
+            name="QualityGrade"
+            label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">درجه کیفی</span>}
+            className="mb-0"
+          >
+            <Input placeholder="مثال: A, B, Grade 1" />
+          </FormItem>
+
+          <FormItem
+            name="IsCertified"
+            label={
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">گواهی تضمین کیفیت دارد؟</span>
+            }
+            valuePropName="checked"
+            className="mb-0 flex flex-col justify-end pb-3"
+          >
+            <Switch />
+          </FormItem>
+        </FormGrid>
+
+        <FormGrid title="تاریخ‌های تولید و بسته‌بندی" columns={3}>
+          <div className="record-form-wide flex justify-end">
+            <Radio.Group
+              size="small"
+              optionType="button"
+              buttonStyle="solid"
+              aria-label="تقویم تاریخ‌های بسته بذر"
+              value={calendarSystem}
+              onChange={(event) => setCalendarSystem(event.target.value)}
+              options={[
+                { label: "شمسی", value: "persian" },
+                { label: "میلادی", value: "gregorian" },
               ]}
-              className="mb-0"
-            >
-              <Input
-                placeholder="مثال: PKG-1001"
-                size="large"
-                className={inputStyleClass}
-                style={inputStyle}
-              />
-            </Form.Item>
-
-            <Form.Item
-              name="PackageNumber"
-              label={
-                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                  تعداد بسته ها
-                </span>
-              }
-              className="mb-0"
-            >
-              <InputNumber
-                className={inputStyleClass}
-                style={{ ...inputStyle, width: "100%", paddingTop: "4px" }}
-                placeholder="عدد"
-                controls={false}
-              />
-            </Form.Item>
-
-            <Form.Item
-              name="PackageType"
-              label={
-                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                  نوع بسته‌بندی
-                </span>
-              }
-              className="mb-0"
-            >
-              <Input
-                placeholder="مثال: پاکت, قوطی..."
-                size="large"
-                className={inputStyleClass}
-                style={inputStyle}
-              />
-            </Form.Item>
-
-            <Form.Item
-              name="SeedCount"
-              label={
-                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                  تعداد بذر در هر بسته
-                </span>
-              }
-              className="mb-0"
-            >
-              <InputNumber
-                className={inputStyleClass}
-                style={{ ...inputStyle, width: "100%", paddingTop: "4px" }}
-                placeholder="عدد"
-                controls={false}
-              />
-            </Form.Item>
-
-            <Form.Item
-              name="WeightGram"
-              label={
-                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                  وزن هر بسته (گرم)
-                </span>
-              }
-              className="mb-0"
-            >
-              <InputNumber
-                className={inputStyleClass}
-                style={{ ...inputStyle, width: "100%", paddingTop: "4px" }}
-                placeholder="گرم"
-                controls={false}
-              />
-            </Form.Item>
-
-            <Form.Item
-              name="GerminationRate"
-              label={
-                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                  نرخ جوانه زنی
-                </span>
-              }
-              className="mb-0"
-            >
-              <InputNumber
-                className={inputStyleClass}
-                style={{ ...inputStyle, width: "100%", paddingTop: "4px" }}
-                placeholder="%"
-                controls={false}
-                max={100}
-                min={0}
-              />
-            </Form.Item>
-
-            <Form.Item
-              name="PurityPercent"
-              label={
-                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                  درصد خلوص (%)
-                </span>
-              }
-              className="mb-0"
-            >
-              <InputNumber
-                className={inputStyleClass}
-                style={{ ...inputStyle, width: "100%", paddingTop: "4px" }}
-                placeholder="%"
-                controls={false}
-                max={100}
-                min={0}
-              />
-            </Form.Item>
-
-            <Form.Item
-              name="QualityGrade"
-              label={
-                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                  درجه کیفی
-                </span>
-              }
-              className="mb-0"
-            >
-              <Input
-                placeholder="مثال: A, B, Grade 1"
-                size="large"
-                className={inputStyleClass}
-                style={inputStyle}
-              />
-            </Form.Item>
-
-            <Form.Item
-              name="ProductionDate"
-              label={
-                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                  تاریخ تولید
-                </span>
-              }
-              className="mb-0"
-            >
-              <DatePicker
-                inputClass={`${inputStyleClass} !h-[46px] px-3`}
-                containerClassName="w-full"
-                placeholder="انتخاب تاریخ"
-              />
-            </Form.Item>
-
-            <Form.Item
-              name="ExpirationDate"
-              label={
-                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                  تاریخ انقضا
-                </span>
-              }
-              className="mb-0"
-            >
-              <DatePicker
-                inputClass={`${inputStyleClass} !h-[46px] px-3`}
-                containerClassName="w-full"
-                placeholder="انتخاب تاریخ"
-              />
-            </Form.Item>
-
-            <Form.Item
-              name="PackagingDate"
-              label={
-                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                  تاریخ بسته‌بندی
-                </span>
-              }
-              className="mb-0"
-            >
-              <DatePicker
-                inputClass={`${inputStyleClass} !h-[46px] px-3`}
-                containerClassName="w-full"
-                placeholder="انتخاب تاریخ"
-              />
-            </Form.Item>
-
-            <Form.Item
-              name="IsCertified"
-              label={
-                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                  گواهی تضمین کیفیت دارد؟
-                </span>
-              }
-              valuePropName="checked"
-              className="mb-0 flex flex-col justify-end pb-3"
-            >
-              <Switch />
-            </Form.Item>
-          </div>
-
-          <FormFeedback message={message} />
-
-          <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 mt-8 pt-6 border-t-2 border-slate-200 dark:border-slate-700">
-            <GreenhouseButton
-              text="انصراف"
-              variant="secondary"
-              onClick={handleClose}
-              disabled={internalLoading}
-              className="w-full sm:w-auto min-w-[140px] h-11"
-              type="button"
-            />
-            <GreenhouseButton
-              text={
-                internalLoading
-                  ? isEditMode
-                    ? "در حال ویرایش..."
-                    : "در حال ثبت..."
-                  : isEditMode
-                    ? "ویرایش بسته بذر"
-                    : "ثبت بسته بذر"
-              }
-              variant="primary"
-              type="submit"
-              loading={internalLoading}
-              className="w-full sm:w-auto min-w-[140px] h-11 shadow-lg hover:shadow-xl"
             />
           </div>
-        </Form>
-      </div>
+          <FormItem
+            name="ProductionDate"
+            label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">تاریخ تولید</span>}
+            className="mb-0"
+          >
+            <DatePicker
+              calendarSystem={calendarSystem}
+              placeholder="انتخاب تاریخ"
+              onChange={() => {
+                setProductionCalendar(calendarSystem);
+                setMessage(null);
+              }}
+            />
+          </FormItem>
+
+          <FormItem
+            name="PackagingDate"
+            label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">تاریخ بسته‌بندی</span>}
+            className="mb-0"
+          >
+            <DatePicker calendarSystem={calendarSystem} placeholder="انتخاب تاریخ" />
+          </FormItem>
+
+          <FormItem
+            name="ExpirationDate"
+            label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">تاریخ انقضا</span>}
+            className="mb-0"
+          >
+            <DatePicker
+              calendarSystem={calendarSystem}
+              disabled
+              placeholder={expirationLoading ? "در حال محاسبه…" : "از تاریخ تولید محاسبه می‌شود"}
+            />
+          </FormItem>
+        </FormGrid>
+
+        <FormActions message={message}>
+          <GreenhouseButton
+            text="انصراف"
+            variant="secondary"
+            onClick={handleClose}
+            disabled={internalLoading}
+
+            type="button"
+          />
+          <GreenhouseButton
+            text={
+              internalLoading
+                ? isEditMode
+                  ? "در حال ویرایش..."
+                  : "در حال ثبت..."
+                : isEditMode
+                  ? "ویرایش بسته بذر"
+                  : "ثبت بسته بذر"
+            }
+            variant="primary"
+            type="submit"
+            loading={internalLoading}
+          />
+        </FormActions>
+      </Form>
     </Modal>
   );
 }
