@@ -12,10 +12,6 @@ export async function updateSeedWarehousing(id: number, input: unknown) {
     await requireSession();
     const data = parseInput(seedWarehousingInputSchema, input);
     parseInput(recordIdSchema, id);
-    const customDate = data.TransactionDate
-      ? new Date(data.TransactionDate)
-      : undefined;
-
     const updatedTrx = await prisma.tbl_WarehousesTransaction.update({
       where: { ID: id },
       data: {
@@ -26,7 +22,7 @@ export async function updateSeedWarehousing(id: number, input: unknown) {
         TransactionType:
           data.TransactionType !== undefined ? data.TransactionType : undefined,
         PackageQuantity: data.PackageQuantity,
-        TransactionDate: customDate,
+        TransactionDate: data.TransactionDate ?? undefined,
         DestinationType: data.DestinationType,
         RecordedBy: data.RecordedBy,
       },

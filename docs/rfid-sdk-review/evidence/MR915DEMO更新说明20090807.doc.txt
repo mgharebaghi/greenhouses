@@ -1,0 +1,43 @@
+添加两个数据读写函数：
+/**********************************************************************
+功能 Gen2Read	EPC GEN2 标签读
+参数	
+		BYTE byMembank; // 读区域，销毁密码和访问密码区为0，EPC编码区为1，USER区为3
+		BYTE byWordPtr;  // 读字数据地址0-7，仅写USER区需要指定
+		BYTE byWordCnt;//读字数
+		BYTE byValue;  //读出一个字长数据				
+返回值
+***********************************************************************/extern "C" DllExport int __stdcall  Gen2Read(HANDLE hPort,BYTE byMembank,BYTE byWordPtr,BYTE byWordCnt, short *byValue, BYTE byReaderAddr = 0xFF);
+
+
+/**********************************************************************
+功能	EPC GEN2 标签写
+参数	
+		BYTE byMembank; // 写入区域，销毁密码和访问密码区为0，EPC编码区为1，USER区为3
+		BYTE byWordPtr;  // 写入字地址0-7，仅写USER区需要指定
+		BYTE byValue;  //写入一个字长数据				
+返回值: Int
+***********************************************************************/
+extern "C" DllExport int __stdcall  Gen2Write(HANDLE hPort,BYTE byMembank,BYTE byWordPtr,short byValue, BYTE byReaderAddr = 0xFF);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

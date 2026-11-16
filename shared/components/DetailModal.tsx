@@ -1,5 +1,6 @@
 import { CloseOutlined } from "@ant-design/icons";
-import { Card, Modal } from "antd";
+import Modal from "@/shared/components/ResponsiveModal";
+import { Card } from "antd";
 import { ReactNode } from "react";
 
 interface DetailModalProps {
@@ -46,17 +47,17 @@ export const InfoCard = ({ title, icon, color, items }: InfoCardProps) => (
       {items.map((item, idx) => (
         <div
           key={idx}
-          className={`flex ${item.span ? "flex-col gap-1" : "items-center justify-between"} ${
+          className={`flex ${item.span ? "flex-col gap-1" : "items-baseline justify-between gap-3"} ${
             idx !== items.length - 1
               ? "pb-3 border-b border-slate-100 dark:border-slate-700"
               : ""
           }`}
         >
-          <span className="text-sm text-slate-600 dark:text-slate-400">
+          <span className="min-w-0 text-sm text-slate-600 dark:text-slate-400">
             {item.label}
           </span>
           <span
-            className={`font-bold text-slate-900 dark:text-slate-100 ${item.span ? "text-sm" : ""}`}
+            className={`min-w-0 [overflow-wrap:anywhere] text-end font-bold text-slate-900 dark:text-slate-100 ${item.span ? "text-sm" : ""}`}
           >
             {item.value ?? "—"}
           </span>
@@ -125,7 +126,7 @@ export default function DetailModal({
 }: DetailModalProps) {
   // Fallback to 'emerald' or use the provided 'gradientFrom' as key
   const theme = themeConfig[gradientFrom] || themeConfig["emerald"];
-  const modalWidth = width || "clamp(360px, 95vw, 1100px)";
+  const modalWidth = width || 1100;
 
   return (
     <Modal
@@ -141,12 +142,9 @@ export default function DetailModal({
           padding: 0,
           borderRadius: "1rem",
           overflow: "hidden",
-          maxHeight: "90vh",
         },
         body: {
           padding: 0,
-          maxHeight: "calc(90vh - 80px)",
-          overflowY: "auto",
         },
         mask: {
           backdropFilter: "blur(4px)",
@@ -155,7 +153,7 @@ export default function DetailModal({
     >
       {/* Header */}
       <div
-        className={`sticky top-0 z-10 px-6 py-5 bg-gradient-to-br ${theme.headerBg} to-white dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 border-b border-slate-200 dark:border-slate-700 backdrop-blur-sm`}
+        className={`sticky top-0 z-10 px-4 py-3 pe-14 sm:px-6 sm:py-5 sm:pe-16 bg-gradient-to-br ${theme.headerBg} to-white dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 border-b border-slate-200 dark:border-slate-700 backdrop-blur-sm`}
       >
         <button
           onClick={onClose}
@@ -165,14 +163,14 @@ export default function DetailModal({
           <CloseOutlined className="text-sm" />
         </button>
 
-        <div className="flex items-center gap-4">
+        <div className="flex min-w-0 items-center gap-3 sm:gap-4">
           <div
-            className={`h-12 w-12 rounded-xl bg-gradient-to-br ${theme.iconBg} flex items-center justify-center text-white text-xl shadow-lg`}
+            className={`size-10 shrink-0 rounded-xl bg-gradient-to-br ${theme.iconBg} flex items-center justify-center text-white text-xl shadow-lg sm:size-12`}
           >
             {icon}
           </div>
-          <div>
-            <h2 className="font-bold text-xl text-slate-900 dark:text-slate-100">
+          <div className="min-w-0">
+            <h2 className="font-bold text-base sm:text-xl text-slate-900 dark:text-slate-100">
               {title}
             </h2>
           </div>
@@ -180,7 +178,7 @@ export default function DetailModal({
       </div>
 
       {/* Body */}
-      <div className="px-6 py-6 bg-slate-50/50 dark:bg-slate-950">
+      <div className="p-4 sm:p-6 bg-slate-50/50 dark:bg-slate-950">
         {children}
       </div>
     </Modal>

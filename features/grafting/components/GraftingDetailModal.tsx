@@ -1,5 +1,7 @@
 "use client";
 
+import { formatPersianDate } from "@/shared/dates/calendar";
+
 import { publicOrderUrl } from "@/shared/config/public-urls";
 
 import DetailModal, { InfoCard } from "@/shared/components/DetailModal";
@@ -10,9 +12,6 @@ import {
   ToolOutlined,
   UsergroupAddOutlined,
 } from "@ant-design/icons";
-import DateObject from "react-date-object";
-import persian from "react-date-object/calendars/persian";
-import persian_fa from "react-date-object/locales/persian_fa";
 import { GraftingOperationWithDetails } from "../types";
 
 interface Props {
@@ -22,13 +21,6 @@ interface Props {
 }
 
 export default function GraftingDetailModal({ open, onCancel, record }: Props) {
-  const formatDate = (date: string | Date | null | undefined) => {
-    if (!date) return "---";
-    return new DateObject(date)
-      .convert(persian, persian_fa)
-      .format("YYYY/MM/DD");
-  };
-
   if (!record) return null;
 
   return (
@@ -59,10 +51,17 @@ export default function GraftingDetailModal({ open, onCancel, record }: Props) {
               label: "تعداد کارگران",
               value: `${record.Tbl_GraftWorkers.length} نفر`,
             },
-            { label: "تاریخ پیوند", value: formatDate(record.GraftingDate) },
+            {
+              label: "تاریخ پیوند",
+              value: formatPersianDate(record.GraftingDate, {
+                fallback: "---",
+              }),
+            },
             {
               label: "تاریخ خروج سردخانه",
-              value: formatDate(record.ColdRoomExitDate),
+              value: formatPersianDate(record.ColdRoomExitDate, {
+                fallback: "---",
+              }),
             },
           ]}
         />

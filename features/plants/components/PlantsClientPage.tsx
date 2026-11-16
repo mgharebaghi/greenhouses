@@ -14,7 +14,7 @@ export default function PlantsClientPage({
   const [data, setData] = useState<PlantRecord[]>(initialData);
   const [loading, setLoading] = useState(false);
   return (
-    <div className="w-full h-full p-6">
+    <div className="dashboard-page">
       <PageHeader
         title="انواع گیاه"
         subtitle="مدیریت اطلاعات پایه انواع گیاه"

@@ -1,3 +1,4 @@
+import { formatPersianDate } from "@/shared/dates/calendar";
 import { getOrderById } from "@/features/orders/server/queries";
 import QRCodeCanvas from "@/shared/components/QRCodeCanvas";
 import { publicOrderUrl } from "@/shared/config/public-urls";
@@ -22,15 +23,6 @@ export default async function PublicOrderScanPage({
 
   if (!order) return notFound();
 
-  const formatDate = (date: string | Date | null | undefined) => {
-    if (!date) return "---";
-    return new Date(date).toLocaleDateString("fa-IR", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
-
   const rootstockPkg =
     order.Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage;
   const scionPkg = order.Tbl_SeedPackage_Tbl_Orders_ScionIDToTbl_SeedPackage;
@@ -40,7 +32,7 @@ export default async function PublicOrderScanPage({
 
   return (
     <div
-      className="min-h-screen bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-200 flex flex-col items-center justify-center p-4 lg:p-8 transition-colors duration-500"
+      className="min-h-dvh bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-200 flex flex-col items-center justify-center p-4 lg:p-8 [overflow-wrap:anywhere] transition-colors duration-500"
       dir="rtl"
       style={regFont}
     >
@@ -52,7 +44,7 @@ export default async function PublicOrderScanPage({
 
       <div className="w-full max-w-2xl relative z-10 space-y-4">
         {/* 1. Header Card (Identity) - Constant Premium Gradient */}
-        <div className="bg-gradient-to-l from-emerald-600 to-teal-800 rounded-[2.5rem] p-8 shadow-2xl shadow-emerald-200/50 dark:shadow-none flex flex-col md:flex-row items-center gap-8 border border-white/10">
+        <div className="bg-gradient-to-l from-emerald-600 to-teal-800 rounded-3xl p-4 sm:rounded-[2.5rem] sm:p-8 shadow-2xl shadow-emerald-200/50 dark:shadow-none flex flex-col md:flex-row items-center gap-8 border border-white/10">
           <div className="shrink-0 bg-white p-4 rounded-[2rem] shadow-xl rotate-3 hover:rotate-0 transition-transform duration-500">
             <QRCodeCanvas value={publicOrderUrl(order.ID)} size={140} />
           </div>
@@ -81,7 +73,12 @@ export default async function PublicOrderScanPage({
             <div className="flex flex-wrap justify-center md:justify-start gap-4">
               <div className="flex items-center gap-2 text-emerald-50 bg-black/10 px-3 py-1 rounded-lg">
                 <CalendarOutlined className="text-xs" />
-                <span className="text-xs">{formatDate(order.OrderDate)}</span>
+                <span className="text-xs">
+                  {formatPersianDate(order.OrderDate, {
+                    format: "D MMMM YYYY",
+                    fallback: "---",
+                  })}
+                </span>
               </div>
               <div className="flex items-center gap-2 text-emerald-50 bg-black/10 px-3 py-1 rounded-lg">
                 <InboxOutlined className="text-xs" />
@@ -173,7 +170,7 @@ export default async function PublicOrderScanPage({
           </div>
 
           {/* Technical Specifications (Full Width) */}
-          <div className="md:col-span-2 bg-white dark:bg-white/5 backdrop-blur-md rounded-[2.5rem] p-8 border border-slate-100 dark:border-white/5 space-y-6 shadow-2xl shadow-slate-200/60 dark:shadow-none relative overflow-hidden group">
+          <div className="md:col-span-2 bg-white dark:bg-white/5 backdrop-blur-md rounded-3xl p-4 sm:rounded-[2.5rem] sm:p-8 border border-slate-100 dark:border-white/5 space-y-6 shadow-2xl shadow-slate-200/60 dark:shadow-none relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-3xl rounded-full"></div>
             <h3
               className="text-teal-600 dark:text-teal-400 text-sm flex items-center gap-2"
@@ -183,7 +180,7 @@ export default async function PublicOrderScanPage({
               مشخصات بیولوژیکی و واریته
             </h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-10">
               <div className="relative pr-8 border-r-2 border-emerald-500/20 group-hover:border-emerald-500/50 transition-colors">
                 <div className="absolute right-[-5px] top-0 w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.4)]"></div>
                 <span

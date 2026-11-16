@@ -1,26 +1,23 @@
+import {
+  calendarDateSchema,
+  optionalCount,
+  sqlInteger,
+} from "@/shared/validation/input";
 import { z } from "zod";
 
 export const startSeedlingCycleSchema = z.object({
-  OrderID: z.number().int().positive(),
+  OrderID: sqlInteger.positive(),
   SeedType: z.boolean(),
-  GerminationRoomExitDate: z.date(),
-  NumberOfLostSeedlingFromGermination: z.coerce
-    .number()
-    .int()
-    .nonnegative()
-    .optional(),
-  GreenhouseEntryDate: z.date(),
-  NumberOfTrays: z.coerce.number().int().nonnegative().optional(),
-  GreenhouseID: z.number().int().positive(),
+  GerminationRoomExitDate: calendarDateSchema,
+  NumberOfLostSeedlingFromGermination: optionalCount,
+  GreenhouseEntryDate: calendarDateSchema,
+  NumberOfTrays: optionalCount,
+  GreenhouseID: sqlInteger.positive(),
   SalonName: z.string().max(50).optional(),
-  GreenhouseExitDate: z.date().optional().nullable(),
-  NumberOfLostSeedlingFromGreenhouse: z.coerce
-    .number()
-    .int()
-    .nonnegative()
-    .optional(),
+  GreenhouseExitDate: calendarDateSchema.nullish(),
+  NumberOfLostSeedlingFromGreenhouse: optionalCount,
 });
 
-export type StartSeedlingCycleFormValues = z.infer<
+export type StartSeedlingCycleFormValues = z.input<
   typeof startSeedlingCycleSchema
 >;

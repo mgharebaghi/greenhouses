@@ -1,5 +1,7 @@
 "use client";
 
+import { formatPersianDate } from "@/shared/dates/calendar";
+
 import { ActionFailure, runDeletion } from "@/shared/forms/delete-record";
 
 import { csvRows } from "@/shared/exports/csv";
@@ -97,17 +99,13 @@ export default function RecoveryRoomTable({
       title: "تاریخ ورود",
       key: "RecoveryEntryDate",
       render: (_: unknown, record: RecoveryRoomListItem) =>
-        record.RecoveryEntryDate
-          ? new Date(record.RecoveryEntryDate).toLocaleDateString("fa-IR")
-          : "—",
+        formatPersianDate(record.RecoveryEntryDate),
     },
     {
       title: "تاریخ خروج",
       key: "RecoveryExitDate",
       render: (_: unknown, record: RecoveryRoomListItem) =>
-        record.RecoveryExitDate
-          ? new Date(record.RecoveryExitDate).toLocaleDateString("fa-IR")
-          : "—",
+        formatPersianDate(record.RecoveryExitDate),
     },
     {
       title: "تلفات کل",

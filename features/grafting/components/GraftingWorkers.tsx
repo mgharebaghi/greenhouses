@@ -1,11 +1,13 @@
 "use client";
 
+import { FieldFeedback, Select } from "@/shared/components/FormControls";
+
 import {
   DeleteOutlined,
   PlusCircleOutlined,
   PrinterOutlined,
 } from "@ant-design/icons";
-import { Button, Select, Tooltip } from "antd";
+import { Button, Tooltip } from "antd";
 import { useState } from "react";
 import { Controller, useFieldArray, useFormContext } from "react-hook-form";
 import { GraftingFormData } from "../types";
@@ -67,12 +69,14 @@ export default function GraftingWorkers({
   };
 
   return (
-    <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border-2 border-green-500/30 shadow-sm transition-all duration-300 relative">
+    <div className="bg-white dark:bg-slate-800 p-3 sm:p-5 rounded-2xl border-2 border-green-500/30 shadow-sm transition-all duration-300 relative">
       {/* Header Labels matching the mockup */}
-      <div className="grid grid-cols-12 gap-4 mb-2 px-2 text-sm font-bold text-slate-700 dark:text-slate-300 text-center">
-        <div className="col-span-2"></div> {/* Icons */}
-        <div className="col-span-6 text-right pr-4">نام و کد ملی پیوندزن</div>
-        <div className="col-span-4 text-right pr-4">کد افراد</div>
+      <div className="grid grid-cols-2 sm:grid-cols-12 gap-2 sm:gap-3 mb-2 px-2 text-sm font-bold text-slate-700 dark:text-slate-300 text-center">
+        <div className="hidden sm:col-span-3 sm:block"></div> {/* Icons */}
+        <div className="min-w-0 sm:col-span-5 text-right sm:pr-2">
+          نام و کد ملی پیوندزن
+        </div>
+        <div className="min-w-0 sm:col-span-4 text-right sm:pr-2">کد افراد</div>
       </div>
 
       <div className="space-y-3">
@@ -80,10 +84,10 @@ export default function GraftingWorkers({
           return (
             <div
               key={item.id}
-              className="grid grid-cols-12 gap-4 items-center animate-in fade-in slide-in-from-top-1 duration-200"
+              className="grid min-w-0 grid-cols-2 sm:grid-cols-12 gap-2 sm:gap-3 items-center animate-in fade-in slide-in-from-top-1 duration-200"
             >
               {/* Actions Column (Print, Delete, Add) */}
-              <div className="col-span-2 flex items-center justify-center gap-1">
+              <div className="col-span-2 sm:col-span-3 flex flex-wrap items-center justify-center gap-1">
                 <Tooltip title="چاپ">
                   <Button
                     icon={<PrinterOutlined />}
@@ -112,40 +116,40 @@ export default function GraftingWorkers({
               </div>
 
               {/* Name & National Code Select */}
-              <div className="col-span-6">
+              <div className="min-w-0 sm:col-span-5">
                 <Controller
                   control={control}
                   name={`Workers.${index}.PersonID`}
-                  render={({ field }) => (
-                    <Select
-                      {...field}
-                      showSearch
-                      placeholder=""
-                      optionFilterProp="label"
-                      className="w-full text-right"
-                      size="large"
-                      options={nameOptions}
-                      // When this changes, the other select (bound to same name) updates automatically
-                      // because they share the same Controller name path.
-                    />
+                  rules={{ deps: "Workers" }}
+                  render={({ field, fieldState }) => (
+                    <>
+                      <Select
+                        {...field}
+                        showSearch
+                        optionFilterProp="label"
+                        options={nameOptions}
+                        status={fieldState.invalid ? "error" : ""}
+                      />
+                      <FieldFeedback message={fieldState.error?.message} />
+                    </>
                   )}
                 />
               </div>
 
               {/* Person Code Select */}
-              <div className="col-span-4">
+              <div className="min-w-0 sm:col-span-4">
                 <Controller
                   control={control}
                   name={`Workers.${index}.PersonID`} // Same Name!
-                  render={({ field }) => (
+                  rules={{ deps: "Workers" }}
+                  render={({ field, fieldState }) => (
                     <Select
                       {...field}
                       showSearch
                       placeholder=""
                       optionFilterProp="label"
-                      className="w-full text-center font-mono text-lg"
-                      size="large"
                       options={codeOptions}
+                      status={fieldState.invalid ? "error" : ""}
                       // Same logic: changing this updates the value in form state, syncing the other Select.
                     />
                   )}

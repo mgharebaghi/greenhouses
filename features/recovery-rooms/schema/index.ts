@@ -1,9 +1,13 @@
-import { optionalDate, recordIdSchema } from "@/shared/validation/input";
+import {
+  optionalDate,
+  recordIdSchema,
+  sqlInteger,
+} from "@/shared/validation/input";
 import { z } from "zod";
 
 export const recoveryWorkerLossSchema = z.object({
   ID: recordIdSchema,
-  LossPerWorker: z.number().int().min(0, "تلفات نمی‌تواند منفی باشد"),
+  LossPerWorker: sqlInteger.min(0, "تلفات نمی‌تواند منفی باشد"),
 });
 
 export const recoveryRoomSchema = z.object({
@@ -11,7 +15,7 @@ export const recoveryRoomSchema = z.object({
   GraftingOperationID: recordIdSchema,
   RecoveryEntryDate: optionalDate,
   RecoveryExitDate: optionalDate,
-  GraftedLossCount: z.number().int().min(0).optional(),
+  GraftedLossCount: sqlInteger.min(0).optional(),
   WorkersLoss: z.array(recoveryWorkerLossSchema).optional(),
 });
 

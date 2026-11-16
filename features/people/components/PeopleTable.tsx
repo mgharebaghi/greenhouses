@@ -1,5 +1,5 @@
 import { csvRows } from "@/shared/exports/csv";
-import { runDeletion } from "@/shared/forms/delete-record";
+import { ActionFailure, runDeletion } from "@/shared/forms/delete-record";
 import { InfoCircleOutlined } from "@ant-design/icons";
 
 import { deletePerson, getPeople } from "@/features/people/actions";
@@ -69,7 +69,12 @@ export default function PeopleTable(props: PeopleTableProps) {
       key: "LastName",
     },
     {
-      title: "کد ملی",
+      title: "نام شرکت",
+      dataIndex: "CompanyName",
+      key: "CompanyName",
+    },
+    {
+      title: "کد ملی (شناسه ملی)",
       dataIndex: "NationalCode",
       key: "NationalCode",
     },
@@ -79,9 +84,17 @@ export default function PeopleTable(props: PeopleTableProps) {
       key: "PhoneNumber",
     },
     {
-      title: "سمت پیشنهادی",
+      title: "سمت",
       dataIndex: "PostName",
       key: "PostName",
+      render: (_: unknown, person: PeopleReadDTO) =>
+        person.Legal ? (
+          <span className="inline-block rounded-md bg-orange-50 px-2 py-0.5 text-xs font-semibold text-orange-800 ring-1 ring-inset ring-orange-200 dark:bg-orange-950/60 dark:text-orange-200 dark:ring-orange-800">
+            {person.PostName || "شخصیت حقوقی"}
+          </span>
+        ) : (
+          person.PostName || "-"
+        ),
     },
     {
       title: "عملیات",
@@ -99,7 +112,9 @@ export default function PeopleTable(props: PeopleTableProps) {
               },
               deleteLoading: deletModalLoading,
               id: record.ID,
-              name: record.FirstName + " " + record.LastName,
+              name: record.Legal
+                ? (record.CompanyName ?? "")
+                : [record.FirstName, record.LastName].filter(Boolean).join(" "),
               onDelete() {
                 handleDelete(record.ID);
               },
@@ -118,7 +133,8 @@ export default function PeopleTable(props: PeopleTableProps) {
         setDeleteModalLoading(true);
         if (id) {
           const response: PersonActionResponse = await deletePerson(id);
-          if (response.status !== "ok") throw new Error(response.message);
+          if (response.status !== "ok")
+            throw new ActionFailure(response.message);
           {
             setDeleteModalLoading(false);
             setDeleteModal(null);

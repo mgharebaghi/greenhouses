@@ -1,3 +1,13 @@
+import { validationOptions } from "@/shared/validation/input";
+import {
+  Form,
+  FormActions,
+  FormGrid,
+  FormItem,
+  Input,
+  Radio,
+  Select,
+} from "@/shared/components/FormControls";
 import {
   createPerson,
   getPeople,
@@ -5,21 +15,20 @@ import {
   getPersonsPosts,
   updatePerson,
 } from "@/features/people/actions";
-import FormFeedback from "@/shared/components/FormFeedback";
 import Modal from "@/shared/components/FormModal";
 import GreenhouseButton from "@/shared/components/GreenhouseButton";
 import { applyFieldErrors } from "@/shared/forms/field-errors";
 import { submitForm } from "@/shared/forms/submit";
-import {
-  CloseOutlined,
-  EditOutlined,
-  UserAddOutlined,
-} from "@ant-design/icons";
-import { Form, Input, Select } from "antd";
+import { UserAddOutlined } from "@ant-design/icons";
+
 import { useEffect, useState } from "react";
+import type { ZodType } from "zod";
 
 import {
-  personInputSchema,
+  commonPersonFields,
+  legalPersonFields,
+  LEGAL_PERSON_POST_ID,
+  naturalPersonFields,
   type PersonInput,
   type PeopleReadDTO,
 } from "../schema";
@@ -52,84 +61,111 @@ export default function PersonFormModal({
   const [form] = Form.useForm<PersonInput>();
 
   const isEdit = !!record;
+  const isLegal = Form.useWatch("Legal", form) === true;
+  const savedLegalCode = record?.Legal
+    ? (record.NationalCode ?? "")
+    : undefined;
+  const validators: Partial<Record<keyof PersonInput, ZodType>> = {
+    ...commonPersonFields,
+    ...(isLegal ? legalPersonFields : naturalPersonFields),
+  };
 
-  const fields: {
+  const postOptions = posts
+    .filter((post) => (post.ID === LEGAL_PERSON_POST_ID) === isLegal)
+    .map((post) => ({ label: post.PostName || "بدون عنوان", value: post.ID }));
+
+  type PersonField = {
     name: keyof PersonInput;
     label: string;
     required: boolean;
     placeholder: string;
-    icon: string;
-    colSpan: number;
-    type?: string;
+    type?: "select";
     disabled?: boolean;
-  }[] = [
+    section?: "company" | "contact";
+  };
+
+  const personCode: PersonField = {
+    name: "PersonCode",
+    label: isLegal ? "کد شخص حقوقی" : "کد شخص حقیقی",
+    required: true,
+    placeholder: "کد شخص را وارد کنید",
+    disabled: true,
+  };
+
+  const fields: PersonField[] = [
     {
       name: "FirstName",
       label: "نام",
-      required: true,
+      required: !isLegal,
+      disabled: isLegal,
       placeholder: "نام را وارد کنید",
-      icon: "👤",
-      colSpan: 1,
     },
     {
       name: "LastName",
       label: "نام خانوادگی",
-      required: true,
+      required: !isLegal,
+      disabled: isLegal,
       placeholder: "نام خانوادگی را وارد کنید",
-      icon: "👥",
-      colSpan: 1,
     },
     {
       name: "NationalCode",
-      label: "کد ملی",
+      label: "کد ملی (شناسه ملی)",
       required: true,
-      placeholder: "کد ملی را وارد کنید",
-      icon: "👤",
-      colSpan: 1,
+      placeholder: isLegal
+        ? "شناسه ملی شرکت را وارد کنید"
+        : "کد ملی را وارد کنید",
+      section: isLegal ? "company" : undefined,
     },
     {
-      name: "EmailAddress",
-      label: "ایمیل",
+      name: "CompanyName",
+      label: "نام شرکت",
       required: true,
-      placeholder: "ایمیل را وارد کنید",
-      icon: "📧",
-      colSpan: 1,
+      placeholder: "نام شرکت را وارد کنید",
+      section: "company",
+    },
+    {
+      name: "CompanyEconomicCode",
+      label: "کد اقتصادی شرکت",
+      required: false,
+      placeholder: "کد اقتصادی را وارد کنید",
+      section: "company",
+    },
+    {
+      name: "CompanyRegistrationCode",
+      label: "شماره ثبت شرکت",
+      required: false,
+      placeholder: "شماره ثبت را وارد کنید",
+      section: "company",
     },
     {
       name: "PhoneNumber",
       label: "شماره تماس",
       required: true,
       placeholder: "09123456789",
-      icon: "📱",
-      colSpan: 2,
+      section: "contact",
+    },
+    {
+      name: "EmailAddress",
+      label: "ایمیل",
+      required: false,
+      placeholder: "ایمیل را وارد کنید",
+      section: "contact",
     },
     {
       name: "PostID",
       label: "سمت",
       required: true,
       placeholder: "سمت را انتخاب کنید",
-      icon: "💼",
-      colSpan: 2,
       type: "select",
+      disabled: isLegal,
+      section: isLegal ? "contact" : undefined,
     },
     {
-      name: "PersonCode",
-      label: "کد شخص",
-      required: true,
-      placeholder: "کد شخص را وارد کنید",
-      icon: "💼",
-      colSpan: 2,
-      type: "input",
-      disabled: true,
-    },
-    {
-      name: "Profesion",
+      name: "Profession",
       label: "تخصص",
-      required: true,
+      required: false,
       placeholder: "تخصص را وارد کنید",
-      icon: "💼",
-      colSpan: 2,
-      type: "input",
+      section: "contact",
     },
   ];
 
@@ -181,14 +217,20 @@ export default function PersonFormModal({
     if (isOpen) {
       if (record) {
         form.setFieldsValue({
+          Legal: record.Legal === true,
           FirstName: record.FirstName ?? "",
           LastName: record.LastName ?? "",
           NationalCode: record.NationalCode ?? "",
           EmailAddress: record.EmailAddress ?? "",
           PhoneNumber: record.PhoneNumber ?? "",
           PersonCode: record.PersonCode ?? "",
-          Profesion: record.Profesion ?? "",
-          PostID: record.Tbl_PeoplePosts?.ID,
+          Profession: record.Profession ?? "",
+          PostID: record.Legal
+            ? LEGAL_PERSON_POST_ID
+            : (record.PostID ?? undefined),
+          CompanyName: record.CompanyName ?? "",
+          CompanyEconomicCode: record.CompanyEconomicCode ?? "",
+          CompanyRegistrationCode: record.CompanyRegistrationCode ?? "",
         });
       } else {
         form.resetFields();
@@ -206,18 +248,19 @@ export default function PersonFormModal({
         try {
           const result =
             isEdit && record
-              ? await updatePerson({ id: record.ID, data: values })
+              ? await updatePerson({
+                  id: record.ID,
+                  data: {
+                    ...values,
+                    NationalCode:
+                      values.Legal && values.NationalCode === savedLegalCode
+                        ? undefined
+                        : values.NationalCode,
+                  },
+                })
               : await createPerson(values);
           applyFieldErrors(form, result);
           if (result.status === "error") {
-            if (result.fieldErrors) {
-              form.setFields(
-                fields.map(({ name }) => ({
-                  name,
-                  errors: result.fieldErrors?.[name] ?? [],
-                })),
-              );
-            }
             setMessage({ status: "error", message: result.message });
             return;
           }
@@ -267,181 +310,132 @@ export default function PersonFormModal({
     form.resetFields();
   };
 
-  const theme = isEdit
-    ? {
-        gradient:
-          "from-amber-50 via-orange-50/80 to-white dark:from-slate-900 dark:via-slate-800 dark:to-slate-900",
-        border: "border-amber-100 dark:border-slate-700",
-        iconBg: "from-amber-500 via-amber-600 to-orange-600",
-        iconDot: "bg-orange-400",
-        textMain: "text-amber-900 dark:text-slate-100",
-        textSub: "text-amber-600/80 dark:text-slate-400",
-        fieldFocus: "focus:border-amber-400 dark:focus:border-amber-600",
-        fieldHover: "hover:border-amber-300 dark:hover:border-amber-700",
-        accent: "amber",
+  const renderField = (field: PersonField) => (
+    <FormItem
+      key={field.name}
+      label={
+        <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5 ">
+          {field.label}
+          {field.required && (
+            <span className="text-rose-500 text-[10px]">*</span>
+          )}
+        </span>
       }
-    : {
-        gradient:
-          "from-emerald-50 via-lime-50/80 to-white dark:from-slate-900 dark:via-slate-800 dark:to-slate-900",
-        border: "border-emerald-100 dark:border-slate-700",
-        iconBg: "from-emerald-500 via-emerald-600 to-emerald-700",
-        iconDot: "bg-lime-400",
-        textMain: "text-emerald-900 dark:text-slate-100",
-        textSub: "text-emerald-600/80 dark:text-slate-400",
-        fieldFocus: "focus:border-emerald-400 dark:focus:border-emerald-600",
-        fieldHover: "hover:border-emerald-300 dark:hover:border-emerald-700",
-        accent: "emerald",
-      };
+      name={field.name}
+      rules={
+        field.disabled
+          ? []
+          : [
+              {
+                validator: async (_, value: unknown) => {
+                  if (
+                    field.name === "NationalCode" &&
+                    isLegal &&
+                    savedLegalCode !== undefined &&
+                    value === savedLegalCode
+                  )
+                    return;
+                  const result = validators[field.name]?.safeParse(
+                    value,
+                    validationOptions,
+                  );
+                  if (result && !result.success)
+                    throw new Error(result.error.issues[0].message);
+                },
+              },
+            ]
+      }
+    >
+      {field.type === "select" ? (
+        <Select
+          loading={postsLoading}
+          placeholder={field.placeholder}
+          disabled={loading || field.disabled}
+          options={postOptions}
+        />
+      ) : (
+        <Input
+          onChange={() => setMessage(null)}
+          placeholder={field.placeholder}
+          disabled={loading || field.disabled}
+        />
+      )}
+    </FormItem>
+  );
 
   return (
     <Modal
       open={isOpen}
-      onCancel={handleClose}
-      width={600}
-      className="!p-0"
-      styles={{
-        content: {
-          padding: 0,
-          borderRadius: "1.25rem",
-          overflow: "hidden",
-          boxShadow:
-            "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-        },
-      }}
+      onClose={handleClose}
+      heading={isEdit ? "ویرایش اطلاعات شخص" : "افزودن شخص جدید"}
+      description={
+        isEdit ? "اطلاعات شخص را ویرایش کنید" : "اطلاعات شخص را وارد کنید"
+      }
+      icon={<UserAddOutlined />}
+      editing={isEdit}
     >
-      {/* Header */}
-      <div
-        className={`relative px-6 py-5 bg-gradient-to-br ${theme.gradient} border-b ${theme.border}`}
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={handleSubmit}
+        initialValues={{ Legal: false }}
+        onValuesChange={(changed: Partial<PersonInput>) => {
+          if (changed.Legal === undefined) return;
+          form.setFieldValue(
+            "PostID",
+            changed.Legal ? LEGAL_PERSON_POST_ID : undefined,
+          );
+          form.setFields(
+            (["FirstName", "LastName", "NationalCode"] as const).map(
+              (name) => ({
+                name,
+                errors: [],
+              }),
+            ),
+          );
+        }}
+        requiredMark={false}
       >
-        <button
-          onClick={handleClose}
-          className={`absolute top-5 left-5 h-9 w-9 rounded-xl bg-white dark:bg-slate-800 hover:bg-${theme.accent}-50 dark:hover:bg-${theme.accent}-900/20 border border-${theme.accent}-200 dark:border-slate-600 hover:border-${theme.accent}-300 dark:hover:border-${theme.accent}-700 transition-all flex items-center justify-center text-${theme.accent}-600 dark:text-${theme.accent}-500 hover:text-${theme.accent}-700 shadow-sm hover:shadow`}
-          aria-label="بستن"
-        >
-          <CloseOutlined className="text-sm" />
-        </button>
+        <FormGrid title="اطلاعات هویتی">
+          <FormItem label="نوع شخص" name="Legal">
+            <Radio.Group disabled={loading}>
+              <Radio value={false}>حقیقی</Radio>
+              <Radio value={true}>حقوقی</Radio>
+            </Radio.Group>
+          </FormItem>
+          {renderField(personCode)}
+          {fields.filter((field) => !field.section).map(renderField)}
+        </FormGrid>
 
-        <div className="flex items-center gap-4">
-          <div className="relative">
-            <div
-              className={`h-14 w-14 rounded-2xl bg-gradient-to-br ${theme.iconBg} shadow-lg flex items-center justify-center text-white`}
-            >
-              {isEdit ? (
-                <EditOutlined className="text-2xl" />
-              ) : (
-                <UserAddOutlined className="text-2xl" />
-              )}
-            </div>
-            <div
-              className={`absolute -bottom-1 -right-1 h-5 w-5 rounded-full ${theme.iconDot} border-2 border-white dark:border-slate-800`}
-            ></div>
-          </div>
-          <div>
-            <h3 className={`font-bold text-2xl ${theme.textMain}`}>
-              {isEdit ? "ویرایش اطلاعات مالک" : "افزودن مالک جدید"}
-            </h3>
-            <p
-              className={`text-sm ${theme.textSub} mt-1 flex items-center gap-1.5`}
-            >
-              <span
-                className={`h-1.5 w-1.5 rounded-full bg-${theme.accent}-400 animate-pulse`}
-              ></span>
-              {isEdit
-                ? "اطلاعات مالک را ویرایش کنید"
-                : "اطلاعات مالک را با دقت وارد کنید"}
-            </p>
-          </div>
-        </div>
-      </div>
+        {isLegal && (
+          <FormGrid title="اطلاعات ثبتی شرکت">
+            {fields
+              .filter((field) => field.section === "company")
+              .map(renderField)}
+          </FormGrid>
+        )}
+        <FormGrid title="اطلاعات تماس و تخصص" columns={isLegal ? 2 : 3}>
+          {fields
+            .filter((field) => field.section === "contact")
+            .map(renderField)}
+        </FormGrid>
 
-      {/* Body */}
-      <div className="px-6 py-6 bg-gradient-to-br from-white to-slate-50/30 dark:from-slate-900 dark:to-slate-950">
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleSubmit}
-          requiredMark={false}
-        >
-          <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-            {fields.map((field) => (
-              <Form.Item
-                key={field.name}
-                label={
-                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5 mb-1">
-                    {field.icon && (
-                      <span className="text-sm opacity-80">{field.icon}</span>
-                    )}
-                    {field.label}
-                    {field.required && (
-                      <span className="text-rose-500 text-[10px]">*</span>
-                    )}
-                  </span>
-                }
-                name={field.name}
-                rules={[
-                  {
-                    validator: async (_, value: unknown) => {
-                      if (
-                        value === undefined ||
-                        value === null ||
-                        value === ""
-                      ) {
-                        throw new Error(`لطفاً ${field.label} را وارد کنید`);
-                      }
-                      const result =
-                        personInputSchema.shape[field.name].safeParse(value);
-                      if (!result.success)
-                        throw new Error(result.error.issues[0].message);
-                    },
-                  },
-                ]}
-                className={`mb-1 ${field.colSpan === 2 ? "col-span-2" : "col-span-2 sm:col-span-1"}`}
-              >
-                {field.type === "select" ? (
-                  <Select
-                    loading={postsLoading}
-                    placeholder={field.placeholder}
-                    className={`w-full rounded-xl transition-all shadow-sm hover:shadow h-10 text-sm`}
-                    popupClassName="rounded-xl overflow-hidden"
-                    options={posts.map((post) => ({
-                      label: post.PostName || "بدون عنوان",
-                      value: post.ID,
-                    }))}
-                    dropdownStyle={{ borderRadius: "0.75rem" }}
-                  />
-                ) : (
-                  <Input
-                    onChange={() => setMessage(null)}
-                    placeholder={field.placeholder}
-                    disabled={loading || field.disabled}
-                    className={`rounded-xl border-2 border-slate-200 dark:border-slate-700 ${theme.fieldHover} ${theme.fieldFocus} transition-all shadow-sm hover:shadow dark:bg-slate-800 dark:text-white dark:placeholder-slate-500 h-10 text-sm`}
-                  />
-                )}
-              </Form.Item>
-            ))}
-          </div>
-
-          <FormFeedback message={message} />
-
-          <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 mt-6 pt-5 border-t border-slate-100 dark:border-slate-800">
-            <GreenhouseButton
-              text="انصراف"
-              variant="secondary"
-              onClick={handleClose}
-              disabled={loading}
-              className="w-full sm:w-auto min-w-[100px] h-10 text-sm"
-            />
-            <GreenhouseButton
-              text={loading ? "..." : isEdit ? "ویرایش" : "ثبت"}
-              variant="primary"
-              type="submit"
-              loading={loading}
-              disabled={codeLoading || postsLoading}
-              className="w-full sm:w-auto min-w-[100px] h-10 shadow-md hover:shadow-lg text-sm"
-            />
-          </div>
-        </Form>
-      </div>
+        <FormActions message={message}>
+          <GreenhouseButton
+            text="انصراف"
+            variant="secondary"
+            onClick={handleClose}
+            disabled={loading}
+          />
+          <GreenhouseButton
+            text={loading ? "..." : isEdit ? "ویرایش" : "ثبت"}
+            variant="primary"
+            type="submit"
+            loading={loading}
+            disabled={codeLoading || postsLoading}
+          />
+        </FormActions>
+      </Form>
     </Modal>
   );
 }

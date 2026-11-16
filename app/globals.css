@@ -13,9 +13,507 @@
   src: url("/fonts/IRANSansX-Bold.woff2") format("woff2");
 }
 
+:root {
+  --scroll-thumb: #a7b6c5;
+  --scroll-thumb-hover: #778a9e;
+}
+
+.dark {
+  --scroll-thumb: #53657d;
+  --scroll-thumb-hover: #788da6;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scroll-thumb) transparent;
+}
+
+@supports selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-width: auto;
+    scrollbar-color: auto;
+  }
+
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+
+  ::-webkit-scrollbar-track,
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: var(--scroll-thumb);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--scroll-thumb-hover);
+  }
+
+  ::-webkit-scrollbar-button {
+    display: none;
+  }
+}
+
+@media (forced-colors: active) {
+  * {
+    scrollbar-color: auto;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: GrayText;
+  }
+}
+
+.rc-virtual-list-scrollbar {
+  --rc-virtual-list-scrollbar-bg: var(--scroll-thumb);
+}
+
+.rc-virtual-list-scrollbar:hover {
+  --rc-virtual-list-scrollbar-bg: var(--scroll-thumb-hover);
+}
+
+.rc-virtual-list-scrollbar-vertical .rc-virtual-list-scrollbar-thumb {
+  max-inline-size: 5px;
+  inset-inline-end: 0;
+}
+
+.rc-virtual-list-scrollbar-horizontal .rc-virtual-list-scrollbar-thumb {
+  max-block-size: 5px;
+  inset-block-end: 0;
+}
+
 body {
   direction: rtl;
   @apply bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-500;
+}
+
+.dashboard-page {
+  min-inline-size: 0;
+  padding: clamp(0.625rem, 2.5vw, 1.5rem);
+}
+
+.dashboard-scroll {
+  overscroll-behavior-y: contain;
+}
+
+.table-card-fields {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 7.5rem), 1fr));
+}
+
+.table-card-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+}
+
+.dialog-print-only {
+  position: fixed;
+  left: -9999px;
+  top: 0;
+}
+
+@media (max-height: 18rem) {
+  .dashboard-menu {
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+  }
+
+  .dashboard-menu-list {
+    flex: 1 0 auto;
+    overflow: visible;
+  }
+}
+
+@media screen {
+  .greenhouse-dialog-wrap.ant-modal-wrap {
+    --dialog-gutter: clamp(0.5rem, 2.5vw, 1.5rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    overscroll-behavior: contain;
+    padding-block-start: max(var(--dialog-gutter), env(safe-area-inset-top));
+    padding-block-end: max(var(--dialog-gutter), env(safe-area-inset-bottom));
+    padding-inline: max(
+      var(--dialog-gutter),
+      env(safe-area-inset-left),
+      env(safe-area-inset-right)
+    );
+  }
+
+  .greenhouse-dialog-wrap.ant-modal-centered::before {
+    display: none;
+  }
+
+  .greenhouse-dialog-wrap .greenhouse-dialog.ant-modal {
+    top: auto;
+    margin: 0;
+    padding: 0;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .greenhouse-dialog .ant-modal-content {
+    display: flex;
+    flex-direction: column;
+    max-block-size: calc(100vh - 2 * var(--dialog-gutter));
+    max-block-size: calc(
+      100dvh - max(var(--dialog-gutter), env(safe-area-inset-top)) -
+        max(var(--dialog-gutter), env(safe-area-inset-bottom))
+    );
+    overflow: hidden;
+  }
+
+  .greenhouse-dialog :is(.ant-modal-header, .ant-modal-footer) {
+    flex-shrink: 0;
+  }
+
+  .greenhouse-dialog .ant-modal-body,
+  .greenhouse-form-scroll {
+    min-block-size: 0;
+    min-inline-size: 0;
+    overflow: auto;
+    overscroll-behavior: contain;
+    overflow-wrap: anywhere;
+  }
+
+  .greenhouse-form-dialog .ant-modal-body {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .greenhouse-form-scroll {
+    --form-gutter: clamp(0.875rem, 3vw, 1.375rem);
+    padding: var(--form-gutter) var(--form-gutter) 0;
+    background: var(--form-surface);
+    overflow-y: auto;
+    scroll-padding-block: 0.75rem 5rem;
+  }
+
+  .greenhouse-form-scroll .record-form-actions {
+    position: sticky;
+    z-index: 2;
+    bottom: 0;
+    margin-inline: calc(-1 * var(--form-gutter));
+    padding-inline: var(--form-gutter);
+    background: var(--form-surface);
+  }
+
+  @media (max-height: 26rem) {
+    .greenhouse-form-scroll .record-form-actions {
+      position: static;
+    }
+  }
+
+  .greenhouse-dialog .ant-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .greenhouse-dialog .ant-modal-footer > .ant-btn {
+    margin-inline-start: 0;
+  }
+
+  .greenhouse-dialog .ant-card-head-title {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .greenhouse-dialog :is(canvas, img, svg.qr-code-canvas) {
+    max-inline-size: 100%;
+    block-size: auto;
+  }
+
+  .dialog-print-only {
+    position: absolute;
+    inset: auto;
+    inline-size: 0;
+    block-size: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  @media (max-width: 480px) {
+    .greenhouse-calendar :is(.rmdp-day, .rmdp-week-day) {
+      inline-size: clamp(1.6rem, 8.5vw, 2.125rem);
+    }
+
+    .qr-modal .ant-btn {
+      height: auto;
+      min-height: 2.75rem;
+      white-space: normal;
+    }
+
+    .greenhouse-dialog .ant-modal-footer > .ant-btn,
+    .record-form-buttons > button {
+      flex: 1 1 auto;
+    }
+
+    .record-form-buttons {
+      inline-size: 100%;
+    }
+
+    .seed-package-preview .seed-package-sheet,
+    .seed-package-preview .seed-package-sheet-frame {
+      padding: 0.75rem;
+    }
+
+    .seed-package-preview .seed-package-sheet-fields {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+}
+
+.record-form {
+  container: record-form / inline-size;
+  --form-surface: #fff;
+  --form-control: #f9fbfc;
+  --form-border: #d6e0e8;
+  --form-label: #314253;
+  --form-section-title: #065f46;
+  --form-section-title-bg: #e9f5ef;
+  --form-placeholder: #64748b;
+}
+
+.dark .record-form {
+  --form-surface: #111b2b;
+  --form-control: #182638;
+  --form-border: #35475d;
+  --form-label: #d7e2ee;
+  --form-section-title: #a7f3d0;
+  --form-section-title-bg: #17382f;
+  --form-placeholder: #9aa9bc;
+}
+
+.record-form .grid {
+  column-gap: clamp(0.625rem, 2vw, 1rem);
+  row-gap: 0.75rem;
+}
+
+.record-form-section {
+  min-inline-size: 0;
+  border: 1px solid var(--form-border);
+  border-radius: 0.875rem;
+  padding: 0.5rem clamp(0.625rem, 2vw, 0.875rem) 0.75rem;
+  background: color-mix(in srgb, var(--form-control) 45%, var(--form-surface));
+}
+
+.record-form-section + .record-form-section {
+  margin-block-start: 0.875rem;
+}
+
+.record-form .record-form-section > .record-form-section-title {
+  inline-size: auto;
+  max-inline-size: 100%;
+  margin: 0;
+  border: 0;
+  border-radius: 0.5rem;
+  padding: 0.125rem 0.625rem;
+  background: var(--form-section-title-bg);
+  color: var(--form-section-title);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.record-form-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.75rem 1rem;
+  align-items: start;
+}
+
+.record-form-grid > * {
+  min-inline-size: 0;
+}
+
+.record-form-grid > .record-form-wide {
+  grid-column: 1 / -1;
+}
+
+@container record-form (min-width: 34rem) {
+  .record-form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container record-form (min-width: 43rem) {
+  .record-form-grid-three {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.record-form .ant-form-item {
+  margin-block-end: 0.75rem;
+  min-inline-size: 0;
+}
+
+.record-form :is(.grid, .record-form-grid) > .ant-form-item {
+  margin-block-end: 0;
+}
+
+.record-form .ant-form-item .ant-form-item-label {
+  padding-block-end: 0.25rem;
+}
+
+.record-form-grid .ant-form-item-label > label {
+  height: auto;
+  min-height: 1.25rem;
+  white-space: normal;
+}
+
+.record-form
+  :is(
+    .ant-input,
+    .ant-input-affix-wrapper,
+    .ant-input-number,
+    .ant-input-number-affix-wrapper,
+    .ant-select
+  ) {
+  width: 100%;
+}
+
+.record-form
+  :is(
+    .ant-input,
+    .ant-input-affix-wrapper,
+    .ant-input-number,
+    .ant-input-number-affix-wrapper,
+    .ant-select-selector,
+    .record-date-input
+  ) {
+  border-radius: 0.625rem;
+}
+
+.record-form
+  :is(
+    .ant-input,
+    .ant-input-number-input,
+    .ant-select-selection-item,
+    .ant-select-selection-placeholder,
+    .record-date-input
+  ) {
+  font-size: 0.875rem;
+  font-weight: 400;
+}
+
+.record-form .ant-input::placeholder,
+.record-form .ant-input-number-input::placeholder,
+.record-form .ant-select .ant-select-selection-placeholder,
+.record-form .record-date-input::placeholder {
+  color: var(--form-placeholder);
+  opacity: 1;
+}
+
+.record-form
+  :is(.ant-input-outlined, .ant-input-number-outlined):not(
+    :disabled,
+    .ant-input-disabled,
+    .ant-input-affix-wrapper-disabled,
+    .ant-input-number-disabled,
+    [class*="-status-"],
+    :hover,
+    :focus-within
+  ),
+.record-form
+  .ant-select-outlined:not(
+    .ant-select-disabled,
+    [class*="-status-"],
+    :hover,
+    .ant-select-focused
+  )
+  .ant-select-selector {
+  border-color: var(--form-border);
+  background: var(--form-control);
+}
+
+.record-form .record-date-input {
+  @apply h-[38px] w-full border px-3 text-slate-900 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/25 disabled:cursor-not-allowed disabled:opacity-60 dark:text-slate-100;
+  border-color: var(--form-border);
+  background: var(--form-control);
+}
+
+.record-form .ant-form-item-has-error .record-date-input {
+  @apply border-rose-500;
+}
+
+.record-form :is(.ant-form-item-label > label, .record-form-label) {
+  color: var(--form-label);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.record-form .record-form-label {
+  margin-block-end: 0.25rem;
+}
+
+.record-form .ant-form-item-label > label > span {
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+.record-form .ant-form-item-explain-error {
+  @apply mt-0.5 text-xs leading-relaxed text-rose-700 dark:text-rose-300;
+}
+
+.record-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  margin-block-start: 1rem;
+  border-block-start: 1px solid var(--form-border);
+  padding-block: 0.625rem;
+}
+
+.record-form-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-inline-start: auto;
+}
+
+.record-form-buttons > button {
+  min-inline-size: 5.5rem;
+}
+
+.record-form-feedback {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  border: 1px solid;
+  border-radius: 0.625rem;
+  padding: 0.45rem 0.625rem;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.record-form-feedback.is-error {
+  @apply border-rose-200 bg-rose-50 text-rose-800 dark:border-rose-900 dark:bg-rose-950 dark:text-rose-200;
+}
+
+.record-form-feedback.is-success {
+  @apply border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-200;
+}
+
+.record-form-actions > .record-form-feedback {
+  flex: 1 1 14rem;
+  min-inline-size: 0;
+}
+
+.record-form-feedback-icon {
+  flex: none;
+}
+
+.record-form > form > .record-form-feedback {
+  margin-block-start: 0.625rem;
 }
 
 /* Modern Table Styles */

@@ -1,4 +1,5 @@
 "use server";
+import { readError } from "@/server/actions/errors";
 import { requireSession } from "@/server/auth/require-session";
 import {
   orderInclude,
@@ -9,8 +10,8 @@ import {
 import { prisma } from "@/server/db/prisma";
 
 export async function getAllOrders() {
-  await requireSession();
   try {
+    await requireSession();
     const orders = await prisma.tbl_Orders.findMany({
       include: orderInclude,
       orderBy: {
@@ -19,12 +20,15 @@ export async function getAllOrders() {
     });
     return orders.map(serializeOrder);
   } catch (error) {
-    console.error("Query failed", error);
-    throw new Error("دریافت اطلاعات انجام نشد. لطفاً دوباره تلاش کنید.");
+    throw readError(error);
   }
 }
 
 export async function getOrderById(id: number) {
-  await requireSession();
-  return queryById(id);
+  try {
+    await requireSession();
+    return queryById(id);
+  } catch (error) {
+    throw readError(error);
+  }
 }

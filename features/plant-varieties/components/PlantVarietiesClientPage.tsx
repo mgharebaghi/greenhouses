@@ -15,7 +15,7 @@ export default function PlantVarietiesClientPage({
   const [loading, setLoading] = useState(false);
 
   return (
-    <div className="p-6 w-full h-full">
+    <div className="dashboard-page">
       <PageHeader
         title="واریته - رقم"
         subtitle="مدیریت واریته‌های مرتبط با هر گیاه"

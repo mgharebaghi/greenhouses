@@ -1,5 +1,7 @@
 "use client";
 
+import { formatPersianDate } from "@/shared/dates/calendar";
+
 import type { SeedPackageDetails } from "../types/details";
 
 import DetailModal, { InfoCard } from "@/shared/components/DetailModal";
@@ -22,11 +24,6 @@ export default function SeedPackageDetailModal({
   data,
 }: SeedPackageDetailModalProps) {
   if (!data) return null;
-
-  const formatDate = (date: string | Date | null | undefined) => {
-    if (!date) return "—";
-    return new Date(date).toLocaleDateString("fa-IR");
-  };
 
   return (
     <DetailModal
@@ -126,9 +123,18 @@ export default function SeedPackageDetailModal({
           icon={<CalendarOutlined />}
           color="#3b82f6"
           items={[
-            { label: "تاریخ تولید", value: formatDate(data.ProductionDate) },
-            { label: "تاریخ بسته بندی", value: formatDate(data.PackagingDate) },
-            { label: "تاریخ انقضا", value: formatDate(data.ExpirationDate) },
+            {
+              label: "تاریخ تولید",
+              value: formatPersianDate(data.ProductionDate),
+            },
+            {
+              label: "تاریخ بسته بندی",
+              value: formatPersianDate(data.PackagingDate),
+            },
+            {
+              label: "تاریخ انقضا",
+              value: formatPersianDate(data.ExpirationDate),
+            },
           ]}
         />
       </div>

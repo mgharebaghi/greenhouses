@@ -1,5 +1,7 @@
 "use client";
 
+import { formatPersianDate } from "@/shared/dates/calendar";
+
 import type { WarehouseRecord } from "../types/record";
 
 import DetailModal, { InfoCard } from "@/shared/components/DetailModal";
@@ -42,9 +44,9 @@ export default function WarehousesDetailModal({
           { label: "موقعیت مکانی", value: data.WarehouseLocation },
           {
             label: "تاریخ ایجاد",
-            value: data.WarehouseCreatedAt
-              ? new Date(data.WarehouseCreatedAt).toLocaleDateString("fa-IR")
-              : "---",
+            value: formatPersianDate(data.WarehouseCreatedAt, {
+              fallback: "---",
+            }),
           },
         ]}
       />

@@ -1,5 +1,10 @@
+import { readError } from "@/server/actions/errors";
 import type { Prisma } from "@/app/generated/prisma";
 import { prisma } from "@/server/db/prisma";
+import {
+  serializeSupplier,
+  supplierIdentitySelect,
+} from "@/features/suppliers/server/person";
 import "server-only";
 import type { OrderDetails, OrderPackageDetails } from "../types/details";
 export const orderInclude = {
@@ -10,13 +15,7 @@ export const orderInclude = {
     select: { FirstName: true, LastName: true, NationalCode: true },
   },
   Tbl_suppliers: {
-    select: {
-      CompanyName: true,
-      FirstName: true,
-      LastName: true,
-      Legal: true,
-      LicenseNumber: true,
-    },
+    select: { ...supplierIdentitySelect, LicenseNumber: true },
   },
   Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage: {
     include: {
@@ -27,14 +26,7 @@ export const orderInclude = {
           },
         },
       },
-      Tbl_suppliers: {
-        select: {
-          CompanyName: true,
-          FirstName: true,
-          LastName: true,
-          Legal: true,
-        },
-      },
+      Tbl_suppliers: { select: supplierIdentitySelect },
     },
   },
   Tbl_SeedPackage_Tbl_Orders_ScionIDToTbl_SeedPackage: {
@@ -46,14 +38,7 @@ export const orderInclude = {
           },
         },
       },
-      Tbl_suppliers: {
-        select: {
-          CompanyName: true,
-          FirstName: true,
-          LastName: true,
-          Legal: true,
-        },
-      },
+      Tbl_suppliers: { select: supplierIdentitySelect },
     },
   },
 } satisfies Prisma.Tbl_OrdersInclude;
@@ -66,6 +51,9 @@ const serializeSeedPackage = (
   if (!pkg) return null;
   return {
     ...pkg,
+    Tbl_suppliers: pkg.Tbl_suppliers
+      ? serializeSupplier(pkg.Tbl_suppliers)
+      : null,
     WeightGram: pkg.WeightGram == null ? null : Number(pkg.WeightGram),
     Tbl_plantVariety: pkg.Tbl_plantVariety
       ? {
@@ -93,6 +81,9 @@ const serializeSeedPackage = (
 const serializeOrder = (order: QueryRecord): OrderDetails => {
   return {
     ...order,
+    Tbl_suppliers: order.Tbl_suppliers
+      ? serializeSupplier(order.Tbl_suppliers)
+      : null,
     Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage:
       serializeSeedPackage(
         order.Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage,
@@ -113,8 +104,7 @@ export async function getOrderById(id: number) {
     if (!order) return null;
     return serializeOrder(order);
   } catch (error) {
-    console.error("Error fetching order by id:", error);
-    throw new Error("دریافت اطلاعات انجام نشد. لطفاً دوباره تلاش کنید.");
+    throw readError(error);
   }
 }
 

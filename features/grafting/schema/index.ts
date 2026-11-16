@@ -1,21 +1,22 @@
+import { calendarDateSchema, sqlInteger } from "@/shared/validation/input";
 import { z } from "zod";
 
 // Worker Schema (Nested in Grafting Operation)
 export const graftingWorkerSchema = z.object({
-  PersonID: z.number().int().positive(),
+  PersonID: sqlInteger.positive(),
   // PersonCode is display-only
 });
 
 // Grafting Operation Schema
 export const createGraftingOperationSchema = z.object({
-  OrderID: z.number().int().positive(),
-  ColdRoomExitDate: z.date(),
-  GraftingDate: z.date(),
+  OrderID: sqlInteger.positive(),
+  ColdRoomExitDate: calendarDateSchema,
+  GraftingDate: calendarDateSchema,
 
   // Tray Information
-  TrayNumber: z.number().int().min(1, "حداقل ۱ سینی"),
-  CellPerTrayNumber: z.number().int().min(1, "حداقل ۱ حفره"),
-  CellHeight: z.number().int().min(1),
+  TrayNumber: sqlInteger.min(1, "حداقل ۱ سینی"),
+  CellPerTrayNumber: sqlInteger.min(1, "حداقل ۱ حفره"),
+  CellHeight: sqlInteger.min(1),
   TrayMaterial: z.string().max(50),
 
   // Planting Information
@@ -27,7 +28,7 @@ export const createGraftingOperationSchema = z.object({
   GraftingStick: z.string().max(50),
 
   // Personnel
-  GraftingTechnicianID: z.number().int().positive(),
+  GraftingTechnicianID: sqlInteger.positive(),
 
   // Workers List
   Workers: z

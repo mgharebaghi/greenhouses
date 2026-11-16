@@ -1,4 +1,6 @@
+import { formatPersianDate } from "@/shared/dates/calendar";
 import { getSeedPackageById } from "@/features/seed-packages/server/queries";
+import { supplierName } from "@/features/suppliers/domain/name";
 import QRCodeCanvas from "@/shared/components/QRCodeCanvas";
 import { publicSeedPackageUrl } from "@/shared/config/public-urls";
 import { notFound } from "next/navigation";
@@ -16,7 +18,7 @@ export default async function PublicSeedPackagePage({
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col items-center p-6 font-Iransans">
+    <div className="min-h-dvh bg-slate-50 flex flex-col items-center p-3 sm:p-6 [overflow-wrap:anywhere] font-Iransans">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-lg overflow-hidden">
         <div className="bg-emerald-600 p-6 text-center">
           <h1 className="text-white text-xl font-bold mb-1">
@@ -39,7 +41,9 @@ export default async function PublicSeedPackagePage({
             <InfoRow label="واریته" value={pkg.Tbl_plantVariety?.VarietyName} />
             <InfoRow
               label="تولید کننده"
-              value={pkg.Tbl_suppliers?.CompanyName}
+              value={
+                pkg.Tbl_suppliers ? supplierName(pkg.Tbl_suppliers) : undefined
+              }
             />
             <InfoRow
               label="تعداد بذر"
@@ -52,27 +56,15 @@ export default async function PublicSeedPackagePage({
             <InfoRow label="نوع بسته‌بندی" value={pkg.PackageType} />
             <InfoRow
               label="تاریخ تولید"
-              value={
-                pkg.ProductionDate
-                  ? new Date(pkg.ProductionDate).toLocaleDateString("fa-IR")
-                  : "-"
-              }
+              value={formatPersianDate(pkg.ProductionDate, { fallback: "-" })}
             />
             <InfoRow
               label="تاریخ بسته‌بندی"
-              value={
-                pkg.PackagingDate
-                  ? new Date(pkg.PackagingDate).toLocaleDateString("fa-IR")
-                  : "-"
-              }
+              value={formatPersianDate(pkg.PackagingDate, { fallback: "-" })}
             />
             <InfoRow
               label="تاریخ انقضا"
-              value={
-                pkg.ExpirationDate
-                  ? new Date(pkg.ExpirationDate).toLocaleDateString("fa-IR")
-                  : "-"
-              }
+              value={formatPersianDate(pkg.ExpirationDate, { fallback: "-" })}
             />
             <InfoRow label="درجه کیفی" value={pkg.QualityGrade} />
             <InfoRow

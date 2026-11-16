@@ -1,5 +1,7 @@
 "use client";
 
+import { formatPersianDate } from "@/shared/dates/calendar";
+
 import type { NurseryRoomRecord } from "../types/record";
 
 import DetailModal, { InfoCard } from "@/shared/components/DetailModal";
@@ -23,11 +25,6 @@ export default function NurseryRoomsDetailModal({
 }: NurseryRoomsDetailModalProps) {
   if (!data) return null;
 
-  const formatDate = (date: string | Date | null | undefined) => {
-    if (!date) return "—";
-    return new Date(date).toLocaleDateString("fa-IR");
-  };
-
   return (
     <DetailModal
       open={open}
@@ -47,7 +44,7 @@ export default function NurseryRoomsDetailModal({
           { label: "نام اتاق", value: data.NurseryRoomName },
           {
             label: "تاریخ ایجاد",
-            value: formatDate(data.NurseryRoomCreatedAt),
+            value: formatPersianDate(data.NurseryRoomCreatedAt),
           },
         ]}
       />

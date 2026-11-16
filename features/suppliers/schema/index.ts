@@ -1,16 +1,29 @@
-import { optionalText } from "@/shared/validation/input";
+import { recordIdSchema } from "@/shared/validation/input";
 import { z } from "zod";
+
+const optionalSupplierText = (length: number) =>
+  z
+    .string()
+    .trim()
+    .max(length)
+    .nullish()
+    .transform((value) => (value === "" ? null : value));
+
 export const supplierInputSchema = z.object({
-  Legal: z.boolean().nullish(),
-  CompanyName: optionalText(150),
-  BrandName: optionalText(150),
-  SupplierCountry: optionalText(150),
-  SupplierCity: optionalText(150),
-  FirstName: optionalText(150),
-  LastName: optionalText(150),
-  ContactEmail: optionalText(150),
-  ContactTel: optionalText(50),
-  CompanyAddress: z.string().nullish(),
-  LicenseNumber: optionalText(50),
+  People_CompaniesID: recordIdSchema,
+  CompanyName: optionalSupplierText(150),
+  BrandName: optionalSupplierText(150),
+  SupplierCountry: optionalSupplierText(150),
+  SupplierCity: optionalSupplierText(150),
+  FirstName: optionalSupplierText(150),
+  LastName: optionalSupplierText(150),
+  ContactEmail: optionalSupplierText(150),
+  ContactTel: z.string().trim().min(1, "تلفن را وارد کنید.").max(50),
+  CompanyAddress: z
+    .string()
+    .trim()
+    .nullish()
+    .transform((value) => (value === "" ? null : value)),
+  LicenseNumber: optionalSupplierText(50),
 });
 export type SupplierInput = z.infer<typeof supplierInputSchema>;

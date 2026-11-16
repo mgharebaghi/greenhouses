@@ -1,11 +1,12 @@
 "use server";
+import { readError } from "@/server/actions/errors";
 import { requireSession } from "@/server/auth/require-session";
 
 import { prisma } from "@/server/db/prisma";
 
 export async function getStartSeedlingCycles() {
-  await requireSession();
   try {
+    await requireSession();
     const cycles = await prisma.tbl_StartSeedlingCycle.findMany({
       include: {
         Tbl_Orders: {
@@ -31,14 +32,13 @@ export async function getStartSeedlingCycles() {
     });
     return cycles;
   } catch (error) {
-    console.error("Query failed", error);
-    throw new Error("دریافت اطلاعات انجام نشد. لطفاً دوباره تلاش کنید.");
+    throw readError(error);
   }
 }
 
 export async function getOrdersForSelect() {
-  await requireSession();
   try {
+    await requireSession();
     const orders = await prisma.tbl_Orders.findMany({
       where: {
         // Filter for orders that are relevant? For now get all or maybe non-completed ones
@@ -71,14 +71,13 @@ export async function getOrdersForSelect() {
           ?.Tbl_plantVariety?.VarietyName,
     }));
   } catch (error) {
-    console.error("Query failed", error);
-    throw new Error("دریافت اطلاعات انجام نشد. لطفاً دوباره تلاش کنید.");
+    throw readError(error);
   }
 }
 
 export async function getGreenhousesForSelect() {
-  await requireSession();
   try {
+    await requireSession();
     const greenhouses = await prisma.tbl_Greenhouses.findMany({
       where: { IsActive: true },
       select: { ID: true, GreenhouseName: true },
@@ -89,7 +88,6 @@ export async function getGreenhousesForSelect() {
       label: g.GreenhouseName,
     }));
   } catch (error) {
-    console.error("Query failed", error);
-    throw new Error("دریافت اطلاعات انجام نشد. لطفاً دوباره تلاش کنید.");
+    throw readError(error);
   }
 }

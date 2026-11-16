@@ -1,6 +1,6 @@
 import GreenhouseButton from "@/shared/components/GreenhouseButton";
 import { CloseOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
-import { Modal } from "antd";
+import Modal from "@/shared/components/ResponsiveModal";
 import { useEffect, useState } from "react";
 
 export type DeleteModalProps = {
@@ -62,7 +62,7 @@ export default function DeleteModal({
       }}
     >
       {/* Header Section */}
-      <div className="relative px-6 py-5 bg-gradient-to-br from-rose-50/60 via-orange-50/40 to-white dark:from-rose-950 dark:via-rose-900/50 dark:to-slate-900 border-b border-slate-200 dark:border-slate-800">
+      <div className="relative px-4 py-3 pe-14 sm:px-6 sm:py-5 sm:pe-16 bg-gradient-to-br from-rose-50/60 via-orange-50/40 to-white dark:from-rose-950 dark:via-rose-900/50 dark:to-slate-900 border-b border-slate-200 dark:border-slate-800">
         <button
           onClick={onClose}
           className="absolute top-4 left-4 h-8 w-8 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 hover:border-slate-300 transition-all flex items-center justify-center text-slate-600 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
@@ -87,7 +87,7 @@ export default function DeleteModal({
       </div>
 
       {/* Body Section */}
-      <div className="px-6 py-6 bg-white dark:bg-slate-900">
+      <div className="p-4 sm:p-6 bg-white dark:bg-slate-900">
         <div className="mb-4">
           <p className="text-slate-700 dark:text-slate-300 text-base leading-relaxed">
             آیا از حذف{" "}
@@ -111,7 +111,7 @@ export default function DeleteModal({
         )}
 
         {/* Action Buttons */}
-        <div className="flex justify-end gap-3 mt-6">
+        <div className="flex flex-wrap justify-end gap-3 mt-6">
           <GreenhouseButton
             text="انصراف"
             variant="secondary"

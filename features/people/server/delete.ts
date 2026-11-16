@@ -2,6 +2,7 @@
 import { actionError } from "@/server/actions/errors";
 import { requireSession } from "@/server/auth/require-session";
 import { parseInput, recordIdSchema } from "@/shared/validation/input";
+import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/server/db/prisma";
 
@@ -15,22 +16,12 @@ export async function deletePerson(
 ): Promise<PeopleDeleteResponse> {
   try {
     await requireSession();
-    parseInput(recordIdSchema, ownerId);
-    const deletation = await prisma.tbl_People.delete({
-      where: { ID: ownerId },
+    const id = parseInput(recordIdSchema, ownerId);
+    await prisma.tbl_People_Companies.delete({
+      where: { ID: id },
     });
-
-    if (!deletation) {
-      return {
-        status: "error",
-        message: "خطایی پیش آمده! لطفا بعدا تلاش کنید.",
-      };
-    } else {
-      return {
-        status: "ok",
-        message: "",
-      };
-    }
+    revalidatePath("/dashboard/people");
+    return { status: "ok", message: "" };
   } catch (error) {
     return actionError(error);
   }

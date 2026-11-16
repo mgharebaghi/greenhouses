@@ -1,3 +1,4 @@
+import { formatPersianDate } from "@/shared/dates/calendar";
 import QRCodeCanvas from "@/shared/components/QRCodeCanvas";
 import type { Ref } from "react";
 import type { OrderDetails } from "../../types/details";
@@ -207,7 +208,7 @@ export default function OrderCertificate({
             </div>
             <div style={{ fontSize: "14px", fontWeight: 900 }}>
               {fullData?.OrderDate
-                ? new Date(fullData.OrderDate).toLocaleDateString("fa-IR")
+                ? formatPersianDate(fullData.OrderDate)
                 : "—"}
             </div>
           </div>

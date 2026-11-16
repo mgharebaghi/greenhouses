@@ -174,7 +174,7 @@ export default function PlantVarietiesTable({
   return (
     <>
       <InsertionRow
-        text="افزودن واریته"
+        text="واریته"
         insertOnclick={() => setFormModal({ open: true, record: null })}
         csvOnclick={async () => {
           const csvData = await plantVarietiesCSVData(data);

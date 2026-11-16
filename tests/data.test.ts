@@ -7,7 +7,12 @@ import {
 } from "../shared/config/public-urls";
 import { csvRows } from "../shared/exports/csv";
 import { applyFieldErrors } from "../shared/forms/field-errors";
-import { displayCell, filterAndSort, visiblePage } from "../shared/table/data";
+import {
+  displayCell,
+  filterAndSort,
+  indexTableRows,
+  visiblePage,
+} from "../shared/table/data";
 
 test("table filtering, stable sorting, and paging do not mutate source rows", () => {
   const rows = [
@@ -16,13 +21,11 @@ test("table filtering, stable sorting, and paging do not mutate source rows", ()
     { id: 3, name: "Basil", count: 4 },
   ];
   assert.deepEqual(
-    filterAndSort(rows, [{ dataIndex: "name" }], "rose", "count", "asc").map(
-      (row) => row.id,
-    ),
+    filterAndSort(rows, "rose", "count", "asc").map((row) => row.id),
     [1, 2],
   );
   assert.deepEqual(
-    filterAndSort(rows, [], "", "count", "desc").map((row) => row.id),
+    filterAndSort(rows, "", "count", "desc").map((row) => row.id),
     [3, 1, 2],
   );
   assert.deepEqual(
@@ -34,6 +37,37 @@ test("table filtering, stable sorting, and paging do not mutate source rows", ()
   assert.equal(displayCell(0), 0);
   assert.equal(displayCell(false), "false");
   assert.equal(displayCell(null), "-");
+});
+
+test("table search finds related names, non-column values and Persian display equivalents", () => {
+  const company = {
+    id: 1,
+    person: { firstName: "علی", lastName: "کریمی" },
+    license: "00124",
+    quantity: 0,
+    date: "2026-11-15T00:00:00.000Z",
+    barcode: "data:image/png;base64,c2VjcmV0",
+  };
+  const rows = [
+    company,
+    {
+      ...company,
+      id: 2,
+      license: "00125",
+      person: { firstName: "زهرا", lastName: "نمونه" },
+      quantity: 4,
+    },
+  ];
+  const index = indexTableRows(rows, (row) =>
+    row.id === 1 ? ["شخصیت حقوقی"] : [],
+  );
+  for (const query of [" علي كريمي ", "۰۰۱۲۴", "کریمی ۰", "۱۴۰۵-۰۸-۲۴ حقوقی"])
+    assert.deepEqual(
+      filterAndSort(rows, query, null, null, index),
+      [company],
+      query,
+    );
+  assert.deepEqual(filterAndSort(rows, "c2VjcmV0", null, null, index), []);
 });
 
 test("CSV preserves selected values, zero and false without exporting relation objects", () => {

@@ -1,3 +1,4 @@
+import { formatPersianDate } from "@/shared/dates/calendar";
 import type { SeedPackageDetails } from "../types/details";
 export const headers = [
   { displayLabel: "شناسه", key: "ID" },
@@ -15,11 +16,7 @@ export const headers = [
 export async function seedPackageCSVData(source: SeedPackageDetails[]) {
   return source.map((item) => ({
     ...item,
-    ProductionDate: item.ProductionDate
-      ? new Date(item.ProductionDate).toLocaleDateString("fa-IR")
-      : "",
-    ExpirationDate: item.ExpirationDate
-      ? new Date(item.ExpirationDate).toLocaleDateString("fa-IR")
-      : "",
+    ProductionDate: formatPersianDate(item.ProductionDate, { fallback: "" }),
+    ExpirationDate: formatPersianDate(item.ExpirationDate, { fallback: "" }),
   }));
 }

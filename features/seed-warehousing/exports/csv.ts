@@ -1,3 +1,4 @@
+import { formatPersianDate } from "@/shared/dates/calendar";
 import type { WarehouseTransactionDetails } from "../types/details";
 export const headers = [
   { displayLabel: "شماره تراکنش", key: "ID" },
@@ -18,8 +19,9 @@ export async function seedWarehousingCSVData(
     TransactionTypeLabel: item.TransactionType ? "ورودی" : "خروجی",
     SeedPackageSerial: item.Tbl_SeedPackage?.SerialNumber || "",
     WarehouseName: item.Tbl_Warehouses?.WarehouseName || "",
-    TransactionDateFormatted: item.TransactionDate
-      ? new Date(item.TransactionDate).toLocaleDateString("fa-IR")
-      : "",
+    TransactionDateFormatted: formatPersianDate(item.TransactionDate, {
+      kind: "timestamp",
+      fallback: "",
+    }),
   }));
 }

@@ -11,17 +11,13 @@ export async function createSeedWarehousing(input: unknown) {
   try {
     await requireSession();
     const data = parseInput(seedWarehousingInputSchema, input);
-    const customDate = data.TransactionDate
-      ? new Date(data.TransactionDate)
-      : new Date();
-
     const newTrx = await prisma.tbl_WarehousesTransaction.create({
       data: {
         SeedPackageID: Number(data.SeedPackageID),
         WarehouseID: Number(data.WarehouseID),
         TransactionType: data.TransactionType, // Boolean handling
         PackageQuantity: Number(data.PackageQuantity),
-        TransactionDate: customDate,
+        TransactionDate: data.TransactionDate ?? new Date(),
         DestinationType: data.DestinationType,
         RecordedBy: data.RecordedBy,
       },

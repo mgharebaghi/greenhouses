@@ -1,4 +1,6 @@
 "use client";
+
+import { formatPersianDate } from "@/shared/dates/calendar";
 import QrImage from "@/shared/components/QrImage";
 
 import { publicOrderUrl } from "@/shared/config/public-urls";
@@ -12,9 +14,6 @@ import {
 } from "@ant-design/icons";
 import QRCode from "qrcode";
 import { useEffect, useState } from "react";
-import DateObject from "react-date-object";
-import persian from "react-date-object/calendars/persian";
-import persian_fa from "react-date-object/locales/persian_fa";
 import { StartSeedlingCycle } from "../types";
 
 interface Props {
@@ -29,13 +28,6 @@ export default function StartSeedlingCycleDetailModal({
   record,
 }: Props) {
   const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
-
-  const formatDate = (date: string | Date | null | undefined) => {
-    if (!date) return "---";
-    return new DateObject(date)
-      .convert(persian, persian_fa)
-      .format("YYYY/MM/DD");
-  };
 
   useEffect(() => {
     if (record && record.OrderID) {
@@ -119,15 +111,21 @@ export default function StartSeedlingCycleDetailModal({
           items={[
             {
               label: "تاریخ خروج از اتاق جوانه زنی",
-              value: formatDate(record.GerminationRoomExitDate),
+              value: formatPersianDate(record.GerminationRoomExitDate, {
+                fallback: "---",
+              }),
             },
             {
               label: "تاریخ ورود به گلخانه-نرسری",
-              value: formatDate(record.GreenhouseEntryDate),
+              value: formatPersianDate(record.GreenhouseEntryDate, {
+                fallback: "---",
+              }),
             },
             {
               label: "تاریخ خروج از اتاق نرسری",
-              value: formatDate(record.GreenhouseExitDate),
+              value: formatPersianDate(record.GreenhouseExitDate, {
+                fallback: "---",
+              }),
             },
           ]}
         />

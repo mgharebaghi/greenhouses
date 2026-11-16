@@ -16,7 +16,7 @@ export default function GreenhousesClientPage({
   const [data, setData] = useState<GreenhouseRecord[]>(initialData || []);
 
   return (
-    <div className="w-full p-6 overflow-hidden">
+    <div className="dashboard-page">
       <PageHeader
         title="گلخانه‌ها"
         subtitle="مدیریت اطلاعات پایه گلخانه‌ها"

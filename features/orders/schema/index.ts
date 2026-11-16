@@ -1,4 +1,8 @@
-import { optionalDate } from "@/shared/validation/input";
+import {
+  optionalDate,
+  recordIdSchema,
+  sqlInteger,
+} from "@/shared/validation/input";
 import { z } from "zod";
 
 export const orderSchema = z.object({
@@ -9,17 +13,13 @@ export const orderSchema = z.object({
     .max(10)
     .optional()
     .nullable(),
-  CustomerID: z.number().min(1, "انتخاب مشتری الزامی است").nullable(),
-  SupplierID: z.number().min(1, "انتخاب تامین کننده الزامی است").nullable(),
-  ProjectManager: z.number().min(1, "انتخاب مدیر پروژه الزامی است").nullable(),
+  CustomerID: recordIdSchema.nullable(),
+  SupplierID: recordIdSchema.nullable(),
+  ProjectManager: recordIdSchema.nullable(),
   OrderDate: optionalDate,
-  OrderCount: z
-    .number()
-    .int()
-    .min(1, "تعداد سفارش باید حداقل ۱ باشد")
-    .nullable(),
-  RootstockID: z.number().nullable().optional(),
-  ScionID: z.number().nullable().optional(),
+  OrderCount: sqlInteger.min(1, "تعداد سفارش باید حداقل ۱ باشد").nullable(),
+  RootstockID: recordIdSchema.nullish(),
+  ScionID: recordIdSchema.nullish(),
 });
 
 export type OrderInput = z.infer<typeof orderSchema>;

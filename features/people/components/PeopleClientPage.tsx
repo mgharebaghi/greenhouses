@@ -21,7 +21,7 @@ export default function PeopleClientPage({
   }>({ open: false, record: null });
 
   return (
-    <div className="w-full h-full p-6">
+    <div className="dashboard-page">
       <PageHeader
         title="اشخاص"
         subtitle="مدیریت اطلاعات پایه اشخاص "

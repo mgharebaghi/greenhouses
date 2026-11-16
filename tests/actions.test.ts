@@ -11,6 +11,133 @@ type Result = {
   dta?: { PersonCode: string }[];
 };
 type Action = (...args: unknown[]) => Promise<Result>;
+
+test("warehouse managers are selected by numeric ID and validated as natural people", async () => {
+  const writes: Record<string, unknown>[] = [];
+  const lookups: unknown[] = [];
+  const loader = createServerLoader({
+    tbl_People_Companies: {
+      findFirst: async ({
+        where,
+      }: {
+        where: { ID: number; Legal: boolean };
+      }) => {
+        lookups.push(where);
+        return where.ID === 7 && where.Legal === false
+          ? { FirstName: "علی", LastName: "نمونه" }
+          : null;
+      },
+    },
+    tbl_Warehouses: {
+      create: async ({ data }: { data: Record<string, unknown> }) =>
+        writes.push(data),
+      update: async ({ data }: { data: Record<string, unknown> }) =>
+        writes.push(data),
+    },
+  });
+  const create = loader.load("@/features/warehouses/server/create")
+    .createWarehouse as Action;
+  const update = loader.load("@/features/warehouses/server/update")
+    .updateWarehouse as Action;
+  const base = { WarehouseCode: "001", WarehouseName: "انبار نمونه" };
+  assert.ok(
+    (await create({ ...base, WarehouseManagerID: "7" })).fieldErrors
+      ?.WarehouseManagerID,
+  );
+  assert.ok(
+    (await create({ ...base, WarehouseManagerID: 8 })).fieldErrors
+      ?.WarehouseManagerID,
+  );
+  assert.equal(writes.length, 0);
+  assert.equal(
+    (
+      await create({
+        ...base,
+        WarehouseManagerID: 7,
+        WarehouseManagerName: "نام جعلی",
+      })
+    ).status,
+    "ok",
+  );
+  assert.deepEqual(writes[0], { ...base, WarehouseManagerName: "علی نمونه" });
+  assert.equal(
+    (await update(1, { ...base, WarehouseManagerID: null })).status,
+    "ok",
+  );
+  assert.equal(writes[1].WarehouseManagerName, null);
+  assert.equal((await update(1, base)).status, "ok");
+  assert.equal(writes[2].WarehouseManagerName, undefined);
+  assert.deepEqual(lookups, [
+    { ID: 8, Legal: false },
+    { ID: 7, Legal: false },
+  ]);
+});
+
+test("seed package expiration is previewed and saved by the server in the production calendar", async () => {
+  const writes: {
+    ExpirationDate?: Date | null;
+    ProductionDate?: Date | null;
+  }[] = [];
+  const seedPackages = {
+    create: async ({ data }: { data: (typeof writes)[number] }) => {
+      writes.push(data);
+      return { ID: 12 };
+    },
+    findUniqueOrThrow: async () => ({
+      ProductionDate: new Date("2024-02-29"),
+      ExpirationDate: new Date("2025-02-28"),
+    }),
+    update: async ({ data }: { data: (typeof writes)[number] }) =>
+      writes.push(data),
+  };
+  const loader = createServerLoader({
+    tbl_SeedPackage: seedPackages,
+    $transaction: async (operation: (tx: unknown) => Promise<unknown>) =>
+      operation({ tbl_SeedPackage: seedPackages }),
+  });
+  const create = loader.load("@/features/seed-packages/server/create")
+    .createSeedPackage as Action;
+  const update = loader.load("@/features/seed-packages/server/update")
+    .updateSeedPackage as Action;
+  const preview = loader.load("@/features/seed-packages/server/read")
+    .getSeedPackageExpiration as (input: unknown) => Promise<string>;
+  const base = { CropVariety: 1, SerialNumber: "001" };
+  const gregorian = {
+    ...base,
+    ProductionDate: "2024-02-29",
+    ProductionCalendar: "gregorian",
+    ExpirationDate: "2000-01-01",
+  };
+  const persian = {
+    ...base,
+    ProductionDate: "2025-03-20",
+    ProductionCalendar: "persian",
+  };
+
+  assert.equal(await preview(gregorian), "2025-02-28");
+  assert.equal((await create(gregorian)).status, "ok");
+  assert.equal(
+    writes[0].ExpirationDate?.toISOString(),
+    "2025-02-28T00:00:00.000Z",
+  );
+  assert.equal(
+    (await update(12, { ...gregorian, ProductionCalendar: "persian" })).status,
+    "ok",
+  );
+  assert.equal(writes[1].ExpirationDate, undefined);
+  assert.equal(await preview(persian), "2026-03-20");
+  assert.equal((await update(12, persian)).status, "ok");
+  assert.equal(
+    writes[2].ExpirationDate?.toISOString(),
+    "2026-03-20T00:00:00.000Z",
+  );
+  assert.equal(
+    (await update(12, { ...base, ProductionDate: null })).status,
+    "ok",
+  );
+  assert.equal(writes[3].ExpirationDate, null);
+});
+
 test("every private feature action blocks anonymous access before touching Prisma", async () => {
   let accesses = 0;
   const database = new Proxy(
@@ -85,13 +212,14 @@ test("anonymous login rejects malformed input before database access", async () 
   assert.equal(reads, 0);
 });
 const personInput = {
+  Legal: false,
   FirstName: "محمد",
   LastName: "محمدی",
   PersonCode: "999",
   NationalCode: "1234567890",
   PhoneNumber: "09123456789",
   EmailAddress: "a@b.co",
-  Profesion: "کارگر",
+  Profession: "کارگر",
   PostID: 1,
 };
 
@@ -173,7 +301,7 @@ test("database errors become friendly failures instead of truthy success or raw 
 test("person code is generated inside a serializable transaction and retries serialization conflicts", async () => {
   let attempts = 0;
   const tx = {
-    tbl_People: {
+    tbl_People_Companies: {
       findFirst: async () => ({ PersonCode: "7" }),
       create: async ({ data }: { data: typeof personInput }) => ({
         ID: 8,
@@ -198,6 +326,131 @@ test("person code is generated inside a serializable transaction and retries ser
   assert.equal(result.status, "ok");
   assert.equal(result.dta?.[0].PersonCode, "8");
   assert.equal(attempts, 2);
+});
+
+test("company writes force the legal role and preserve an unchanged historical identifier", async () => {
+  const company = {
+    ...personInput,
+    Legal: true,
+    CompanyName: "شرکت نمونه",
+    CompanyEconomicCode: "0012",
+    CompanyRegistrationCode: "0013",
+  };
+  const writes: { where?: unknown; data: Record<string, unknown> }[] = [];
+  const record = {
+    ID: 20,
+    PersonCode: "8",
+    NationalCode: "123456789",
+    Tbl_PeoplePosts: { ID: 13, PostName: "شخصیت حقوقی" },
+  };
+  const companies = {
+    findFirst: async () => ({ PersonCode: "7" }),
+    create: async (args: { data: Record<string, unknown> }) => {
+      writes.push(args);
+      return { ...record, ...args.data };
+    },
+    update: async (args: (typeof writes)[number]) => {
+      writes.push(args);
+      return { ...args.data, ...record };
+    },
+  };
+  const loader = createServerLoader({
+    tbl_People_Companies: companies,
+    $transaction: async (operation: (tx: unknown) => Promise<unknown>) =>
+      operation({ tbl_People_Companies: companies }),
+  });
+  const create = loader.load("@/features/people/server/create")
+    .createPerson as Action;
+  const update = loader.load("@/features/people/server/update")
+    .updatePerson as Action;
+
+  const invalid = await create({ ...company, NationalCode: "012345678901" });
+  assert.ok(invalid.fieldErrors?.NationalCode);
+  assert.equal(writes.length, 0);
+
+  const created = await create({ ...company, NationalCode: "۰۱۲۳۴۵۶۷۸" });
+  assert.equal(created.status, "ok");
+  assert.equal(writes[0].data.PostID, 13);
+  assert.equal(writes[0].data.FirstName, null);
+  assert.equal(writes[0].data.LastName, null);
+  assert.equal(writes[0].data.NationalCode, "012345678");
+  assert.equal(writes[0].data.CompanyRegistrationCode, "0013");
+
+  const edited = await update({
+    id: 20,
+    data: { ...company, NationalCode: undefined },
+  });
+  assert.equal(edited.status, "ok");
+  assert.deepEqual(writes[1].where, { ID: 20, Legal: true });
+  assert.equal(writes[1].data.NationalCode, undefined);
+});
+
+test("supplier writes use the linked person's type and preserve text identifiers", async () => {
+  const writes: Record<string, unknown>[] = [];
+  const tx = {
+    tbl_People_Companies: {
+      findUnique: async ({ where }: { where: { ID: number } }) =>
+        where.ID === 31
+          ? { Legal: false }
+          : where.ID === 32
+            ? { Legal: true }
+            : null,
+    },
+    tbl_Suppliers: {
+      create: async ({ data }: { data: Record<string, unknown> }) =>
+        writes.push(data),
+      update: async ({ data }: { data: Record<string, unknown> }) =>
+        writes.push(data),
+    },
+  };
+  const loader = createServerLoader({
+    $transaction: async (operation: (tx: unknown) => Promise<unknown>) =>
+      operation(tx),
+  });
+  const create = loader.load("@/features/suppliers/server/create")
+    .createSupplier as Action;
+  const update = loader.load("@/features/suppliers/server/update")
+    .updateSupplier as Action;
+  const input = {
+    People_CompaniesID: 31,
+    FirstName: "علی",
+    LastName: "نمونه",
+    BrandName: "بذر",
+    ContactTel: "02100000000",
+    LicenseNumber: "0012",
+  };
+
+  const wrongTypes = await create({
+    ...input,
+    People_CompaniesID: "31",
+    ContactTel: 123,
+  });
+  assert.ok(wrongTypes.fieldErrors?.People_CompaniesID);
+  assert.ok(wrongTypes.fieldErrors?.ContactTel);
+  const missingPerson = await create({ ...input, People_CompaniesID: 99 });
+  assert.ok(missingPerson.fieldErrors?.People_CompaniesID);
+  assert.equal(writes.length, 0);
+
+  assert.equal((await create({ ...input, Legal: true })).status, "ok");
+  assert.equal(writes[0].People_CompaniesID, 31);
+  assert.equal(writes[0].FirstName, null);
+  assert.equal(writes[0].LastName, null);
+  assert.equal(writes[0].BrandName, "بذر");
+  assert.equal(writes[0].ContactTel, "02100000000");
+  assert.equal(writes[0].LicenseNumber, "0012");
+  assert.equal("Legal" in writes[0], false);
+
+  assert.equal(
+    (
+      await update({
+        id: 1,
+        data: { ...input, People_CompaniesID: 32, Legal: false },
+      })
+    ).status,
+    "ok",
+  );
+  assert.equal(writes[1].FirstName, "علی");
+  assert.equal(writes[1].LastName, "نمونه");
 });
 
 test("unavailable recovery storage blocks reads and all writes without touching Prisma", async () => {
@@ -303,6 +556,47 @@ test("warehouse updates persist zero quantity and false transaction type", async
   assert.equal(written.TransactionType, false);
 });
 
+test("warehouse create uses server time for an empty date and update keeps the saved timestamp", async () => {
+  const writes: { TransactionDate?: Date }[] = [];
+  const loader = createServerLoader({
+    tbl_WarehousesTransaction: {
+      create: async ({ data }: { data: (typeof writes)[number] }) =>
+        writes.push(data),
+      update: async ({ data }: { data: (typeof writes)[number] }) =>
+        writes.push(data),
+    },
+  });
+  const create = loader.load("@/features/seed-warehousing/server/create")
+    .createSeedWarehousing as Action;
+  const update = loader.load("@/features/seed-warehousing/server/update")
+    .updateSeedWarehousing as Action;
+  const input = {
+    SeedPackageID: 1,
+    WarehouseID: 2,
+    TransactionType: false,
+    PackageQuantity: 1,
+  };
+  const before = Date.now();
+  assert.equal(
+    (await create({ ...input, TransactionDate: null })).status,
+    "ok",
+  );
+  const timestamp = writes[0]?.TransactionDate?.getTime();
+  assert.ok(
+    timestamp !== undefined && timestamp >= before && timestamp <= Date.now(),
+  );
+  assert.equal((await update(1, input)).status, "ok");
+  assert.equal(writes[1]?.TransactionDate, undefined);
+  assert.equal(
+    (await update(1, { ...input, TransactionDate: "2026-11-15" })).status,
+    "ok",
+  );
+  assert.equal(
+    writes[2]?.TransactionDate?.toISOString(),
+    "2026-11-14T20:30:00.000Z",
+  );
+});
+
 test("private queries require a session; public QR queries keep working without one", async () => {
   let reads = 0;
   const loader = createServerLoader(
@@ -324,4 +618,19 @@ test("private queries require a session; public QR queries keep working without 
     .getOrderById as (id: number) => Promise<unknown>;
   assert.equal(await publicRead(1), null);
   assert.equal(reads, 1);
+});
+
+test("read actions report a public message when persistence fails", async () => {
+  const loader = createServerLoader({
+    tbl_Plants: {
+      findMany: async () => {
+        throw new Error("DB_INTERNAL_DETAIL");
+      },
+    },
+  });
+  const readPlants = loader.load("@/features/plants/server/read")
+    .getPlants as Action;
+  await assert.rejects(() => readPlants(), {
+    message: "دریافت اطلاعات انجام نشد. لطفاً دوباره تلاش کنید.",
+  });
 });

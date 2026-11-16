@@ -19,7 +19,7 @@ export default function OrdersClientPage() {
   if (error) return <DataLoadError onRetry={() => void fetchData()} />;
 
   return (
-    <div className="p-6">
+    <div className="dashboard-page">
       <PageHeader
         title="ثبت سفارش"
         subtitle="مدیریت سفارشات ثبت شده در سیستم"

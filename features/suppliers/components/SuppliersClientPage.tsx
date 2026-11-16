@@ -2,7 +2,7 @@
 
 import PageHeader from "@/shared/components/PageHeader";
 import { ShopOutlined } from "@ant-design/icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { SupplierDTO } from "../types";
 import SuppliersTable from "./SuppliersTable";
 
@@ -14,8 +14,10 @@ export default function SuppliersClientPage({
   const [data, setData] = useState<SupplierDTO[]>(initialData);
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => setData(initialData), [initialData]);
+
   return (
-    <div className="w-full h-full p-6">
+    <div className="dashboard-page">
       <PageHeader
         title="تامین‌کنندگان"
         subtitle="مدیریت اطلاعات پایه تامین‌کنندگان بذر"

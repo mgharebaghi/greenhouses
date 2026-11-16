@@ -4,20 +4,30 @@ import {
   displayCell,
   fieldValue,
   filterAndSort,
+  indexTableRows,
   visiblePage,
 } from "@/shared/table/data";
 import {
+  CloseCircleFilled,
   SearchOutlined,
   SortAscendingOutlined,
   SortDescendingOutlined,
   TableOutlined,
 } from "@ant-design/icons";
-import React, { useEffect, useMemo, useState } from "react";
+import clsx from "clsx";
+import {
+  isValidElement,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import Pagination from "./Pagination";
 
 export interface Column<T extends object> {
   title: string;
-  dataIndex?: string; // Make dataIndex optional
+  dataIndex?: string;
   key: string;
   width?: number;
   align?: "left" | "right" | "center";
@@ -26,7 +36,7 @@ export interface Column<T extends object> {
   sortable?: boolean;
   searchable?: boolean;
   render?: {
-    render(value: unknown, record: T, index: number): React.ReactNode;
+    render(value: unknown, record: T, index: number): ReactNode;
   }["render"];
   className?: string;
 }
@@ -57,6 +67,48 @@ interface TableProps<T extends object> {
   ) => { onClick?: () => void; onDoubleClick?: () => void };
 }
 
+const controlKeys = new Set(["actions", "action", "details", "qrcode"]);
+const isControlColumn = (column: { key: string }) =>
+  controlKeys.has(column.key.toLowerCase());
+
+function getRenderedText(node: ReactNode): string {
+  if (
+    typeof node === "string" ||
+    typeof node === "number" ||
+    typeof node === "bigint"
+  )
+    return String(node);
+  if (Array.isArray(node)) return node.map(getRenderedText).join(" ");
+  if (isValidElement<{ children?: ReactNode }>(node))
+    return getRenderedText(node.props.children);
+  return "";
+}
+
+function renderCell<T extends object>(
+  column: Column<T>,
+  record: T,
+  index: number,
+) {
+  const value = column.dataIndex
+    ? fieldValue(record, column.dataIndex)
+    : undefined;
+  return column.render
+    ? column.render(value, record, index)
+    : displayCell(value);
+}
+
+const cellSizes = {
+  small: "px-2 py-2 text-xs",
+  middle: "px-3 py-2.5 text-sm",
+  large: "px-4 py-3 text-base",
+};
+const columnAlignment = {
+  left: "text-left",
+  center: "text-center",
+  right: "text-right",
+};
+const persianNumber = new Intl.NumberFormat("fa-IR");
+
 export default function Table<T extends object>({
   columns,
   dataSource,
@@ -73,351 +125,346 @@ export default function Table<T extends object>({
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc" | null>(null);
   const [currentPage, setCurrentPage] = useState(
-    pagination && typeof pagination === "object" ? pagination.current || 1 : 1,
+    pagination ? (pagination.current ?? 1) : 1,
   );
   const [pageSize, setPageSize] = useState(
-    pagination && typeof pagination === "object"
-      ? pagination.pageSize || 10
-      : 10,
+    pagination ? (pagination.pageSize ?? 10) : 10,
   );
-  const [isMobile, setIsMobile] = useState(false);
+  const [availableWidth, setAvailableWidth] = useState(0);
+  const tableContainer = useRef<HTMLDivElement>(null);
+  const searchInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+    const container = tableContainer.current;
+    if (!container) return;
+    setAvailableWidth(container.clientWidth);
+    const observer = new ResizeObserver(([entry]) =>
+      setAvailableWidth(entry.contentRect.width),
+    );
+    observer.observe(container);
+    return () => observer.disconnect();
   }, []);
 
+  const dataColumns = columns.filter((column) => !isControlColumn(column));
+  const controlColumns = columns.filter(isControlColumn);
+  const sortableColumns = columns.filter(
+    (column) => column.dataIndex && column.sortable !== false,
+  );
+  const minimumTableWidth = Math.max(
+    460,
+    scroll?.x ?? 0,
+    columns.reduce(
+      (width, column) =>
+        width + (column.width ?? (isControlColumn(column) ? 86 : 100)),
+      0,
+    ),
+  );
+  const showCards = availableWidth < minimumTableWidth + 26;
+
+  const hasSearch = Boolean(searchText.trim());
+  const searchIndex = useMemo(() => {
+    if (!hasSearch) return undefined;
+    const renderedColumns = columns.filter(
+      (column) =>
+        column.render &&
+        column.searchable !== false &&
+        !isControlColumn(column),
+    );
+    return indexTableRows(dataSource, (row, index) =>
+      renderedColumns.map((column) =>
+        getRenderedText(renderCell(column, row, index)),
+      ),
+    );
+  }, [columns, dataSource, hasSearch]);
   const processedData = useMemo(
-    () => filterAndSort(dataSource, columns, searchText, sortField, sortOrder),
-    [dataSource, columns, searchText, sortField, sortOrder],
+    () =>
+      filterAndSort(dataSource, searchText, sortField, sortOrder, searchIndex),
+    [dataSource, searchText, sortField, sortOrder, searchIndex],
   );
   const effectivePage = visiblePage(
     currentPage,
     processedData.length,
     pageSize,
   );
-  const paginatedData = useMemo(
-    () =>
-      pagination === false
-        ? processedData
-        : processedData.slice(
-            (effectivePage - 1) * pageSize,
-            effectivePage * pageSize,
-          ),
-    [processedData, effectivePage, pageSize, pagination],
-  );
+  const paginatedData =
+    pagination === false
+      ? processedData
+      : processedData.slice(
+          (effectivePage - 1) * pageSize,
+          effectivePage * pageSize,
+        );
+
+  const changeSearch = (text: string) => {
+    setSearchText(text);
+    setCurrentPage(1);
+  };
 
   const handleSort = (field: string) => {
-    if (sortField === field) {
-      setSortOrder(
-        sortOrder === "asc" ? "desc" : sortOrder === "desc" ? null : "asc",
-      );
-      if (sortOrder === "desc") setSortField(null);
-    } else {
+    if (sortField !== field) {
       setSortField(field);
       setSortOrder("asc");
+    } else if (sortOrder === "asc") {
+      setSortOrder("desc");
+    } else {
+      setSortField(null);
+      setSortOrder(null);
     }
+    setCurrentPage(1);
   };
 
-  const getRowKey = (record: T, index: number) => {
-    return typeof rowKey === "function"
+  const getRowKey = (record: T, index: number) =>
+    typeof rowKey === "function"
       ? rowKey(record)
       : String(fieldValue(record, rowKey) ?? index);
-  };
-
-  const renderMobileCard = (record: T, index: number) => {
-    const key = getRowKey(record, index);
-    const rowClass = rowClassName ? rowClassName(record, index) : "";
-    const rowEvents = onRow ? onRow(record, index) : {};
-
-    return (
-      <div
-        key={key}
-        className={`bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-4 hover:shadow-lg hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-300 hover:-translate-y-1 ${rowClass}`}
-        {...rowEvents}
-      >
-        {/* Card Header - اول دو field مهم */}
-        <div className="mb-3 pb-3 border-b border-slate-100 dark:border-slate-800">
-          {columns.slice(0, 2).map((column) => {
-            if (column.dataIndex || column.render) {
-              const value = column.dataIndex
-                ? fieldValue(record, column.dataIndex)
-                : undefined;
-              return (
-                <div key={column.key} className="mb-2 last:mb-0">
-                  <div className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
-                    {column.title}
-                  </div>
-                  <div className="text-base font-semibold text-slate-900 dark:text-slate-200">
-                    {column.render
-                      ? column.render(value, record, index)
-                      : displayCell(value)}
-                  </div>
-                </div>
-              );
-            }
-            return null;
-          })}
-        </div>
-
-        {/* Card Body - بقیه fields */}
-        <div className="grid grid-cols-2 gap-3">
-          {columns.slice(2).map((column) => {
-            if (column.dataIndex || column.render) {
-              const value = column.dataIndex
-                ? fieldValue(record, column.dataIndex)
-                : undefined;
-              return (
-                <div key={column.key} className="space-y-1">
-                  <div className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
-                    {column.title}
-                  </div>
-                  <div className="text-sm text-slate-700 dark:text-slate-300 font-medium">
-                    {column.render
-                      ? column.render(value, record, index)
-                      : displayCell(value)}
-                  </div>
-                </div>
-              );
-            }
-            return null;
-          })}
-        </div>
-      </div>
-    );
-  };
-
-  const sizeClasses = {
-    small: "text-xs",
-    middle: "text-sm",
-    large: "text-base",
-  };
-
-  const paddingClasses = {
-    small: "px-2 py-1.5",
-    middle: "px-3 py-2",
-    large: "px-4 py-3",
-  };
-
-  // Soft professional styling
-  const rowBase =
-    "transition-all duration-300 group hover:shadow-[0_2px_8px_rgba(16,185,129,0.12)] hover:scale-[1.002] bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800/80";
-  const cellBase = "relative transition-colors duration-300";
 
   return (
-    <div className={`w-full pb-8 ${className}`}>
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden">
-        {/* Soft Header */}
-        <div className="px-4 py-3 bg-gradient-to-r from-slate-50/80 to-slate-100/80 dark:from-slate-800/80 dark:to-slate-900/80 border-b border-slate-200/60 dark:border-slate-700/60 transition-colors">
-          <div className="flex items-center justify-between gap-3">
-            <div className="relative flex-1 max-w-sm">
-              <SearchOutlined className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
-              <input
-                type="text"
-                placeholder="جستجو در داده‌ها..."
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-                className="w-full h-10 pr-10 pl-4 bg-white/90 dark:bg-slate-950/80 border-2 border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-300/60 focus:border-emerald-300 dark:focus:border-emerald-600 transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600 text-sm shadow-sm dark:text-slate-200"
-              />
-            </div>
-            <div className="flex items-center gap-3">
+    <div
+      ref={tableContainer}
+      className={clsx("min-w-0 w-full pb-5 sm:pb-8", className)}
+    >
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
+        <div className="flex flex-wrap items-center gap-2.5 border-b border-slate-200/70 bg-slate-50/80 px-3 py-2.5 sm:px-4 dark:border-slate-700/70 dark:bg-slate-800/65">
+          <div className="relative min-w-0 flex-[1_1_14rem] sm:max-w-sm">
+            <SearchOutlined className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400" />
+            <input
+              ref={searchInput}
+              type="text"
+              aria-label="جست‌وجو در همهٔ فیلدها"
+              placeholder="جست‌وجو در همهٔ فیلدها…"
+              value={searchText}
+              onChange={(event) => changeSearch(event.target.value)}
+              className="h-10 w-full rounded-lg border border-slate-200 bg-white ps-9 pe-9 text-sm outline-none placeholder:text-slate-500 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-400"
+            />
+            {searchText && (
+              <button
+                type="button"
+                aria-label="پاک کردن جست‌وجو"
+                onClick={() => {
+                  changeSearch("");
+                  searchInput.current?.focus();
+                }}
+                className="absolute end-1 top-1/2 grid size-8 -translate-y-1/2 place-items-center rounded-md text-slate-500 hover:text-slate-800 dark:hover:text-slate-100"
+              >
+                <CloseCircleFilled />
+              </button>
+            )}
+          </div>
+          {showCards && sortableColumns.length > 0 && (
+            <div className="flex min-w-0 items-center gap-1">
+              <select
+                value={sortField ?? ""}
+                aria-label="مرتب‌سازی بر اساس"
+                onChange={(event) => {
+                  setSortField(event.target.value || null);
+                  setSortOrder(event.target.value ? "asc" : null);
+                  setCurrentPage(1);
+                }}
+                className="h-9 min-w-0 max-w-40 truncate rounded-lg border border-slate-200 bg-white px-2 text-xs text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+              >
+                <option value="">مرتب‌سازی</option>
+                {sortableColumns.map((column) => (
+                  <option key={column.key} value={column.dataIndex}>
+                    {column.title}
+                  </option>
+                ))}
+              </select>
               {sortField && (
-                <div className="px-2 py-1 bg-emerald-500/90 text-white text-xs rounded-md flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+                    setCurrentPage(1);
+                  }}
+                  aria-label={
+                    sortOrder === "asc" ? "مرتب‌سازی نزولی" : "مرتب‌سازی صعودی"
+                  }
+                  className="grid size-9 place-items-center rounded-lg border border-slate-200 bg-white text-emerald-700 dark:border-slate-700 dark:bg-slate-900 dark:text-emerald-300"
+                >
                   {sortOrder === "asc" ? (
                     <SortAscendingOutlined />
                   ) : (
                     <SortDescendingOutlined />
                   )}
-                  <span className="hidden sm:inline">
-                    {columns.find((c) => c.dataIndex === sortField)?.title}
-                  </span>
-                </div>
+                </button>
               )}
             </div>
-          </div>
-        </div>
-
-        {/* Content */}
-        <div className="p-4">
-          {loading ? (
-            <div className="flex flex-col items-center justify-center py-12 gap-3">
-              <div className="relative">
-                <div className="h-12 w-12 rounded-full border-3 border-slate-200 dark:border-slate-700"></div>
-                <div className="absolute inset-0 h-12 w-12 rounded-full border-3 border-emerald-300 border-t-transparent animate-spin"></div>
-              </div>
-              <span className="text-slate-600 dark:text-slate-400 font-medium">
-                در حال بارگذاری...
-              </span>
-            </div>
-          ) : paginatedData.length === 0 ? (
-            <div className="flex flex-col items-center gap-4 py-12">
-              <div className="h-16 w-16 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-                <TableOutlined className="text-slate-400 dark:text-slate-500 text-2xl" />
-              </div>
-              <div className="text-center">
-                <h3 className="text-slate-800 dark:text-slate-200 font-semibold mb-1">
-                  هیچ داده‌ای یافت نشد
-                </h3>
-                <p className="text-slate-500 dark:text-slate-400 text-sm">
-                  فیلترها را بررسی کنید یا جستجوی جدید انجام دهید
-                </p>
-              </div>
-            </div>
-          ) : (
-            <>
-              {isMobile ? (
-                <div className="space-y-4">
-                  {paginatedData.map((record, index) =>
-                    renderMobileCard(record, index),
-                  )}
-                </div>
-              ) : (
-                <div
-                  className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200/60 dark:border-slate-700/60 custom-scrollbar transition-colors"
-                  style={{
-                    overflowX: scroll?.x ? "auto" : "visible",
-                    overflowY: scroll?.y ? "auto" : "visible",
-                    maxHeight: scroll?.y,
-                  }}
-                >
-                  <style jsx>{`
-                    .custom-scrollbar::-webkit-scrollbar {
-                      height: 6px;
-                      width: 6px;
-                    }
-                    .custom-scrollbar::-webkit-scrollbar-track {
-                      background: #f1f5f9;
-                      border-radius: 3px;
-                    }
-                    .custom-scrollbar::-webkit-scrollbar-thumb {
-                      background: #cbd5e1;
-                      border-radius: 3px;
-                    }
-                    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                      background: #94a3b8;
-                    }
-                    .custom-scrollbar {
-                      scrollbar-width: thin;
-                      scrollbar-color: #cbd5e1 #f1f5f9;
-                    }
-                    /* Dark Mode Scrollbar */
-                    :global(.dark) .custom-scrollbar::-webkit-scrollbar-track {
-                      background: #1e293b;
-                    }
-                    :global(.dark) .custom-scrollbar::-webkit-scrollbar-thumb {
-                      background: #475569;
-                    }
-                    :global(.dark)
-                      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                      background: #64748b;
-                    }
-                    :global(.dark) .custom-scrollbar {
-                      scrollbar-color: #475569 #1e293b;
-                    }
-                  `}</style>
-                  <table
-                    className="w-full"
-                    style={{ minWidth: scroll?.x, tableLayout: "auto" }}
-                  >
-                    <thead className="sticky top-0 z-10">
-                      <tr className="bg-gradient-to-r from-slate-100/70 to-slate-50/70 dark:from-slate-800 dark:to-slate-800 border-b border-slate-200/60 dark:border-slate-700/60 transition-colors">
-                        {columns.map((column) => (
-                          <th
-                            key={column.key}
-                            className={`${paddingClasses[size]} text-right font-semibold text-slate-700 dark:text-slate-300 ${sizeClasses[size]} relative whitespace-nowrap`}
-                            style={{ width: column.width }}
-                          >
-                            <div className="flex items-center justify-between gap-2">
-                              <span
-                                className="relative truncate max-w-[200px]"
-                                title={column.title}
-                              >
-                                {column.title}
-                                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-emerald-300 transition-all duration-200 group-hover:w-full"></span>
-                              </span>
-                              {column.sortable !== false &&
-                                column.dataIndex && (
-                                  <button
-                                    onClick={() =>
-                                      handleSort(column.dataIndex!)
-                                    }
-                                    className="p-1.5 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 rounded-md transition-all duration-200 hover:scale-105 flex-shrink-0"
-                                  >
-                                    {sortField === column.dataIndex ? (
-                                      sortOrder === "asc" ? (
-                                        <SortAscendingOutlined className="text-emerald-500" />
-                                      ) : (
-                                        <SortDescendingOutlined className="text-emerald-500" />
-                                      )
-                                    ) : (
-                                      <SortAscendingOutlined className="text-slate-400 dark:text-slate-500 hover:text-emerald-500 dark:hover:text-emerald-400" />
-                                    )}
-                                  </button>
-                                )}
-                            </div>
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {paginatedData.map((record, index) => {
-                        const key = getRowKey(record, index);
-                        const rowClass = rowClassName
-                          ? rowClassName(record, index)
-                          : "";
-                        const rowEvents = onRow ? onRow(record, index) : {};
-
-                        return (
-                          <tr
-                            key={key}
-                            className={`${rowBase} ${rowClass} hover:bg-emerald-50/30 dark:hover:bg-emerald-900/20`}
-                            {...rowEvents}
-                          >
-                            {columns.map((column, colIdx) => (
-                              <td
-                                key={column.key}
-                                className={`${paddingClasses[size]} py-4 ${sizeClasses[size]} ${cellBase} text-slate-600 dark:text-slate-300 align-middle ${
-                                  colIdx === 0
-                                    ? "font-semibold text-emerald-700 dark:text-emerald-400"
-                                    : colIdx === columns.length - 1
-                                      ? "text-right"
-                                      : ""
-                                }`}
-                              >
-                                <span className="block truncate">
-                                  {column.render
-                                    ? column.render(
-                                        column.dataIndex
-                                          ? fieldValue(record, column.dataIndex)
-                                          : undefined,
-                                        record,
-                                        index,
-                                      )
-                                    : column.dataIndex
-                                      ? displayCell(
-                                          fieldValue(record, column.dataIndex),
-                                        )
-                                      : "-"}
-                                </span>
-                              </td>
-                            ))}
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </>
+          )}
+          {hasSearch && !loading && (
+            <span
+              role="status"
+              className="text-xs text-slate-500 dark:text-slate-400"
+            >
+              {persianNumber.format(processedData.length)} نتیجه
+            </span>
           )}
         </div>
 
-        {/* Soft Pagination */}
+        <div className="min-w-0 p-2.5 sm:p-3" aria-busy={loading}>
+          {loading ? (
+            <div
+              role="status"
+              className="flex flex-col items-center gap-3 py-10 text-sm text-slate-500 dark:text-slate-400"
+            >
+              <div className="size-9 animate-spin rounded-full border-2 border-slate-200 border-t-emerald-500 dark:border-slate-700 dark:border-t-emerald-400" />
+              در حال بارگذاری…
+            </div>
+          ) : paginatedData.length === 0 ? (
+            <div className="flex flex-col items-center gap-2 px-4 py-10 text-center">
+              <TableOutlined className="rounded-xl bg-slate-100 p-3 text-lg text-slate-500 dark:bg-slate-800 dark:text-slate-400" />
+              <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+                {hasSearch
+                  ? "نتیجه‌ای برای جست‌وجو پیدا نشد"
+                  : "داده‌ای برای نمایش وجود ندارد"}
+              </p>
+            </div>
+          ) : showCards ? (
+            <div className="table-card-grid grid gap-3">
+              {paginatedData.map((record, index) => {
+                const [primary, ...fields] = dataColumns;
+                return (
+                  <article
+                    key={getRowKey(record, index)}
+                    {...onRow?.(record, index)}
+                    className={clsx(
+                      "flex min-w-0 flex-col rounded-xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900",
+                      rowClassName?.(record, index),
+                    )}
+                  >
+                    {primary && (
+                      <header className="min-w-0 rounded-t-xl border-b border-slate-200/70 bg-slate-50/80 px-3 py-2 dark:border-slate-700 dark:bg-slate-800/70">
+                        <div className="text-xs text-slate-500 dark:text-slate-400">
+                          {primary.title}
+                        </div>
+                        <div className="[overflow-wrap:anywhere] text-sm font-semibold text-slate-900 dark:text-slate-100">
+                          {renderCell(primary, record, index)}
+                        </div>
+                      </header>
+                    )}
+                    {fields.length > 0 && (
+                      <dl className="table-card-fields grid gap-x-3 gap-y-2.5 p-3">
+                        {fields.map((column) => (
+                          <div
+                            key={column.key}
+                            className="min-w-0 [overflow-wrap:anywhere]"
+                          >
+                            <dt className="text-xs text-slate-500 dark:text-slate-400">
+                              {column.title}
+                            </dt>
+                            <dd className="mt-0.5 text-sm text-slate-700 dark:text-slate-200">
+                              {renderCell(column, record, index)}
+                            </dd>
+                          </div>
+                        ))}
+                      </dl>
+                    )}
+                    {controlColumns.length > 0 && (
+                      <div
+                        role="group"
+                        aria-label="عملیات رکورد"
+                        className="mt-auto flex flex-wrap items-center gap-2 border-t border-slate-100 px-3 py-2 dark:border-slate-800"
+                      >
+                        {controlColumns.map((column) => (
+                          <div key={column.key} className="min-w-0">
+                            {renderCell(column, record, index)}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </article>
+                );
+              })}
+            </div>
+          ) : (
+            <div
+              role="region"
+              aria-label="جدول داده‌ها"
+              tabIndex={0}
+              className="min-w-0 max-w-full overflow-auto overscroll-x-contain rounded-lg border border-slate-200/80 focus-visible:outline-emerald-500 dark:border-slate-700"
+              style={{ maxHeight: scroll?.y }}
+            >
+              <table className="w-full" style={{ minWidth: scroll?.x }}>
+                <thead className="sticky top-0 z-10 bg-slate-100 dark:bg-slate-800">
+                  <tr>
+                    {columns.map((column) => {
+                      const field = column.dataIndex;
+                      const active = field && sortField === field;
+                      return (
+                        <th
+                          key={column.key}
+                          scope="col"
+                          aria-sort={
+                            active
+                              ? sortOrder === "asc"
+                                ? "ascending"
+                                : "descending"
+                              : undefined
+                          }
+                          className={clsx(
+                            cellSizes[size],
+                            "font-semibold text-slate-700 dark:text-slate-200",
+                            columnAlignment[column.align ?? "right"],
+                          )}
+                          style={{ width: column.width }}
+                        >
+                          {field && column.sortable !== false ? (
+                            <button
+                              type="button"
+                              onClick={() => handleSort(field)}
+                              className="inline-flex max-w-full items-center gap-1.5 rounded text-start [overflow-wrap:anywhere] hover:text-emerald-700 focus-visible:outline-emerald-500 dark:hover:text-emerald-300"
+                            >
+                              {column.title}
+                              {active && sortOrder === "desc" ? (
+                                <SortDescendingOutlined className="shrink-0 text-emerald-600 dark:text-emerald-300" />
+                              ) : (
+                                <SortAscendingOutlined
+                                  className={clsx(
+                                    "shrink-0",
+                                    active
+                                      ? "text-emerald-600 dark:text-emerald-300"
+                                      : "text-slate-400 dark:text-slate-500",
+                                  )}
+                                />
+                              )}
+                            </button>
+                          ) : (
+                            column.title
+                          )}
+                        </th>
+                      );
+                    })}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                  {paginatedData.map((record, index) => (
+                    <tr
+                      key={getRowKey(record, index)}
+                      {...onRow?.(record, index)}
+                      className={clsx(
+                        "bg-white transition-colors hover:bg-emerald-50/40 dark:bg-slate-900 dark:hover:bg-emerald-950/35",
+                        rowClassName?.(record, index),
+                      )}
+                    >
+                      {columns.map((column) => (
+                        <td
+                          key={column.key}
+                          className={clsx(
+                            cellSizes[size],
+                            "align-middle [overflow-wrap:anywhere] text-slate-700 dark:text-slate-300",
+                            columnAlignment[column.align ?? "right"],
+                            column.className,
+                          )}
+                        >
+                          {renderCell(column, record, index)}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
         {pagination !== false && (
           <Pagination
             current={effectivePage}
@@ -426,24 +473,10 @@ export default function Table<T extends object>({
             onChange={(page, size) => {
               setCurrentPage(page);
               setPageSize(size);
-              if (
-                pagination &&
-                typeof pagination === "object" &&
-                pagination.onChange
-              ) {
-                pagination.onChange(page, size);
-              }
+              pagination.onChange?.(page, size);
             }}
-            showSizeChanger={
-              pagination && typeof pagination === "object"
-                ? pagination.showSizeChanger
-                : true
-            }
-            showTotal={
-              pagination && typeof pagination === "object"
-                ? pagination.showTotal
-                : undefined
-            }
+            showSizeChanger={pagination.showSizeChanger}
+            showTotal={pagination.showTotal}
           />
         )}
       </div>

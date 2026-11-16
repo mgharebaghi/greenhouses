@@ -1,7 +1,8 @@
 import { deletePlant, getPlants } from "@/features/plants/actions";
 import type { PlantRecord } from "@/features/plants/types/record";
 import { ActionFailure, runDeletion } from "@/shared/forms/delete-record";
-import { Button, Divider, Modal } from "antd";
+import Modal from "@/shared/components/ResponsiveModal";
+import { Button, Divider } from "antd";
 import { useState } from "react";
 
 export type PlantsDeleteModalProps = {

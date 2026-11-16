@@ -19,7 +19,7 @@ export default async function SeedWarehousingPage() {
   ]);
 
   return (
-    <div className="p-6">
+    <div className="dashboard-page">
       <PageHeader
         title="انبارداری بذر"
         subtitle="مدیریت ورود و خروج بسته‌های بذر به انبارها"

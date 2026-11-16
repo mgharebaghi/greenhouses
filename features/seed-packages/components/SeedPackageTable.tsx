@@ -1,5 +1,7 @@
 "use client";
 
+import { formatPersianDate } from "@/shared/dates/calendar";
+
 import { ActionFailure, runDeletion } from "@/shared/forms/delete-record";
 
 import { csvRows } from "@/shared/exports/csv";
@@ -110,9 +112,7 @@ export default function SeedPackageTable({
       title: "تاریخ تولید",
       key: "ProductionDate",
       render: (_: unknown, record: SeedPackageDetails) =>
-        record.ProductionDate
-          ? new Date(record.ProductionDate).toLocaleDateString("fa-IR")
-          : "—",
+        formatPersianDate(record.ProductionDate),
     },
     {
       title: "عملیات",
@@ -135,9 +135,12 @@ export default function SeedPackageTable({
 
   const refreshData = async () => {
     setLoading(true);
-    const res = await getAllSeedPackages();
-    setData(res);
-    setLoading(false);
+    try {
+      const res = await getAllSeedPackages();
+      setData(res);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDelete = async (id: number) => {

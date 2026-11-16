@@ -1,5 +1,7 @@
 "use client";
 
+import { formatPersianDate } from "@/shared/dates/calendar";
+
 import { ActionFailure, runDeletion } from "@/shared/forms/delete-record";
 
 import type { CycleGreenhouseOption, CycleOrderOption } from "../types";
@@ -141,8 +143,7 @@ export default function StartSeedlingCycleTable({
       title: "تاریخ ورود به گلخانه",
       dataIndex: "GreenhouseEntryDate",
       key: "GreenhouseEntryDate",
-      render: (val: Date) =>
-        val ? new Date(val).toLocaleDateString("fa-IR") : "---",
+      render: (val: Date) => formatPersianDate(val, { fallback: "---" }),
     },
     {
       title: "عملیات",

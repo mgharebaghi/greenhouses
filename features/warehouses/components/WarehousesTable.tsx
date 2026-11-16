@@ -1,5 +1,7 @@
 "use client";
 
+import { formatPersianDate } from "@/shared/dates/calendar";
+
 import { ActionFailure, runDeletion } from "@/shared/forms/delete-record";
 
 import { csvRows } from "@/shared/exports/csv";
@@ -84,9 +86,7 @@ export default function WarehousesTable({
       title: "تاریخ تاسیس",
       key: "WarehouseCreatedAt",
       render: (_: unknown, record: WarehouseRecord) =>
-        record.WarehouseCreatedAt
-          ? new Date(record.WarehouseCreatedAt).toLocaleDateString("fa-IR")
-          : "-",
+        formatPersianDate(record.WarehouseCreatedAt, { fallback: "-" }),
     },
     {
       title: "مسئول انبار",

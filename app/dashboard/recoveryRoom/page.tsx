@@ -6,7 +6,7 @@ import { MedicineBoxOutlined } from "@ant-design/icons";
 
 export default function RecoveryRoomPage() {
   return (
-    <div className="p-6">
+    <div className="dashboard-page">
       <PageHeader
         title="اتاق ریکاوری"
         subtitle="مدیریت و مشاهده وضعیت سینی‌های موجود در اتاق ریکاوری"

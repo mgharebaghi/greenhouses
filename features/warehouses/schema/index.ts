@@ -1,6 +1,7 @@
 import {
   optionalCount,
   optionalDate,
+  optionalId,
   optionalText,
 } from "@/shared/validation/input";
 import { z } from "zod";
@@ -11,6 +12,6 @@ export const warehouseInputSchema = z.object({
   TemperatureRange: optionalText(50),
   HumidityRange: optionalText(50),
   Capacity: optionalCount,
-  WarehouseManagerName: optionalText(150),
+  WarehouseManagerID: optionalId,
   WarehouseCreatedAt: optionalDate,
 });

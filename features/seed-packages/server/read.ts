@@ -1,6 +1,11 @@
 "use server";
+import { readError } from "@/server/actions/errors";
 import { requireSession } from "@/server/auth/require-session";
 import type { SeedPackageDetails } from "../types/details";
+import { optionalDate, parseInput } from "@/shared/validation/input";
+import { z } from "zod";
+import { seedPackageExpiration } from "../domain/expiration";
+import { productionCalendarSchema } from "../schema";
 import {
   getSeedPackageById as queryById,
   seedPackageInclude,
@@ -10,8 +15,8 @@ import {
 import { prisma } from "@/server/db/prisma";
 
 export async function getAllSeedPackages(): Promise<SeedPackageDetails[]> {
-  await requireSession();
   try {
+    await requireSession();
     const seedPackages = await prisma.tbl_SeedPackage.findMany({
       include: seedPackageInclude,
       orderBy: {
@@ -21,12 +26,31 @@ export async function getAllSeedPackages(): Promise<SeedPackageDetails[]> {
 
     return seedPackages.map(serializeSeedPackage);
   } catch (error) {
-    console.error("Query failed", error);
-    throw new Error("دریافت اطلاعات انجام نشد. لطفاً دوباره تلاش کنید.");
+    throw readError(error);
   }
 }
 
 export async function getSeedPackageById(id: number) {
+  try {
+    await requireSession();
+    return queryById(id);
+  } catch (error) {
+    throw readError(error);
+  }
+}
+
+export async function getSeedPackageExpiration(input: unknown) {
   await requireSession();
-  return queryById(id);
+  const { ProductionDate, ProductionCalendar } = parseInput(
+    z.object({
+      ProductionDate: optionalDate,
+      ProductionCalendar: productionCalendarSchema,
+    }),
+    input,
+  );
+  return (
+    seedPackageExpiration(ProductionDate, ProductionCalendar)
+      ?.toISOString()
+      .slice(0, 10) ?? null
+  );
 }

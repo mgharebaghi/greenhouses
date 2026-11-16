@@ -1,0 +1,4 @@
+{
+  "python.terminal.useEnvFile": true,
+  "prisma.pinToPrisma6": true
+}
