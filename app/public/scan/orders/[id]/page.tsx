@@ -103,7 +103,7 @@ export default async function PublicOrderScanPage({
             </h3>
             <div className="space-y-4">
               <div className="flex flex-col">
-                <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest">
+                <span className="text-[10px] text-slate-400 dark:text-slate-300 font-bold uppercase tracking-widest">
                   مشتری ارجمند
                 </span>
                 <span
@@ -116,7 +116,7 @@ export default async function PublicOrderScanPage({
                 </span>
               </div>
               <div className="flex flex-col">
-                <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest">
+                <span className="text-[10px] text-slate-400 dark:text-slate-300 font-bold uppercase tracking-widest">
                   مدیر پروژه
                 </span>
                 <span
@@ -142,7 +142,7 @@ export default async function PublicOrderScanPage({
             </h3>
             <div className="space-y-4">
               <div className="flex flex-col">
-                <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest">
+                <span className="text-[10px] text-slate-400 dark:text-slate-300 font-bold uppercase tracking-widest">
                   تامین کننده
                 </span>
                 <span
@@ -155,7 +155,7 @@ export default async function PublicOrderScanPage({
                 </span>
               </div>
               <div className="flex flex-col">
-                <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest">
+                <span className="text-[10px] text-slate-400 dark:text-slate-300 font-bold uppercase tracking-widest">
                   {" "}
                   کد مجوز تامین کننده
                 </span>
@@ -184,7 +184,7 @@ export default async function PublicOrderScanPage({
               <div className="relative pr-8 border-r-2 border-emerald-500/20 group-hover:border-emerald-500/50 transition-colors">
                 <div className="absolute right-[-5px] top-0 w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.4)]"></div>
                 <span
-                  className="text-[10px] text-emerald-600 dark:text-emerald-500 font-bold uppercase tracking-[0.2em] block mb-2"
+                  className="text-[10px] text-emerald-600 dark:text-emerald-300 font-bold uppercase tracking-[0.2em] block mb-2"
                   style={boldFont}
                 >
                   پایه (Rootstock)
@@ -210,7 +210,7 @@ export default async function PublicOrderScanPage({
               <div className="relative pr-8 border-r-2 border-blue-500/20 group-hover:border-blue-500/50 transition-colors">
                 <div className="absolute right-[-5px] top-0 w-2.5 h-2.5 rounded-full bg-blue-500 shadow-[0_0_12px_rgba(59,130,246,0.4)]"></div>
                 <span
-                  className="text-[10px] text-blue-600 dark:text-blue-500 font-bold uppercase tracking-[0.2em] block mb-2"
+                  className="text-[10px] text-blue-600 dark:text-blue-300 font-bold uppercase tracking-[0.2em] block mb-2"
                   style={boldFont}
                 >
                   پیوندک (Scion)
@@ -237,14 +237,14 @@ export default async function PublicOrderScanPage({
         </div>
 
         {/* Footer Info */}
-        <div className="pt-6 flex flex-col md:flex-row items-center justify-between text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-widest gap-4">
+        <div className="pt-6 flex flex-col md:flex-row items-center justify-between text-[10px] text-slate-400 dark:text-slate-300 uppercase tracking-widest gap-4">
           <div className="flex items-center gap-2">
             <CheckCircleFilled className="text-emerald-500 text-sm" />
             <span style={boldFont}>تایید شده توسط بخش کنترل کیفی</span>
           </div>
           <div className="text-center md:text-left flex items-center gap-2">
             <span
-              className="text-emerald-700 dark:text-emerald-600 font-bold"
+              className="text-emerald-700 dark:text-emerald-300 font-bold"
               style={boldFont}
             >
               فکور پیوند آریا

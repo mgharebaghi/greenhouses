@@ -1,8 +1,6 @@
 "use client";
 
 import type { GrowthStageRecord } from "@/features/growth-stages/types/record";
-import PageHeader from "@/shared/components/PageHeader";
-import { RiseOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import GrowthStagesTable from "./GrowthStagesTable";
 
@@ -16,11 +14,6 @@ export default function GrowthStagesDashboard({
 
   return (
     <div className="dashboard-page">
-      <PageHeader
-        title="مراحل رشد"
-        subtitle="مدیریت مراحل رشد انواع گیاهان"
-        icon={<RiseOutlined />}
-      />
       <div className="w-full">
         <GrowthStagesTable
           data={data}

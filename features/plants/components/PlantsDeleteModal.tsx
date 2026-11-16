@@ -2,7 +2,8 @@ import { deletePlant, getPlants } from "@/features/plants/actions";
 import type { PlantRecord } from "@/features/plants/types/record";
 import { ActionFailure, runDeletion } from "@/shared/forms/delete-record";
 import Modal from "@/shared/components/ResponsiveModal";
-import { Button, Divider } from "antd";
+import { Divider } from "antd";
+import GreenhouseButton from "@/shared/components/GreenhouseButton";
 import { useState } from "react";
 
 export type PlantsDeleteModalProps = {
@@ -50,13 +51,20 @@ export default function PlantsDeleteModal({
     <Modal open={isOpen} onCancel={onClose} title="حذف گیاه" footer={null}>
       <Divider />
       <p>آیا از حذف {plant?.CommonName} اطمینان دارید؟</p>
-      <Button type="primary" danger onClick={handleDelete}>
-        حذف
-      </Button>
-      <Button onClick={onClose} className="mr-4">
-        انصراف
-      </Button>
-      {loading && <p className="mt-2 text-sm text-gray-500">در حال حذف...</p>}
+      <div className="mt-4 flex flex-wrap justify-end gap-2">
+        <GreenhouseButton
+          text="انصراف"
+          variant="secondary"
+          onClick={onClose}
+          disabled={loading}
+        />
+        <GreenhouseButton
+          text={loading ? "در حال حذف…" : "حذف"}
+          variant="danger"
+          onClick={handleDelete}
+          loading={loading}
+        />
+      </div>
     </Modal>
   );
 }

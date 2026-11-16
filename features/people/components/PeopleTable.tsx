@@ -1,14 +1,13 @@
 import { csvRows } from "@/shared/exports/csv";
 import { ActionFailure, runDeletion } from "@/shared/forms/delete-record";
-import { InfoCircleOutlined } from "@ant-design/icons";
 
 import { deletePerson, getPeople } from "@/features/people/actions";
 import type { PersonActionResponse } from "@/features/people/types";
 import DeleteModal, { DeleteModalProps } from "@/shared/components/DeleteModal";
 import InsertionRow from "@/shared/components/InsertionRow";
-import Table from "@/shared/components/Table";
+import Table, { detailsColumn } from "@/shared/components/Table";
+import PhoneNumberText from "@/shared/components/PhoneNumberText";
 import TableActions from "@/shared/components/TableActions";
-import { Button, Tooltip } from "antd";
 import { download, generateCsv, mkConfig } from "export-to-csv";
 import { useState } from "react";
 import { headers, peopleCSVData } from "../exports/csv";
@@ -34,25 +33,9 @@ export default function PeopleTable(props: PeopleTableProps) {
   }>({ open: false, data: null });
 
   const columns = [
-    {
-      title: "جزئیات",
-      key: "details",
-      width: 80,
-      align: "center" as const,
-      render: (_: unknown, record: PeopleReadDTO) => (
-        <Tooltip title="مشاهده جزئیات">
-          <Button
-            type="text"
-            icon={
-              <InfoCircleOutlined
-                style={{ color: "#3b82f6", fontSize: "18px" }}
-              />
-            }
-            onClick={() => setDetailModal({ open: true, data: record })}
-          />
-        </Tooltip>
-      ),
-    },
+    detailsColumn<PeopleReadDTO>((record) =>
+      setDetailModal({ open: true, data: record }),
+    ),
     {
       title: "کد افراد",
       dataIndex: "PersonCode",
@@ -82,6 +65,9 @@ export default function PeopleTable(props: PeopleTableProps) {
       title: "شماره تماس",
       dataIndex: "PhoneNumber",
       key: "PhoneNumber",
+      render: (_: unknown, person: PeopleReadDTO) => (
+        <PhoneNumberText value={person.PhoneNumber} />
+      ),
     },
     {
       title: "سمت",
@@ -177,7 +163,6 @@ export default function PeopleTable(props: PeopleTableProps) {
         columns={columns}
         dataSource={props.data}
         rowKey="ID"
-        pagination={{ pageSize: 5 }}
         loading={props.loading}
       />
 

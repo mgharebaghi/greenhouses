@@ -218,9 +218,7 @@
       "managed": false,
       "clr_flags": null,
       "export_count": 3399,
-      "exports": [
-        "(support library exports omitted)"
-      ],
+      "exports": ["(support library exports omitted)"],
       "sha256": "20c2b647a377f910045aa2cebee61876e0daa6cc25ffaa72b95a27716f6064aa",
       "bytes": 4082688
     },
@@ -312,9 +310,7 @@
       "managed": false,
       "clr_flags": null,
       "export_count": 3399,
-      "exports": [
-        "(support library exports omitted)"
-      ],
+      "exports": ["(support library exports omitted)"],
       "sha256": "20c2b647a377f910045aa2cebee61876e0daa6cc25ffaa72b95a27716f6064aa",
       "bytes": 4082688
     },

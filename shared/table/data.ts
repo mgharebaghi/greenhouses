@@ -1,4 +1,5 @@
 import { formatPersianDate } from "@/shared/dates/calendar";
+import { toLatinDigits } from "@/shared/utils/digits";
 
 export type SortOrder = "asc" | "desc" | null;
 
@@ -6,15 +7,11 @@ export function fieldValue(record: object, field: string): unknown {
   return (record as Record<string, unknown>)[field];
 }
 
-const localizedDigits = "۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩";
-
 function normalizeSearch(text: string) {
-  return text
-    .normalize("NFKC")
+  return toLatinDigits(text.normalize("NFKC"))
     .toLowerCase()
-    .replace(/[۰-۹٠-٩]/g, (digit) =>
-      String(localizedDigits.indexOf(digit) % 10),
-    )
+    .replace(/٫/g, ".")
+    .replace(/(\d)[٬,](?=\d)/g, "$1")
     .replace(/[يى]/g, "ی")
     .replace(/ك/g, "ک")
     .replace(/[\u064b-\u065f\u0670]/g, "")

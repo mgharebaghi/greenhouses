@@ -1,5 +1,3 @@
-import PageHeader from "@/shared/components/PageHeader";
-import { RetweetOutlined } from "@ant-design/icons";
 import {
   getGreenhousesForSelect,
   getOrdersForSelect,
@@ -14,11 +12,6 @@ export default async function StartSeedlingCyclePage() {
 
   return (
     <div className="dashboard-page">
-      <PageHeader
-        title="شروع سیکل نشاء"
-        subtitle="مدیریت عملیات انتقال سینی‌ها به گلخانه"
-        icon={<RetweetOutlined />}
-      />
       <StartSeedlingCycleTable
         data={data}
         orders={orders}

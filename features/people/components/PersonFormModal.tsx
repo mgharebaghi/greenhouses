@@ -16,7 +16,6 @@ import {
   updatePerson,
 } from "@/features/people/actions";
 import Modal from "@/shared/components/FormModal";
-import GreenhouseButton from "@/shared/components/GreenhouseButton";
 import { applyFieldErrors } from "@/shared/forms/field-errors";
 import { submitForm } from "@/shared/forms/submit";
 import { UserAddOutlined } from "@ant-design/icons";
@@ -355,6 +354,9 @@ export default function PersonFormModal({
         />
       ) : (
         <Input
+          type={field.name === "PhoneNumber" ? "tel" : "text"}
+          dir={field.name === "PhoneNumber" ? "ltr" : undefined}
+          className={field.name === "PhoneNumber" ? "text-right" : undefined}
           onChange={() => setMessage(null)}
           placeholder={field.placeholder}
           disabled={loading || field.disabled}
@@ -420,21 +422,13 @@ export default function PersonFormModal({
             .map(renderField)}
         </FormGrid>
 
-        <FormActions message={message}>
-          <GreenhouseButton
-            text="انصراف"
-            variant="secondary"
-            onClick={handleClose}
-            disabled={loading}
-          />
-          <GreenhouseButton
-            text={loading ? "..." : isEdit ? "ویرایش" : "ثبت"}
-            variant="primary"
-            type="submit"
-            loading={loading}
-            disabled={codeLoading || postsLoading}
-          />
-        </FormActions>
+        <FormActions
+          message={message}
+          onCancel={handleClose}
+          loading={loading}
+          editing={isEdit}
+          submitDisabled={codeLoading || postsLoading}
+        />
       </Form>
     </Modal>
   );

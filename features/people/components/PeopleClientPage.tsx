@@ -1,8 +1,6 @@
 "use client";
 
 import type { PersonActionResponse } from "@/features/people/types";
-import PageHeader from "@/shared/components/PageHeader";
-import { UsergroupAddOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import { PeopleReadDTO } from "../schema";
 import PeopleTable from "./PeopleTable";
@@ -22,11 +20,6 @@ export default function PeopleClientPage({
 
   return (
     <div className="dashboard-page">
-      <PageHeader
-        title="اشخاص"
-        subtitle="مدیریت اطلاعات پایه اشخاص "
-        icon={<UsergroupAddOutlined />}
-      />
       <div className="w-full flex justify-center items-center">
         <PeopleTable
           data={data}

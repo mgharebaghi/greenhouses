@@ -6,7 +6,9 @@ import { csvRows } from "@/shared/exports/csv";
 
 import PlantFormModal from "@/features/plants/components/PlantFormModal";
 import type { PlantRecord } from "@/features/plants/types/record";
-import Table from "@/shared/components/Table";
+import DetailModal, { InfoCard } from "@/shared/components/DetailModal";
+import Table, { detailsColumn } from "@/shared/components/Table";
+import { FileTextOutlined } from "@ant-design/icons";
 import { useState } from "react";
 
 import { deletePlant, getPlants } from "@/features/plants/actions";
@@ -24,6 +26,7 @@ type PlantsTableProps = {
 };
 
 export default function PlantsTable(props: PlantsTableProps) {
+  const [details, setDetails] = useState<PlantRecord | null>(null);
   const [formModal, setFormModal] = useState<{
     open: boolean;
     record: PlantRecord | null;
@@ -36,6 +39,7 @@ export default function PlantsTable(props: PlantsTableProps) {
   const [deleteModalMsg] = useState("");
   const [deleteModalLoading, setDeleteModalLoading] = useState(false);
   const columns = [
+    detailsColumn<PlantRecord>(setDetails),
     {
       title: "نام رایج",
       dataIndex: "CommonName",
@@ -130,7 +134,6 @@ export default function PlantsTable(props: PlantsTableProps) {
         dataSource={props.data}
         loading={props.loading}
         rowKey="ID"
-        pagination={{ pageSize: 5 }}
       />
 
       <PlantFormModal
@@ -140,6 +143,26 @@ export default function PlantsTable(props: PlantsTableProps) {
         setMainData={props.setMainData!} // Assume provided, or handle optional
         setMainLoading={props.setMainLoading!} // Assume provided
       />
+
+      {details && (
+        <DetailModal
+          open
+          onClose={() => setDetails(null)}
+          title={details.CommonName || "جزئیات گیاه"}
+          icon={<FileTextOutlined />}
+        >
+          <InfoCard
+            title="اطلاعات گیاه"
+            icon={<FileTextOutlined />}
+            items={[
+              { label: "نام رایج", value: details.CommonName },
+              { label: "نام علمی", value: details.ScientificName },
+              { label: "خانواده", value: details.PlantFamily },
+              { label: "توضیحات", value: details.Notes, span: true },
+            ]}
+          />
+        </DetailModal>
+      )}
 
       <DeleteModal
         open={openDeleteModal?.open || false}

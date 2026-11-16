@@ -13,7 +13,6 @@ import {
   updateSupplier,
 } from "@/features/suppliers/actions";
 import Modal from "@/shared/components/FormModal";
-import GreenhouseButton from "@/shared/components/GreenhouseButton";
 import { applyFieldErrors } from "@/shared/forms/field-errors";
 import { loadFormOptions } from "@/shared/forms/load-options";
 import { refreshSavedForm, submitForm } from "@/shared/forms/submit";
@@ -22,7 +21,7 @@ import { UserAddOutlined } from "@ant-design/icons";
 
 import { useEffect, useState } from "react";
 import { supplierName } from "../domain/name";
-import { supplierInputSchema, type SupplierInput } from "../schema";
+import { supplierFieldsSchema, type SupplierInput } from "../schema";
 import type { SupplierDTO, SupplierPersonOption } from "../types";
 
 type SupplierFormModalProps = {
@@ -230,7 +229,7 @@ export default function SupplierFormModal({
       rules={[
         {
           validator: async (_, value: unknown) => {
-            const checked = supplierInputSchema.shape[field.name].safeParse(
+            const checked = supplierFieldsSchema.shape[field.name].safeParse(
               value,
               validationOptions,
             );
@@ -250,7 +249,9 @@ export default function SupplierFormModal({
         <Input
           placeholder={field.placeholder}
           disabled={loading}
-          inputMode={field.name === "ContactTel" ? "tel" : undefined}
+          type={field.name === "ContactTel" ? "tel" : "text"}
+          dir={field.name === "ContactTel" ? "ltr" : undefined}
+          className={field.name === "ContactTel" ? "text-right" : undefined}
         />
       )}
     </FormItem>
@@ -349,21 +350,13 @@ export default function SupplierFormModal({
             .map(renderField)}
         </FormGrid>
 
-        <FormActions message={message}>
-          <GreenhouseButton
-            text="انصراف"
-            variant="secondary"
-            onClick={handleClose}
-            disabled={loading}
-          />
-          <GreenhouseButton
-            text={loading ? "..." : isEdit ? "ویرایش" : "ثبت"}
-            variant="primary"
-            type="submit"
-            loading={loading}
-            disabled={peopleLoading}
-          />
-        </FormActions>
+        <FormActions
+          message={message}
+          onCancel={handleClose}
+          loading={loading}
+          editing={isEdit}
+          submitDisabled={peopleLoading}
+        />
       </Form>
     </Modal>
   );

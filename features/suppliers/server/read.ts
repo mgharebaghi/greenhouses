@@ -2,6 +2,7 @@
 import { readError } from "@/server/actions/errors";
 import { requireSession } from "@/server/auth/require-session";
 import { prisma } from "@/server/db/prisma";
+import { supplierPhoneNumber } from "../schema";
 import {
   serializeSupplier,
   supplierIdentitySelect,
@@ -17,7 +18,13 @@ export async function getSuppliers() {
       },
       orderBy: { ID: "desc" },
     });
-    return suppliers.map(serializeSupplier);
+    return suppliers.map((supplier) => ({
+      ...serializeSupplier(supplier),
+      ContactTel:
+        supplier.ContactTel == null
+          ? null
+          : supplierPhoneNumber(supplier.ContactTel, supplier.SupplierCountry),
+    }));
   } catch (error) {
     throw readError(error);
   }

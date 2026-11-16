@@ -5,12 +5,10 @@ import {
 import type { PlantVarietyRecord } from "@/features/plant-varieties/types/record";
 import DeleteModal, { DeleteModalProps } from "@/shared/components/DeleteModal";
 import InsertionRow from "@/shared/components/InsertionRow";
-import Table from "@/shared/components/Table";
+import Table, { detailsColumn } from "@/shared/components/Table";
 import TableActions from "@/shared/components/TableActions";
 import { csvRows } from "@/shared/exports/csv";
 import { ActionFailure, runDeletion } from "@/shared/forms/delete-record";
-import { InfoCircleOutlined } from "@ant-design/icons";
-import { Button, Tooltip } from "antd";
 import { download, generateCsv, mkConfig } from "export-to-csv";
 import { useState } from "react";
 import { headers, plantVarietiesCSVData } from "../exports/csv";
@@ -51,25 +49,9 @@ export default function PlantVarietiesTable({
   });
 
   const columns = [
-    {
-      title: "جزئیات",
-      key: "details",
-      width: 80,
-      align: "center" as const,
-      render: (_: unknown, record: PlantVarietyDTO) => (
-        <Tooltip title="مشاهده جزئیات">
-          <Button
-            type="text"
-            icon={
-              <InfoCircleOutlined
-                style={{ color: "#3b82f6", fontSize: "18px" }}
-              />
-            }
-            onClick={() => setDetailModal({ open: true, data: record })}
-          />
-        </Tooltip>
-      ),
-    },
+    detailsColumn<PlantVarietyDTO>((record) =>
+      setDetailModal({ open: true, data: record }),
+    ),
     {
       title: "واریته",
       dataIndex: "VarietyName",
@@ -92,7 +74,7 @@ export default function PlantVarietiesTable({
       key: "DaysToGermination",
       width: 110,
       align: "center" as const,
-      render: (value: number) => (value ? `${value} روز` : "-"),
+      render: (value: number) => (value != null ? `${value} روز` : "-"),
     },
     {
       title: "رویش",
@@ -100,7 +82,7 @@ export default function PlantVarietiesTable({
       key: "DaysToSprout",
       width: 110,
       align: "center" as const,
-      render: (value: number) => (value ? `${value} روز` : "-"),
+      render: (value: number) => (value != null ? `${value} روز` : "-"),
     },
     {
       title: "نشاء",
@@ -108,7 +90,7 @@ export default function PlantVarietiesTable({
       key: "DaysToSeedling",
       width: 110,
       align: "center" as const,
-      render: (value: number) => (value ? `${value} روز` : "-"),
+      render: (value: number) => (value != null ? `${value} روز` : "-"),
     },
     {
       title: "بلوغ",
@@ -116,7 +98,7 @@ export default function PlantVarietiesTable({
       key: "DaysToMaturity",
       width: 110,
       align: "center" as const,
-      render: (value: number) => (value ? `${value} روز` : "-"),
+      render: (value: number) => (value != null ? `${value} روز` : "-"),
     },
     {
       title: "عملیات",
@@ -195,7 +177,6 @@ export default function PlantVarietiesTable({
         dataSource={data}
         rowKey="ID"
         loading={loading}
-        pagination={{ pageSize: 5 }}
         scroll={{ x: 1000 }}
       />
 

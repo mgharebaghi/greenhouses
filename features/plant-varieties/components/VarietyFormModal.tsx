@@ -24,7 +24,6 @@ import {
 import type { PlantVarietyRecord } from "@/features/plant-varieties/types/record";
 import { getPlants } from "@/features/plants/actions";
 import type { PlantRecord } from "@/features/plants/types/record";
-import GreenhouseButton from "@/shared/components/GreenhouseButton";
 import { PlusOutlined } from "@ant-design/icons";
 
 import { useEffect, useState } from "react";
@@ -348,20 +347,12 @@ export default function VarietyFormModal({
           </FormItem>
         </FormGrid>
 
-        <FormActions message={message}>
-          <GreenhouseButton
-            text="انصراف"
-            variant="secondary"
-            onClick={handleClose}
-            disabled={loading}
-          />
-          <GreenhouseButton
-            text={loading ? "در حال ثبت..." : isEdit ? "ویرایش" : "ثبت"}
-            variant="primary"
-            type="submit"
-            loading={loading}
-          />
-        </FormActions>
+        <FormActions
+          message={message}
+          onCancel={handleClose}
+          loading={loading}
+          editing={isEdit}
+        />
       </Form>
     </Modal>
   );

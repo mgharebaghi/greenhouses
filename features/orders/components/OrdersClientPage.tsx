@@ -2,9 +2,7 @@
 
 import { getAllOrders } from "@/features/orders/actions";
 import DataLoadError from "@/shared/components/DataLoadError";
-import PageHeader from "@/shared/components/PageHeader";
 import useRemoteList from "@/shared/hooks/useRemoteList";
-import { ShoppingCartOutlined } from "@ant-design/icons";
 import OrdersTable from "./OrdersTable";
 
 export default function OrdersClientPage() {
@@ -20,11 +18,6 @@ export default function OrdersClientPage() {
 
   return (
     <div className="dashboard-page">
-      <PageHeader
-        title="ثبت سفارش"
-        subtitle="مدیریت سفارشات ثبت شده در سیستم"
-        icon={<ShoppingCartOutlined />}
-      />
       <OrdersTable
         data={data}
         loading={loading}

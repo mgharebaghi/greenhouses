@@ -36,15 +36,12 @@ export default function SeedWarehousingDetailModal({
       onClose={onCancel}
       title="جزئیات تراکنش انبار"
       icon={<FileTextOutlined />}
-      gradientFrom="emerald"
-      gradientTo="teal"
     >
       <>
         {/* General Info */}
         <InfoCard
           title="اطلاعات کلی تراکنش"
           icon={<InfoCircleOutlined />}
-          color="#10b981"
           items={[
             { label: "شماره ثبت", value: data.ID },
             {
@@ -65,7 +62,6 @@ export default function SeedWarehousingDetailModal({
         <InfoCard
           title="جزئیات انبار"
           icon={<ContainerOutlined />}
-          color="#3b82f6"
           items={[
             {
               label: "نام انبار",
@@ -86,7 +82,6 @@ export default function SeedWarehousingDetailModal({
         <InfoCard
           title="جزئیات بسته بذر"
           icon={<InboxOutlined />}
-          color="#f59e0b"
           items={[
             {
               label: "شماره سریال",
@@ -107,7 +102,6 @@ export default function SeedWarehousingDetailModal({
         <InfoCard
           title="سایر اطلاعات"
           icon={<FileTextOutlined />}
-          color="#64748b"
           items={[
             { label: "مقصد/منبع", value: data.DestinationType || "—" },
             { label: "ثبت کننده", value: data.RecordedBy || "—" },

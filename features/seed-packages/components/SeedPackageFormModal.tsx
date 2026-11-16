@@ -12,15 +12,22 @@ import {
   Switch,
 } from "@/shared/components/FormControls";
 import { getPlantVarieties } from "@/features/plant-varieties/actions";
-import { createSeedPackage, getSeedPackageExpiration, updateSeedPackage } from "@/features/seed-packages/actions";
+import {
+  createSeedPackage,
+  getSeedPackageExpiration,
+  updateSeedPackage,
+} from "@/features/seed-packages/actions";
 import { getSuppliers } from "@/features/suppliers/actions";
 import { supplierName } from "@/features/suppliers/domain/name";
 import Modal from "@/shared/components/FormModal";
-import GreenhouseButton from "@/shared/components/GreenhouseButton";
 import { applyFieldErrors } from "@/shared/forms/field-errors";
 import { refreshSavedForm, submitForm } from "@/shared/forms/submit";
 import { PlusOutlined } from "@ant-design/icons";
-import { pickerDateToISO, toCalendarDate, type DateCalendar } from "@/shared/dates/calendar";
+import {
+  pickerDateToISO,
+  toCalendarDate,
+  type DateCalendar,
+} from "@/shared/dates/calendar";
 
 import { useEffect, useState } from "react";
 import type { z } from "zod";
@@ -45,15 +52,20 @@ export default function SeedPackageInsUpModal({
   const [form] = Form.useForm();
   const [internalLoading, setInternalLoading] = useState(false);
   const [calendarSystem, setCalendarSystem] = useState<DateCalendar>("persian");
-  const [productionCalendar, setProductionCalendar] = useState<DateCalendar>("persian");
+  const [productionCalendar, setProductionCalendar] =
+    useState<DateCalendar>("persian");
   const [expirationLoading, setExpirationLoading] = useState(false);
   const [message, setMessage] = useState<{
     status: "ok" | "error";
     message: string;
   } | null>(null);
 
-  const [suppliers, setSuppliers] = useState<{ value: number; label: string }[]>([]);
-  const [varieties, setVarieties] = useState<{ value: number; label: string }[]>([]);
+  const [suppliers, setSuppliers] = useState<
+    { value: number; label: string }[]
+  >([]);
+  const [varieties, setVarieties] = useState<
+    { value: number; label: string }[]
+  >([]);
 
   const isEditMode = !!data;
   const productionDate = Form.useWatch("ProductionDate", form);
@@ -111,18 +123,38 @@ export default function SeedPackageInsUpModal({
     void getSeedPackageExpiration({
       ProductionDate: productionDay,
       ProductionCalendar: productionCalendar,
-    }).then((expiration) => {
-      if (current) form.setFieldValue("ExpirationDate", expiration);
-    }).catch(() => {
-      if (current) setMessage({ status: "error", message: "محاسبهٔ تاریخ انقضا انجام نشد. تاریخ تولید را بررسی کنید." });
-    }).finally(() => {
-      if (current) setExpirationLoading(false);
-    });
-    return () => { current = false; };
-  }, [open, form, productionDay, productionCalendar, savedProduction, savedExpiration]);
+    })
+      .then((expiration) => {
+        if (current) form.setFieldValue("ExpirationDate", expiration);
+      })
+      .catch(() => {
+        if (current)
+          setMessage({
+            status: "error",
+            message:
+              "محاسبهٔ تاریخ انقضا انجام نشد. تاریخ تولید را بررسی کنید.",
+          });
+      })
+      .finally(() => {
+        if (current) setExpirationLoading(false);
+      });
+    return () => {
+      current = false;
+    };
+  }, [
+    open,
+    form,
+    productionDay,
+    productionCalendar,
+    savedProduction,
+    savedExpiration,
+  ]);
 
   const fetchOptions = async (isCurrent: () => boolean) => {
-    const [suppliersData, varietiesData] = await Promise.all([getSuppliers(), getPlantVarieties()]);
+    const [suppliersData, varietiesData] = await Promise.all([
+      getSuppliers(),
+      getPlantVarieties(),
+    ]);
 
     if (suppliersData) {
       if (!isCurrent()) return;
@@ -144,7 +176,9 @@ export default function SeedPackageInsUpModal({
     }
   };
 
-  const handleFinish = async (values: z.input<typeof seedPackageInputSchema>) => {
+  const handleFinish = async (
+    values: z.input<typeof seedPackageInputSchema>,
+  ) => {
     await submitForm(
       async () => {
         setInternalLoading(true);
@@ -200,15 +234,28 @@ export default function SeedPackageInsUpModal({
       onClose={handleClose}
       destroyOnHidden
       heading={isEditMode ? "ویرایش بسته بذر" : "افزودن بسته بذر جدید"}
-      description={isEditMode ? `ویرایش اطلاعات بسته: ${data?.SerialNumber}` : "اطلاعات بسته را با دقت وارد کنید"}
+      description={
+        isEditMode
+          ? `ویرایش اطلاعات بسته: ${data?.SerialNumber}`
+          : "اطلاعات بسته را با دقت وارد کنید"
+      }
       icon={<PlusOutlined />}
       editing={isEditMode}
     >
-      <Form form={form} layout="vertical" onFinish={handleFinish} requiredMark={false}>
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={handleFinish}
+        requiredMark={false}
+      >
         <FormGrid title="هویت بسته و تأمین‌کننده" columns={3}>
           <FormItem
             name="SupplierID"
-            label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">تأمین کننده</span>}
+            label={
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                تأمین کننده
+              </span>
+            }
             className="mb-0"
           >
             <Select
@@ -223,7 +270,11 @@ export default function SeedPackageInsUpModal({
 
           <FormItem
             name="ProducerCompany"
-            label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">شرکت تولید کننده</span>}
+            label={
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                شرکت تولید کننده
+              </span>
+            }
             className="mb-0"
           >
             <Input placeholder="نام شرکت" />
@@ -231,7 +282,11 @@ export default function SeedPackageInsUpModal({
 
           <FormItem
             name="CropVariety"
-            label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">واریته</span>}
+            label={
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                واریته
+              </span>
+            }
             className="mb-0"
           >
             <Select
@@ -251,7 +306,9 @@ export default function SeedPackageInsUpModal({
                 شماره سریال <span className="text-rose-500">*</span>
               </span>
             }
-            rules={[{ required: true, message: "لطفا شماره سریال را وارد کنید" }]}
+            rules={[
+              { required: true, message: "لطفا شماره سریال را وارد کنید" },
+            ]}
             className="mb-0"
           >
             <Input placeholder="مثال: PKG-1001" />
@@ -259,7 +316,11 @@ export default function SeedPackageInsUpModal({
 
           <FormItem
             name="PackageNumber"
-            label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">تعداد بسته ها</span>}
+            label={
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                تعداد بسته ها
+              </span>
+            }
             className="mb-0"
           >
             <InputNumber placeholder="عدد" controls={false} />
@@ -267,7 +328,11 @@ export default function SeedPackageInsUpModal({
 
           <FormItem
             name="PackageType"
-            label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">نوع بسته‌بندی</span>}
+            label={
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                نوع بسته‌بندی
+              </span>
+            }
             className="mb-0"
           >
             <Input placeholder="مثال: پاکت, قوطی..." />
@@ -278,7 +343,9 @@ export default function SeedPackageInsUpModal({
           <FormItem
             name="SeedCount"
             label={
-              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">تعداد بذر در هر بسته</span>
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                تعداد بذر در هر بسته
+              </span>
             }
             className="mb-0"
           >
@@ -287,7 +354,11 @@ export default function SeedPackageInsUpModal({
 
           <FormItem
             name="WeightGram"
-            label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">وزن هر بسته (گرم)</span>}
+            label={
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                وزن هر بسته (گرم)
+              </span>
+            }
             className="mb-0"
           >
             <InputNumber placeholder="گرم" controls={false} />
@@ -295,7 +366,11 @@ export default function SeedPackageInsUpModal({
 
           <FormItem
             name="GerminationRate"
-            label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">نرخ جوانه زنی (%)</span>}
+            label={
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                نرخ جوانه زنی (%)
+              </span>
+            }
             className="mb-0"
           >
             <InputNumber placeholder="%" controls={false} max={100} min={0} />
@@ -303,7 +378,11 @@ export default function SeedPackageInsUpModal({
 
           <FormItem
             name="PurityPercent"
-            label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">درصد خلوص (%)</span>}
+            label={
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                درصد خلوص (%)
+              </span>
+            }
             className="mb-0"
           >
             <InputNumber placeholder="%" controls={false} max={100} min={0} />
@@ -311,7 +390,11 @@ export default function SeedPackageInsUpModal({
 
           <FormItem
             name="QualityGrade"
-            label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">درجه کیفی</span>}
+            label={
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                درجه کیفی
+              </span>
+            }
             className="mb-0"
           >
             <Input placeholder="مثال: A, B, Grade 1" />
@@ -320,7 +403,9 @@ export default function SeedPackageInsUpModal({
           <FormItem
             name="IsCertified"
             label={
-              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">گواهی تضمین کیفیت دارد؟</span>
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                گواهی تضمین کیفیت دارد؟
+              </span>
             }
             valuePropName="checked"
             className="mb-0 flex flex-col justify-end pb-3"
@@ -346,7 +431,11 @@ export default function SeedPackageInsUpModal({
           </div>
           <FormItem
             name="ProductionDate"
-            label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">تاریخ تولید</span>}
+            label={
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                تاریخ تولید
+              </span>
+            }
             className="mb-0"
           >
             <DatePicker
@@ -361,49 +450,46 @@ export default function SeedPackageInsUpModal({
 
           <FormItem
             name="PackagingDate"
-            label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">تاریخ بسته‌بندی</span>}
+            label={
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                تاریخ بسته‌بندی
+              </span>
+            }
             className="mb-0"
           >
-            <DatePicker calendarSystem={calendarSystem} placeholder="انتخاب تاریخ" />
+            <DatePicker
+              calendarSystem={calendarSystem}
+              placeholder="انتخاب تاریخ"
+            />
           </FormItem>
 
           <FormItem
             name="ExpirationDate"
-            label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">تاریخ انقضا</span>}
+            label={
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                تاریخ انقضا
+              </span>
+            }
             className="mb-0"
           >
             <DatePicker
               calendarSystem={calendarSystem}
               disabled
-              placeholder={expirationLoading ? "در حال محاسبه…" : "از تاریخ تولید محاسبه می‌شود"}
+              placeholder={
+                expirationLoading
+                  ? "در حال محاسبه…"
+                  : "از تاریخ تولید محاسبه می‌شود"
+              }
             />
           </FormItem>
         </FormGrid>
 
-        <FormActions message={message}>
-          <GreenhouseButton
-            text="انصراف"
-            variant="secondary"
-            onClick={handleClose}
-            disabled={internalLoading}
-
-            type="button"
-          />
-          <GreenhouseButton
-            text={
-              internalLoading
-                ? isEditMode
-                  ? "در حال ویرایش..."
-                  : "در حال ثبت..."
-                : isEditMode
-                  ? "ویرایش بسته بذر"
-                  : "ثبت بسته بذر"
-            }
-            variant="primary"
-            type="submit"
-            loading={internalLoading}
-          />
-        </FormActions>
+        <FormActions
+          message={message}
+          onCancel={handleClose}
+          loading={internalLoading}
+          editing={isEditMode}
+        />
       </Form>
     </Modal>
   );

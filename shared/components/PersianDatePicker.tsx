@@ -62,7 +62,11 @@ export default function PersianDatePicker({
         date.year === today.year &&
         date.month.number === today.month.number &&
         date.day === today.day
-          ? { className: "bg-sky-300 text-white", "aria-current": "date" }
+          ? {
+              className:
+                "bg-emerald-100 text-emerald-950 dark:bg-emerald-900 dark:text-emerald-100",
+              "aria-current": "date",
+            }
           : undefined
       }
       onChange={(date) => onChange?.(pickerDateToISO(date))}

@@ -3,13 +3,14 @@
 import { publicOrderUrl } from "@/shared/config/public-urls";
 
 import QRCodeCanvas from "@/shared/components/QRCodeCanvas";
+import GreenhouseButton from "@/shared/components/GreenhouseButton";
 import {
   CloseOutlined,
   DownloadOutlined,
   QrcodeOutlined,
 } from "@ant-design/icons";
 import Modal from "@/shared/components/ResponsiveModal";
-import { Button, Select, Tooltip } from "antd";
+import { Select, Tooltip } from "antd";
 import { useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
 
@@ -162,12 +163,13 @@ export default function WorkerQRModal({
             />
           </div>
           <Tooltip title="دانلود تصویر QR">
-            <button
+            <GreenhouseButton
               onClick={handleDownloadQR}
-              className="absolute left-1 bottom-1 sm:-left-4 sm:-bottom-4 w-10 h-10 sm:w-12 sm:h-12 bg-white border border-slate-100 rounded-full shadow-lg flex items-center justify-center text-slate-600 hover:text-emerald-600 hover:scale-110 transition-all z-10 cursor-pointer"
-            >
-              <DownloadOutlined className="text-xl" />
-            </button>
+              aria-label="دانلود تصویر QR"
+              className="absolute end-1 bottom-1 z-10 sm:-end-3 sm:-bottom-3"
+              variant="secondary"
+              icon={<DownloadOutlined />}
+            />
           </Tooltip>
         </div>
 
@@ -255,13 +257,12 @@ export default function WorkerQRModal({
             </div>
           </div>
 
-          <Button
-            icon={<QrcodeOutlined className="text-lg" />}
+          <GreenhouseButton
+            text="چاپ برچسب (QR Code)"
+            icon={<QrcodeOutlined />}
+            fullWidth
             onClick={() => handlePrintLabel && handlePrintLabel()}
-            className="w-full h-12 text-sm font-bold bg-slate-800 text-white border-none hover:!bg-slate-700 hover:!text-white shadow-lg shadow-slate-200 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
-          >
-            چاپ برچسب (QR Code)
-          </Button>
+          />
         </div>
 
         {/* Hidden Print Content */}

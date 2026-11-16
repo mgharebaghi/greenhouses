@@ -19,7 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fa" suppressHydrationWarning>
-      <body className={`antialiased font-IransansR`}>
+      <body className="antialiased">
         <Providers>{children}</Providers>
       </body>
     </html>

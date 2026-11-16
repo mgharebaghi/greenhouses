@@ -1,4 +1,5 @@
 import GreenhouseButton from "@/shared/components/GreenhouseButton";
+import { toPersianDigits } from "@/shared/utils/digits";
 import {
   BarChartOutlined,
   DownCircleOutlined,
@@ -36,7 +37,7 @@ export default function InsertionRow({
             </div>
             <div>
               <div className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-                {dataCount} مورد
+                {toPersianDigits(dataCount)} مورد
               </div>
               <div className="text-xs text-slate-500 dark:text-slate-400">
                 کل {text}

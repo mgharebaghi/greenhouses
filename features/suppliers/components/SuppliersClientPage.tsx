@@ -1,7 +1,5 @@
 "use client";
 
-import PageHeader from "@/shared/components/PageHeader";
-import { ShopOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import type { SupplierDTO } from "../types";
 import SuppliersTable from "./SuppliersTable";
@@ -18,11 +16,6 @@ export default function SuppliersClientPage({
 
   return (
     <div className="dashboard-page">
-      <PageHeader
-        title="تامین‌کنندگان"
-        subtitle="مدیریت اطلاعات پایه تامین‌کنندگان بذر"
-        icon={<ShopOutlined />}
-      />
       <div className="w-full flex justify-center items-center">
         <SuppliersTable
           data={data}

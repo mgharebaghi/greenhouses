@@ -16,6 +16,7 @@ import type { OrderDetails } from "../types/details";
 import { publicOrderUrl } from "@/shared/config/public-urls";
 
 import QRCodeCanvas from "@/shared/components/QRCodeCanvas";
+import GreenhouseButton from "@/shared/components/GreenhouseButton";
 import DataLoadError from "@/shared/components/DataLoadError";
 import {
   CloseOutlined,
@@ -24,7 +25,7 @@ import {
   QrcodeOutlined,
 } from "@ant-design/icons";
 import Modal from "@/shared/components/ResponsiveModal";
-import { Button, Select, Tooltip } from "antd";
+import { Select, Tooltip } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
 import { getOrderById } from "../actions";
@@ -296,12 +297,13 @@ export default function OrdersQRModal({
             <QRCodeCanvas value={qrUrl} size={220} className="qr-code-canvas" />
           </div>
           <Tooltip title="دانلود تصویر QR">
-            <button
+            <GreenhouseButton
               onClick={handleDownloadQR}
-              className="absolute left-1 bottom-1 sm:-left-4 sm:-bottom-4 w-10 h-10 sm:w-12 sm:h-12 bg-white border border-slate-100 rounded-full shadow-lg flex items-center justify-center text-slate-600 hover:text-emerald-600 hover:scale-110 transition-all z-10 cursor-pointer"
-            >
-              <DownloadOutlined className="text-xl" />
-            </button>
+              aria-label="دانلود تصویر QR"
+              className="absolute end-1 bottom-1 z-10 sm:-end-3 sm:-bottom-3"
+              variant="secondary"
+              icon={<DownloadOutlined />}
+            />
           </Tooltip>
         </div>
 
@@ -373,15 +375,13 @@ export default function OrdersQRModal({
 
         <div className="flex flex-col gap-6 w-full mb-2">
           {/* Certificate */}
-          <Button
-            type="primary"
-            icon={<FileTextOutlined className="text-lg" />}
+          <GreenhouseButton
+            text="چاپ گواهی دیجیتال (Full Page)"
+            fullWidth
+            icon={<FileTextOutlined />}
             onClick={() => handlePrintCertificate && handlePrintCertificate()}
-            className="w-full h-14 text-base font-black bg-emerald-600 hover:!bg-emerald-500 shadow-xl shadow-emerald-100 rounded-2xl border-none flex items-center justify-center gap-3 transition-all hover:-translate-y-0.5 active:translate-y-0"
             loading={loading}
-          >
-            چاپ گواهی دیجیتال (Full Page)
-          </Button>
+          />
 
           {/* Label */}
           <div className="bg-slate-50/50 border border-slate-100 rounded-2xl p-3 sm:rounded-3xl sm:p-6 shadow-sm">
@@ -455,14 +455,14 @@ export default function OrdersQRModal({
                 />
               </div>
             </div>
-            <Button
-              icon={<QrcodeOutlined className="text-lg" />}
+            <GreenhouseButton
+              text="چاپ برچسب (QR Code)"
+              fullWidth
+              variant="secondary"
+              icon={<QrcodeOutlined />}
               onClick={handlePrintLabelClick}
-              className="w-full h-12 text-sm font-bold bg-slate-800 text-white border-none hover:!bg-slate-700 hover:!text-white shadow-lg shadow-slate-200 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
               loading={loading}
-            >
-              چاپ برچسب (QR Code)
-            </Button>
+            />
           </div>
         </div>
 

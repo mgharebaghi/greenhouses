@@ -9,12 +9,14 @@ import {
 } from "@/shared/table/data";
 import {
   CloseCircleFilled,
+  EyeOutlined,
   SearchOutlined,
   SortAscendingOutlined,
   SortDescendingOutlined,
   TableOutlined,
 } from "@ant-design/icons";
 import clsx from "clsx";
+import { toPersianDigits } from "@/shared/utils/digits";
 import {
   isValidElement,
   useEffect,
@@ -24,6 +26,7 @@ import {
   type ReactNode,
 } from "react";
 import Pagination from "./Pagination";
+import GreenhouseButton from "./GreenhouseButton";
 
 export interface Column<T extends object> {
   title: string;
@@ -39,6 +42,26 @@ export interface Column<T extends object> {
     render(value: unknown, record: T, index: number): ReactNode;
   }["render"];
   className?: string;
+}
+
+export function detailsColumn<T extends object>(
+  onOpen: (record: T) => void,
+): Column<T> {
+  return {
+    key: "details",
+    title: "جزئیات",
+    width: 80,
+    align: "center",
+    render: (_, record) => (
+      <GreenhouseButton
+        onClick={() => onOpen(record)}
+        title="مشاهده جزئیات"
+        aria-label="مشاهده جزئیات"
+        variant="soft"
+        icon={<EyeOutlined />}
+      />
+    ),
+  };
 }
 
 interface PaginationConfig {
@@ -92,9 +115,17 @@ function renderCell<T extends object>(
   const value = column.dataIndex
     ? fieldValue(record, column.dataIndex)
     : undefined;
-  return column.render
+  const content = column.render
     ? column.render(value, record, index)
     : displayCell(value);
+  if (
+    typeof content === "number" ||
+    typeof content === "string" ||
+    typeof content === "bigint"
+  ) {
+    return toPersianDigits(content);
+  }
+  return content;
 }
 
 const cellSizes = {
@@ -128,7 +159,7 @@ export default function Table<T extends object>({
     pagination ? (pagination.current ?? 1) : 1,
   );
   const [pageSize, setPageSize] = useState(
-    pagination ? (pagination.pageSize ?? 10) : 10,
+    pagination ? (pagination.pageSize ?? 20) : 20,
   );
   const [availableWidth, setAvailableWidth] = useState(0);
   const tableContainer = useRef<HTMLDivElement>(null);
@@ -236,17 +267,16 @@ export default function Table<T extends object>({
               className="h-10 w-full rounded-lg border border-slate-200 bg-white ps-9 pe-9 text-sm outline-none placeholder:text-slate-500 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-400"
             />
             {searchText && (
-              <button
-                type="button"
+              <GreenhouseButton
                 aria-label="پاک کردن جست‌وجو"
                 onClick={() => {
                   changeSearch("");
                   searchInput.current?.focus();
                 }}
-                className="absolute end-1 top-1/2 grid size-8 -translate-y-1/2 place-items-center rounded-md text-slate-500 hover:text-slate-800 dark:hover:text-slate-100"
-              >
-                <CloseCircleFilled />
-              </button>
+                className="absolute end-1 top-1/2 size-8 -translate-y-1/2"
+                variant="ghost"
+                icon={<CloseCircleFilled />}
+              />
             )}
           </div>
           {showCards && sortableColumns.length > 0 && (
@@ -269,8 +299,7 @@ export default function Table<T extends object>({
                 ))}
               </select>
               {sortField && (
-                <button
-                  type="button"
+                <GreenhouseButton
                   onClick={() => {
                     setSortOrder(sortOrder === "asc" ? "desc" : "asc");
                     setCurrentPage(1);
@@ -278,14 +307,15 @@ export default function Table<T extends object>({
                   aria-label={
                     sortOrder === "asc" ? "مرتب‌سازی نزولی" : "مرتب‌سازی صعودی"
                   }
-                  className="grid size-9 place-items-center rounded-lg border border-slate-200 bg-white text-emerald-700 dark:border-slate-700 dark:bg-slate-900 dark:text-emerald-300"
-                >
-                  {sortOrder === "asc" ? (
-                    <SortAscendingOutlined />
-                  ) : (
-                    <SortDescendingOutlined />
-                  )}
-                </button>
+                  variant="soft"
+                  icon={
+                    sortOrder === "asc" ? (
+                      <SortAscendingOutlined />
+                    ) : (
+                      <SortDescendingOutlined />
+                    )
+                  }
+                />
               )}
             </div>
           )}
@@ -407,10 +437,10 @@ export default function Table<T extends object>({
                           style={{ width: column.width }}
                         >
                           {field && column.sortable !== false ? (
-                            <button
-                              type="button"
+                            <GreenhouseButton
                               onClick={() => handleSort(field)}
-                              className="inline-flex max-w-full items-center gap-1.5 rounded text-start [overflow-wrap:anywhere] hover:text-emerald-700 focus-visible:outline-emerald-500 dark:hover:text-emerald-300"
+                              variant="ghost"
+                              className="h-auto max-w-full px-1 py-1 text-start text-inherit [overflow-wrap:anywhere]"
                             >
                               {column.title}
                               {active && sortOrder === "desc" ? (
@@ -425,7 +455,7 @@ export default function Table<T extends object>({
                                   )}
                                 />
                               )}
-                            </button>
+                            </GreenhouseButton>
                           ) : (
                             column.title
                           )}

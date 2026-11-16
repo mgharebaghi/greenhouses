@@ -1,6 +1,7 @@
 "use client";
 
 import FormFeedback from "@/shared/components/FormFeedback";
+import GreenhouseButton from "@/shared/components/GreenhouseButton";
 
 import {
   Checkbox,
@@ -16,7 +17,6 @@ import { signIn } from "@/features/auth/actions";
 import SeedGrowthAnimation from "./SeedGrowthAnimation";
 import {
   CheckCircleFilled,
-  LoadingOutlined,
   LockOutlined,
   UserOutlined,
 } from "@ant-design/icons";
@@ -187,7 +187,9 @@ export default function Login() {
                   className="mb-0"
                 >
                   <Input
-                    prefix={<UserOutlined className="text-slate-500" />}
+                    prefix={
+                      <UserOutlined className="text-slate-500 dark:text-slate-300" />
+                    }
                     placeholder="نام کاربری"
                     autoComplete="username"
                   />
@@ -198,7 +200,9 @@ export default function Login() {
                   className="mb-2"
                 >
                   <Input.Password
-                    prefix={<LockOutlined className="text-slate-500" />}
+                    prefix={
+                      <LockOutlined className="text-slate-500 dark:text-slate-300" />
+                    }
                     placeholder="رمز عبور"
                     autoComplete="current-password"
                   />
@@ -219,22 +223,13 @@ export default function Login() {
                     فراموشی رمز عبور؟
                   </a>
                 </div>
-                <button
+                <GreenhouseButton
                   type="submit"
-                  disabled={loading}
-                  className={`relative w-full h-14 rounded-2xl font-bold text-lg text-white shadow-[0_10px_20px_rgba(16,185,129,0.2)] dark:shadow-none transition-all duration-300 transform hover:-translate-y-1 active:scale-[0.98] ${loading ? "bg-slate-300 cursor-not-allowed shadow-none" : "bg-gradient-to-r from-emerald-500 to-teal-500 hover:shadow-[0_20px_40px_rgba(16,185,129,0.3)]"}`}
-                >
-                  <span
-                    className={`flex items-center justify-center  gap-2 ${loading ? "opacity-0" : "opacity-100"} cursor-pointer`}
-                  >
-                    ورود به سیستم
-                  </span>
-                  {loading && (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <LoadingOutlined className="text-2xl animate-spin text-white" />
-                    </div>
-                  )}
-                </button>
+                  fullWidth
+                  className="h-12"
+                  text={loading ? "در حال ورود…" : "ورود به سیستم"}
+                  loading={loading}
+                />
                 <FormFeedback
                   message={error ? { status: "error", message: error } : null}
                 />
@@ -242,7 +237,7 @@ export default function Login() {
             </FormAppearance>
           </div>
           <div className="mt-8 text-center animate-fade-in-up animation-delay-200">
-            <p className="text-slate-400 dark:text-slate-500 text-xs font-medium">
+            <p className="text-slate-400 dark:text-slate-300 text-xs font-medium">
               © ۲۰۲۵ سامانه هوشمند مدیریت گلخانه - فکور پیوند آریا
             </p>
           </div>

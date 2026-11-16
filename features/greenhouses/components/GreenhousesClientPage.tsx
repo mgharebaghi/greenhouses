@@ -1,8 +1,6 @@
 "use client";
 
 import type { GreenhouseRecord } from "@/features/greenhouses/types/record";
-import PageHeader from "@/shared/components/PageHeader";
-import { GatewayOutlined } from "@ant-design/icons";
 import { Col, Row } from "antd";
 import { useState } from "react";
 import GreenhousesTable from "./GreenhousesTable";
@@ -17,11 +15,6 @@ export default function GreenhousesClientPage({
 
   return (
     <div className="dashboard-page">
-      <PageHeader
-        title="گلخانه‌ها"
-        subtitle="مدیریت اطلاعات پایه گلخانه‌ها"
-        icon={<GatewayOutlined />}
-      />
       <Row gutter={[16, 16]}>
         <Col span={24}>
           <GreenhousesTable

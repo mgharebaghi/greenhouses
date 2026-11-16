@@ -52,9 +52,48 @@ function AntdConfigProvider({ children }: { children: React.ReactNode }) {
           : themeNumeric.defaultAlgorithm,
         token: {
           fontFamily: "IransansR",
-          colorPrimary: "#10b981", // Emerald 500
-          colorBgContainer: isDark ? "#1e293b" : "#ffffff", // Slate 800 vs White
-          colorBgLayout: isDark ? "#0f172a" : "#f5f5f5", // Slate 900 vs Gray 100
+          colorPrimary: isDark ? "#2fb98c" : "#047857",
+          ...(isDark && {
+            colorTextBase: "#f1f5fb",
+            colorText: "#f1f5fb",
+            colorTextSecondary: "#c5d1e1",
+            colorTextTertiary: "#bac8da",
+            colorTextPlaceholder: "#a6b6cb",
+            colorTextDisabled: "#a6b6cb",
+            colorBgContainer: "#142033",
+            colorBgElevated: "#19283d",
+            colorBgLayout: "#0b1423",
+            colorBgContainerDisabled: "#19283d",
+            colorBorder: "#3a4a60",
+            colorBorderSecondary: "#35465d",
+            colorLink: "#7de3bc",
+          }),
+        },
+        components: {
+          Button: {
+            borderRadius: 10,
+            borderRadiusLG: 12,
+            fontWeight: 600,
+            motionDurationMid: "0.2s",
+            defaultShadow: "none",
+            primaryShadow: "none",
+            dangerShadow: "none",
+            colorPrimary: isDark ? "#67c6a4" : "#147960",
+            colorPrimaryHover: isDark ? "#81d5b7" : "#106650",
+            defaultBg: isDark ? "#202d40" : "#f1f4f6",
+            defaultHoverBg: isDark ? "#2b3a4d" : "#e7eef0",
+            ...(isDark && { primaryColor: "#092b22" }),
+          },
+          Modal: {
+            motionDurationMid: "0.2s",
+            colorBgTextHover: isDark ? "#2b3a4d" : "#e7eef0",
+          },
+          ...(isDark && {
+            Select: {
+              optionActiveBg: "#233750",
+              optionSelectedBg: "#174536",
+            },
+          }),
         },
       }}
     >

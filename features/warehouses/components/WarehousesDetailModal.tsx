@@ -31,13 +31,10 @@ export default function WarehousesDetailModal({
       onClose={onClose}
       title="جزئیات انبار"
       icon={<ShopOutlined />}
-      gradientFrom="emerald"
-      gradientTo="cyan"
     >
       <InfoCard
         title="اطلاعات کلی"
         icon={<DashboardOutlined />}
-        color="#10b981"
         items={[
           { label: "کد انبار", value: data.WarehouseCode },
           { label: "نام انبار", value: data.WarehouseName },
@@ -54,7 +51,6 @@ export default function WarehousesDetailModal({
       <InfoCard
         title="شرایط و ظرفیت"
         icon={<EnvironmentOutlined />}
-        color="#0ea5e9"
         items={[
           { label: "محدوده دمایی", value: data.TemperatureRange },
           { label: "محدوده رطوبت", value: data.HumidityRange },
@@ -65,7 +61,6 @@ export default function WarehousesDetailModal({
       <InfoCard
         title="مدیریت"
         icon={<UserOutlined />}
-        color="#8b5cf6"
         items={[
           { label: "مسئول انبار", value: data.WarehouseManagerName || "---" },
         ]}

@@ -7,7 +7,8 @@ import {
   PlusCircleOutlined,
   PrinterOutlined,
 } from "@ant-design/icons";
-import { Button, Tooltip } from "antd";
+import { Tooltip } from "antd";
+import GreenhouseButton from "@/shared/components/GreenhouseButton";
 import { useState } from "react";
 import { Controller, useFieldArray, useFormContext } from "react-hook-form";
 import { GraftingFormData } from "../types";
@@ -89,27 +90,26 @@ export default function GraftingWorkers({
               {/* Actions Column (Print, Delete, Add) */}
               <div className="col-span-2 sm:col-span-3 flex flex-wrap items-center justify-center gap-1">
                 <Tooltip title="چاپ">
-                  <Button
+                  <GreenhouseButton
                     icon={<PrinterOutlined />}
-                    size="middle" // Medium size as in image
-                    className="text-slate-600 border-slate-400 bg-white"
+                    aria-label="چاپ"
+                    variant="secondary"
                     onClick={() => handlePrint(index)}
                   />
                 </Tooltip>
                 <Tooltip title="حذف">
-                  <Button
-                    danger
+                  <GreenhouseButton
                     icon={<DeleteOutlined />}
-                    size="middle"
-                    className="bg-red-500 text-white border-red-500 hover:bg-red-600 hover:border-red-600"
+                    aria-label="حذف"
+                    variant="danger-soft"
                     onClick={() => remove(index)}
                   />
                 </Tooltip>
                 <Tooltip title="افزودن جدید">
-                  <Button
+                  <GreenhouseButton
                     icon={<PlusCircleOutlined />}
-                    size="middle"
-                    className="bg-green-500 text-white border-green-500 hover:bg-green-600 hover:border-green-600"
+                    aria-label="افزودن جدید"
+                    variant="soft"
                     onClick={() => append({ PersonID: null })}
                   />
                 </Tooltip>
@@ -162,15 +162,15 @@ export default function GraftingWorkers({
         {/* Empty State / Initial Add Button if list is empty */}
         {fields.length === 0 && (
           <div className="text-center py-8 border-2 border-dashed border-slate-200 rounded-xl">
-            <p className="text-slate-400 mb-4">هیچ فردی اضافه نشده است</p>
-            <Button
-              type="dashed"
+            <p className="text-slate-600 mb-4 dark:text-slate-300">
+              هیچ فردی اضافه نشده است
+            </p>
+            <GreenhouseButton
+              text="افزودن اولین فرد"
+              variant="soft"
               onClick={() => append({ PersonID: null })}
               icon={<PlusCircleOutlined />}
-              className="text-emerald-600 border-emerald-300 hover:text-emerald-700 hover:border-emerald-500 h-10 px-6 rounded-xl"
-            >
-              افزودن اولین فرد
-            </Button>
+            />
           </div>
         )}
       </div>

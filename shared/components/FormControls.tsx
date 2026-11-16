@@ -1,7 +1,14 @@
 "use client";
 
-import { ConfigProvider, Form as AntForm, type FormProps } from "antd";
+import {
+  ConfigProvider,
+  Form as AntForm,
+  InputNumber as AntInputNumber,
+  type FormProps,
+  type InputNumberProps,
+} from "antd";
 import clsx from "clsx";
+import { ArrowLeftOutlined, ArrowRightOutlined } from "@ant-design/icons";
 import {
   createContext,
   useContext,
@@ -17,11 +24,30 @@ import {
 } from "@/shared/validation/input";
 import FormFeedback, { FormValidationFeedback } from "./FormFeedback";
 import PersianDatePicker from "./PersianDatePicker";
+import GreenhouseButton from "./GreenhouseButton";
+import { normalizeNumericInput } from "@/shared/utils/digits";
 
 // Keep Ant Design's value, event, and ref types at the point of use.
-export { Checkbox, Input, InputNumber, Radio, Select, Switch } from "antd";
+export { Checkbox, Input, Radio, Select, Switch } from "antd";
 export const FormItem = AntForm.Item;
 const FormIsOpen = createContext(true);
+
+export function InputNumber<T extends string | number = number>({
+  decimalSeparator = "٫",
+  parser,
+  ...props
+}: ComponentProps<typeof AntInputNumber<T>> & InputNumberProps<T>) {
+  return (
+    <AntInputNumber<T>
+      {...props}
+      decimalSeparator={decimalSeparator}
+      parser={
+        parser ??
+        ((value) => normalizeNumericInput(value, decimalSeparator) as T)
+      }
+    />
+  );
+}
 
 function SharedForm<T>({
   onFinish,
@@ -153,16 +179,52 @@ export function FieldFeedback({ message }: { message?: string }) {
 }
 
 export function FormActions({
-  children,
   message,
+  onCancel,
+  loading = false,
+  editing = false,
+  submitDisabled = false,
+  nextStep = false,
+  onBack,
 }: {
-  children: ReactNode;
   message?: ActionMessage | null;
+  onCancel: () => void;
+  loading?: boolean;
+  editing?: boolean;
+  submitDisabled?: boolean;
+  nextStep?: boolean;
+  onBack?: () => void;
 }) {
+  const submitLabel = editing ? "ذخیره تغییرات" : "ثبت";
   return (
     <div className="record-form-actions">
       <FormFeedback message={message} />
-      <div className="record-form-buttons">{children}</div>
+      <div className="record-form-buttons">
+        <GreenhouseButton
+          text="انصراف"
+          variant="secondary"
+          onClick={onCancel}
+          disabled={loading}
+        />
+        {onBack && (
+          <GreenhouseButton
+            text="مرحله قبل"
+            variant="outline"
+            icon={<ArrowRightOutlined />}
+            onClick={onBack}
+            disabled={loading}
+          />
+        )}
+        <GreenhouseButton
+          text={
+            nextStep ? "مرحله بعد" : loading ? "در حال ذخیره…" : submitLabel
+          }
+          type="submit"
+          icon={nextStep ? <ArrowLeftOutlined /> : undefined}
+          loading={loading}
+          disabled={submitDisabled}
+        />
+      </div>
     </div>
   );
 }

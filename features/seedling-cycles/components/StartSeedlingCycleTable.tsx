@@ -10,10 +10,8 @@ import { csvRows } from "@/shared/exports/csv";
 
 import DeleteModal, { DeleteModalProps } from "@/shared/components/DeleteModal";
 import InsertionRow from "@/shared/components/InsertionRow";
-import Table from "@/shared/components/Table";
+import Table, { detailsColumn } from "@/shared/components/Table";
 import TableActions from "@/shared/components/TableActions";
-import { EyeOutlined } from "@ant-design/icons";
-import { Button, Tooltip } from "antd";
 import { download, generateCsv, mkConfig } from "export-to-csv";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -72,26 +70,10 @@ export default function StartSeedlingCycleTable({
   // ... (keep existing delete modal state)
 
   const columns = [
-    {
-      title: "جزئیات",
-      key: "details",
-      width: 80,
-      align: "center" as const,
-      render: (_: unknown, record: StartSeedlingCycle) => (
-        <Tooltip title="مشاهده جزئیات">
-          <Button
-            icon={<EyeOutlined />}
-            shape="circle"
-            type="text"
-            onClick={() => {
-              setDetailRecord(record);
-              setDetailOpen(true);
-            }}
-            className="text-blue-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20"
-          />
-        </Tooltip>
-      ),
-    },
+    detailsColumn<StartSeedlingCycle>((record) => {
+      setDetailRecord(record);
+      setDetailOpen(true);
+    }),
     {
       title: "شناسه",
       dataIndex: "ID",
@@ -137,7 +119,7 @@ export default function StartSeedlingCycleTable({
       title: "تعداد سینی",
       dataIndex: "NumberOfTrays",
       key: "NumberOfTrays",
-      render: (val: number) => (val ? val.toLocaleString() : "---"),
+      render: (val: number) => (val != null ? val.toLocaleString() : "---"),
     },
     {
       title: "تاریخ ورود به گلخانه",
@@ -194,12 +176,7 @@ export default function StartSeedlingCycleTable({
         data={data}
       />
 
-      <Table
-        columns={columns}
-        dataSource={data}
-        rowKey="ID"
-        pagination={{ pageSize: 10 }}
-      />
+      <Table columns={columns} dataSource={data} rowKey="ID" />
 
       <StartSeedlingCycleFormModal
         open={isModalOpen}

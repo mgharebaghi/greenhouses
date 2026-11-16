@@ -7,7 +7,7 @@ import type { SeedPackageDetails } from "../types/details";
 
 import { CloseOutlined, PrinterOutlined } from "@ant-design/icons";
 import Modal from "@/shared/components/ResponsiveModal";
-import { Button } from "antd";
+import GreenhouseButton from "@/shared/components/GreenhouseButton";
 import { useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 
@@ -172,22 +172,16 @@ export default function SeedPackagePrintModal({
 
         {/* Actions */}
         <div className="flex flex-wrap justify-end gap-3 pt-2 border-t border-slate-100 dark:border-slate-700">
-          <Button
+          <GreenhouseButton
             onClick={handleClose}
-            size="large"
-            className="dark:text-slate-300 dark:border-slate-600 dark:hover:border-slate-500 dark:hover:text-slate-100"
-          >
-            انصراف
-          </Button>
-          <Button
-            type="primary"
+            variant="secondary"
+            text="انصراف"
+          />
+          <GreenhouseButton
+            text="چاپ شناسنامه"
             icon={<PrinterOutlined />}
-            size="large"
-            className="bg-emerald-600 hover:bg-emerald-500"
             onClick={() => handlePrint && handlePrint()}
-          >
-            چاپ شناسنامه
-          </Button>
+          />
         </div>
       </div>
     </Modal>

@@ -5,6 +5,7 @@ import {
   PrinterOutlined,
   QrcodeOutlined,
 } from "@ant-design/icons";
+import GreenhouseButton from "./GreenhouseButton";
 
 interface TableActionsProps {
   onEdit: () => void;
@@ -34,78 +35,48 @@ export default function TableActions({
   return (
     <div className="flex min-w-0 flex-wrap items-center gap-1.5 sm:gap-2 [&>button]:shrink-0">
       {onView && (
-        <button
-          onClick={onView}
-          title={viewTitle || "مشاهده جزئیات"}
+        <GreenhouseButton
           aria-label={viewTitle || "مشاهده جزئیات"}
-          className={`h-8 w-8 flex items-center justify-center rounded-full border border-sky-100 dark:border-sky-800 bg-sky-50/60 dark:bg-sky-900/20 shadow-sm transition-all
-            hover:bg-sky-100 dark:hover:bg-sky-900/40 hover:border-sky-300 dark:hover:border-sky-700 hover:shadow-md
-            focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-200
-            disabled:opacity-50 disabled:cursor-not-allowed
-            group`}
-          type="button"
-        >
-          <EyeOutlined className="text-sky-500 dark:text-sky-400 text-base group-hover:scale-110 transition-transform" />
-        </button>
+          title={viewTitle || "مشاهده جزئیات"}
+          icon={<EyeOutlined />}
+          variant="soft"
+          onClick={onView}
+        />
       )}
       {qrcode && (
-        <button
-          onClick={qrcode}
-          title="کد QR"
+        <GreenhouseButton
           aria-label="کد QR"
-          className={`h-8 w-8 flex items-center justify-center rounded-full border border-blue-100 dark:border-blue-800 bg-blue-50/60 dark:bg-blue-900/20 shadow-sm transition-all
-            hover:bg-blue-100 dark:hover:bg-blue-900/40 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-md
-            focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-200
-            disabled:opacity-50 disabled:cursor-not-allowed
-            group`}
-          type="button"
-        >
-          <QrcodeOutlined className="text-blue-500 dark:text-blue-400 text-base group-hover:scale-110 transition-transform" />
-        </button>
+          title="کد QR"
+          icon={<QrcodeOutlined />}
+          variant="secondary"
+          onClick={qrcode}
+        />
       )}
       {onPrint && (
-        <button
-          onClick={onPrint}
-          title="چاپ"
+        <GreenhouseButton
           aria-label="چاپ"
-          className={`h-8 w-8 flex items-center justify-center rounded-full border border-purple-100 dark:border-purple-800 bg-purple-50/60 dark:bg-purple-900/20 shadow-sm transition-all
-            hover:bg-purple-100 dark:hover:bg-purple-900/40 hover:border-purple-300 dark:hover:border-purple-700 hover:shadow-md
-            focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-200
-            disabled:opacity-50 disabled:cursor-not-allowed
-            group`}
-          type="button"
-        >
-          <PrinterOutlined className="text-purple-500 dark:text-purple-400 text-base group-hover:scale-110 transition-transform" />
-        </button>
+          title="چاپ"
+          icon={<PrinterOutlined />}
+          variant="secondary"
+          onClick={onPrint}
+        />
       )}
-      <button
-        onClick={onEdit}
-        title={editTitle}
+      <GreenhouseButton
         aria-label={editTitle}
+        title={editTitle}
+        icon={<EditOutlined />}
+        variant="soft"
+        onClick={onEdit}
         disabled={disabledEdit}
-        className={`h-8 w-8 flex items-center justify-center rounded-full border border-emerald-100 dark:border-emerald-800 bg-emerald-50/60 dark:bg-emerald-900/20 shadow-sm transition-all
-          hover:bg-emerald-100 dark:hover:bg-emerald-900/40 hover:border-emerald-300 dark:hover:border-emerald-700 hover:shadow-md
-          focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300
-          disabled:opacity-50 disabled:cursor-not-allowed
-          group`}
-        type="button"
-      >
-        <EditOutlined className="text-emerald-600 dark:text-emerald-400 text-base group-hover:scale-110 transition-transform" />
-      </button>
-      <button
-        onClick={onDelete}
-        title={deleteTitle}
+      />
+      <GreenhouseButton
         aria-label={deleteTitle}
+        title={deleteTitle}
+        icon={<DeleteOutlined />}
+        variant="danger-soft"
+        onClick={onDelete}
         disabled={disabledDelete}
-        className={`h-8 w-8 flex items-center justify-center rounded-full border border-red-100 dark:border-red-800 bg-red-50/60 dark:bg-red-900/20 shadow-sm transition-all
-          hover:bg-red-100 dark:hover:bg-red-900/40 hover:border-red-300 dark:hover:border-red-700 hover:shadow-md
-          focus:outline-none focus-visible:ring-2 focus-visible:ring-red-200
-          disabled:opacity-50 disabled:cursor-not-allowed
-          group`}
-        type="button"
-      >
-        <DeleteOutlined className="text-red-500 dark:text-red-400 text-base group-hover:scale-110 transition-transform" />
-      </button>
+      />
     </div>
   );
 }

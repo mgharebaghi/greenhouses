@@ -8,12 +8,13 @@ import type { OrderDetails } from "../types/details";
 
 import DeleteModal from "@/shared/components/DeleteModal";
 import InsertionRow from "@/shared/components/InsertionRow";
-import Table from "@/shared/components/Table";
+import Table, { detailsColumn } from "@/shared/components/Table";
 import TableActions from "@/shared/components/TableActions";
 import OrdersFormModal from "./OrdersFormModal";
 import { deleteOrder } from "@/features/orders/actions";
-import { EyeOutlined, QrcodeOutlined } from "@ant-design/icons";
-import { Button, Tooltip } from "antd";
+import { QrcodeOutlined } from "@ant-design/icons";
+import { Tooltip } from "antd";
+import GreenhouseButton from "@/shared/components/GreenhouseButton";
 import { useState } from "react";
 import OrdersDetailModal from "./OrdersDetailModal";
 import OrdersQRModal from "./OrdersQRModal";
@@ -66,20 +67,9 @@ export default function OrdersTable({
   };
 
   const columns = [
-    {
-      title: "جزئیات",
-      key: "details",
-      width: 80,
-      align: "center" as const,
-      render: (_: unknown, record: OrderDetails) => (
-        <Tooltip title="مشاهده جزئیات">
-          <Button
-            icon={<EyeOutlined />}
-            onClick={() => setDetailModal({ open: true, data: record })}
-          />
-        </Tooltip>
-      ),
-    },
+    detailsColumn<OrderDetails>((record) =>
+      setDetailModal({ open: true, data: record }),
+    ),
     {
       title: "QR Code",
       key: "QRCode",
@@ -87,7 +77,9 @@ export default function OrdersTable({
       align: "center" as const,
       render: (_: unknown, record: OrderDetails) => (
         <Tooltip title="چاپ QR Code">
-          <Button
+          <GreenhouseButton
+            aria-label="چاپ QR Code"
+            variant="secondary"
             icon={<QrcodeOutlined />}
             onClick={() => setQrModal({ open: true, data: record })}
           />
@@ -124,7 +116,8 @@ export default function OrdersTable({
       title: "تعداد سفارش",
       dataIndex: "OrderCount",
       key: "OrderCount",
-      render: (val: number | null) => (val ? val.toLocaleString() : "—"),
+      render: (val: number | null) =>
+        val != null ? val.toLocaleString() : "—",
     },
     {
       title: "تاریخ ثبت",
@@ -164,7 +157,6 @@ export default function OrdersTable({
         dataSource={data}
         loading={loading}
         rowKey="ID"
-        pagination={{ pageSize: 5 }}
       />
 
       <OrdersFormModal

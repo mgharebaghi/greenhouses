@@ -17,7 +17,6 @@ import {
 import type { GrowthStageRecord } from "@/features/growth-stages/types/record";
 import { getPlantVarieties } from "@/features/plant-varieties/actions";
 import Modal from "@/shared/components/FormModal";
-import GreenhouseButton from "@/shared/components/GreenhouseButton";
 import { applyFieldErrors } from "@/shared/forms/field-errors";
 import { refreshSavedForm, submitForm } from "@/shared/forms/submit";
 import { PlusOutlined } from "@ant-design/icons";
@@ -315,28 +314,12 @@ export default function GrowthStageFormModal({
         </FormGrid>
 
         {/* Actions */}
-        <FormActions message={submitMessage}>
-          <GreenhouseButton
-            text="انصراف"
-            variant="secondary"
-            onClick={handleClose}
-            disabled={loading}
-          />
-          <GreenhouseButton
-            text={
-              loading
-                ? isEdit
-                  ? "در حال ویرایش..."
-                  : "در حال ثبت..."
-                : isEdit
-                  ? "ویرایش مرحله رشد"
-                  : "ثبت مرحله رشد"
-            }
-            variant="primary"
-            type="submit"
-            loading={loading}
-          />
-        </FormActions>
+        <FormActions
+          message={submitMessage}
+          onCancel={handleClose}
+          loading={loading}
+          editing={isEdit}
+        />
       </Form>
     </Modal>
   );

@@ -28,7 +28,6 @@ import {
   createSeedWarehousing,
   updateSeedWarehousing,
 } from "@/features/seed-warehousing/actions";
-import GreenhouseButton from "@/shared/components/GreenhouseButton";
 
 import { ExperimentOutlined } from "@ant-design/icons";
 
@@ -260,30 +259,12 @@ export default function SeedWarehousingFormModal({
           </FormItem>
         </FormGrid>
 
-        <FormActions message={message}>
-          <GreenhouseButton
-            text="انصراف"
-            variant="secondary"
-            onClick={handleClose}
-            disabled={loading}
-
-            type="button"
-          />
-          <GreenhouseButton
-            text={
-              loading
-                ? isEdit
-                  ? "در حال ذخیره..."
-                  : "در حال ثبت..."
-                : isEdit
-                  ? "ذخیره تغییرات"
-                  : "ثبت تراکنش"
-            }
-            variant="primary"
-            type="submit"
-            loading={loading}
-          />
-        </FormActions>
+        <FormActions
+          message={message}
+          onCancel={handleClose}
+          loading={loading}
+          editing={isEdit}
+        />
       </Form>
     </Modal>
   );

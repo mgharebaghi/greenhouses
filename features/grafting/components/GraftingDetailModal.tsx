@@ -29,8 +29,6 @@ export default function GraftingDetailModal({ open, onCancel, record }: Props) {
       onClose={onCancel}
       title={`جزئیات عملیات پیوند - ${record.Tbl_Orders?.OrderCode || ""}`}
       icon={<ExperimentOutlined />}
-      gradientFrom="emerald"
-      gradientTo="teal"
       width={850}
     >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -38,7 +36,6 @@ export default function GraftingDetailModal({ open, onCancel, record }: Props) {
         <InfoCard
           title="اطلاعات پایه و سفارش"
           icon={<BarcodeOutlined />}
-          color="#10b981"
           items={[
             { label: "کد سفارش", value: record.Tbl_Orders?.OrderCode || "---" },
             {
@@ -70,7 +67,6 @@ export default function GraftingDetailModal({ open, onCancel, record }: Props) {
         <InfoCard
           title="مشخصات کشت"
           icon={<ExperimentOutlined />}
-          color="#0ea5e9"
           items={[
             {
               label: "تعداد سینی",
@@ -96,7 +92,6 @@ export default function GraftingDetailModal({ open, onCancel, record }: Props) {
         <InfoCard
           title="ابزار و تجهیزات"
           icon={<ToolOutlined />}
-          color="#f59e0b"
           items={[
             { label: "نوع گیره", value: record.GraftingClamp },
             { label: "نوع قیم (Stick)", value: record.GraftingStick },
@@ -107,7 +102,6 @@ export default function GraftingDetailModal({ open, onCancel, record }: Props) {
           <InfoCard
             title="کد QR سفارش"
             icon={<BarcodeOutlined />}
-            color="#64748b"
             items={[
               {
                 label: "",
@@ -142,7 +136,6 @@ export default function GraftingDetailModal({ open, onCancel, record }: Props) {
           <InfoCard
             title={`لیست پیوند‌زنان (${record.Tbl_GraftWorkers.length} نفر)`}
             icon={<UsergroupAddOutlined />}
-            color="#8b5cf6"
             items={[
               {
                 label: "",

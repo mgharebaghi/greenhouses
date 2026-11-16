@@ -8,7 +8,8 @@ import {
   QrcodeOutlined,
 } from "@ant-design/icons";
 import Modal from "@/shared/components/ResponsiveModal";
-import { Alert, Button, Card, Space, Spin } from "antd";
+import { Alert, Card, Space, Spin } from "antd";
+import GreenhouseButton from "./GreenhouseButton";
 import QRCodeLib from "qrcode";
 import { useEffect, useRef, useState } from "react";
 
@@ -207,37 +208,27 @@ export default function QRCodeModal({
       onCancel={onClose}
       width={500}
       footer={[
-        <Button key="close" onClick={onClose} size="large">
-          بستن
-        </Button>,
-        <Button
+        <GreenhouseButton
+          key="close"
+          onClick={onClose}
+          text="بستن"
+          variant="secondary"
+        />,
+        <GreenhouseButton
           key="download"
-          type="default"
-          size="large"
+          variant="soft"
+          text="دانلود"
           icon={<DownloadOutlined />}
           onClick={handleDownload}
           disabled={!qrDataUrl}
-          style={{
-            borderColor: "#52c41a",
-            color: "#52c41a",
-          }}
-        >
-          دانلود
-        </Button>,
-        <Button
+        />,
+        <GreenhouseButton
           key="print"
-          type="primary"
-          size="large"
+          text="چاپ"
           icon={<PrinterOutlined />}
           onClick={handlePrint}
           disabled={!qrDataUrl}
-          style={{
-            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-            borderColor: "transparent",
-          }}
-        >
-          چاپ
-        </Button>,
+        />,
       ]}
       centered
       styles={{

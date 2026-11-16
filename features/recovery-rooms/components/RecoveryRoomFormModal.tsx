@@ -28,7 +28,6 @@ import {
   getGraftingOperationsForDropdown,
   updateRecoveryRoom,
 } from "@/features/recovery-rooms/actions";
-import GreenhouseButton from "@/shared/components/GreenhouseButton";
 
 import QRCodeCanvas from "@/shared/components/QRCodeCanvas";
 import { EditOutlined, UserOutlined } from "@ant-design/icons";
@@ -316,7 +315,7 @@ export default function RecoveryRoomFormModal({
                     value={publicOrderUrl(selectedOpDetails.OrderID)}
                     size={80}
                   />
-                  <span className="text-[11px] text-slate-500 mt-2 font-mono break-all text-center max-w-[100px]">
+                  <span className="text-[11px] text-slate-600 mt-2 dark:text-slate-300 font-mono break-all text-center max-w-[100px]">
                     {selectedOpDetails.OrderCode}
                   </span>
                 </div>
@@ -403,7 +402,7 @@ export default function RecoveryRoomFormModal({
                         </div>
 
                         <div className="col-span-1 md:col-span-3 flex justify-between md:justify-center items-center">
-                          <span className="md:hidden text-xs font-semibold text-slate-400">
+                          <span className="md:hidden text-xs font-semibold text-slate-600 dark:text-slate-300">
                             کد فعالیت:
                           </span>
                           <span className="px-4 py-1.5 rounded-xl bg-emerald-50/50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 text-xs font-black border border-emerald-100/50 dark:border-emerald-800/50 shadow-sm min-w-[60px] text-center">
@@ -444,7 +443,7 @@ export default function RecoveryRoomFormModal({
                     </div>
                   )}
                   {fields.length === 0 && (
-                    <div className="text-center text-slate-400 py-4">
+                    <div className="text-center text-slate-600 py-4 dark:text-slate-300">
                       سفارشی انتخاب نشده است
                     </div>
                   )}
@@ -454,20 +453,12 @@ export default function RecoveryRoomFormModal({
           </Form.List>
         </div>
 
-        <FormActions message={message}>
-          <GreenhouseButton
-            text="ثبت"
-            variant="primary"
-            type="submit"
-            loading={internalLoading}
-          />
-          <GreenhouseButton
-            text="انصراف"
-            variant="secondary"
-            onClick={handleClose}
-            disabled={internalLoading}
-          />
-        </FormActions>
+        <FormActions
+          message={message}
+          onCancel={handleClose}
+          loading={internalLoading}
+          editing={isEditMode}
+        />
       </Form>
     </Modal>
   );

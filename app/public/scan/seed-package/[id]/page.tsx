@@ -3,6 +3,7 @@ import { getSeedPackageById } from "@/features/seed-packages/server/queries";
 import { supplierName } from "@/features/suppliers/domain/name";
 import QRCodeCanvas from "@/shared/components/QRCodeCanvas";
 import { publicSeedPackageUrl } from "@/shared/config/public-urls";
+import { toPersianDigits } from "@/shared/utils/digits";
 import { notFound } from "next/navigation";
 
 export default async function PublicSeedPackagePage({
@@ -18,9 +19,9 @@ export default async function PublicSeedPackagePage({
   }
 
   return (
-    <div className="min-h-dvh bg-slate-50 flex flex-col items-center p-3 sm:p-6 [overflow-wrap:anywhere] font-Iransans">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-lg overflow-hidden">
-        <div className="bg-emerald-600 p-6 text-center">
+    <div className="min-h-dvh flex flex-col items-center p-3 sm:p-6 [overflow-wrap:anywhere]">
+      <div className="w-full max-w-md overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg dark:border-slate-700 dark:bg-slate-900">
+        <div className="bg-emerald-800 p-6 text-center">
           <h1 className="text-white text-xl font-bold mb-1">
             شناسنامه دیجیتال بذر
           </h1>
@@ -47,11 +48,11 @@ export default async function PublicSeedPackagePage({
             />
             <InfoRow
               label="تعداد بذر"
-              value={pkg.SeedCount ? `${pkg.SeedCount} عدد` : "-"}
+              value={pkg.SeedCount != null ? `${pkg.SeedCount} عدد` : "-"}
             />
             <InfoRow
               label="وزن بسته"
-              value={pkg.WeightGram ? `${pkg.WeightGram} گرم` : "-"}
+              value={pkg.WeightGram != null ? `${pkg.WeightGram} گرم` : "-"}
             />
             <InfoRow label="نوع بسته‌بندی" value={pkg.PackageType} />
             <InfoRow
@@ -69,15 +70,17 @@ export default async function PublicSeedPackagePage({
             <InfoRow label="درجه کیفی" value={pkg.QualityGrade} />
             <InfoRow
               label="درصد جوانه زنی"
-              value={pkg.GerminationRate ? `${pkg.GerminationRate}%` : "-"}
+              value={
+                pkg.GerminationRate != null ? `${pkg.GerminationRate}٪` : "-"
+              }
             />
             <InfoRow
               label="درصد خلوص"
-              value={pkg.PurityPercent ? `${pkg.PurityPercent}%` : "-"}
+              value={pkg.PurityPercent != null ? `${pkg.PurityPercent}٪` : "-"}
             />
 
             <div
-              className={`mt-6 p-3 rounded-lg text-center font-bold text-sm ${pkg.IsCertified ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`}
+              className={`mt-6 p-3 rounded-lg text-center font-bold text-sm ${pkg.IsCertified ? "bg-emerald-50 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200" : "bg-amber-50 text-amber-800 dark:bg-amber-950 dark:text-amber-200"}`}
             >
               {pkg.IsCertified
                 ? "✓ دارای گواهی اصالت و سلامت"
@@ -86,7 +89,7 @@ export default async function PublicSeedPackagePage({
           </div>
         </div>
 
-        <div className="bg-slate-50 p-4 text-center text-xs text-slate-400">
+        <div className="bg-slate-50 p-4 text-center text-xs text-slate-600 dark:bg-slate-800 dark:text-slate-300">
           فکور پیوند آریا
         </div>
       </div>
@@ -103,9 +106,13 @@ function InfoRow({
 }) {
   if (!value) return null;
   return (
-    <div className="flex justify-between items-center border-b border-slate-100 pb-2 last:border-0">
-      <span className="text-slate-500 text-sm">{label}</span>
-      <span className="text-slate-800 font-semibold">{value}</span>
+    <div className="flex items-start justify-between gap-3 border-b border-slate-100 pb-2 last:border-0 dark:border-slate-700">
+      <span className="text-sm text-slate-600 dark:text-slate-300">
+        {label}
+      </span>
+      <span className="text-end font-semibold text-slate-800 dark:text-slate-100">
+        {toPersianDigits(value)}
+      </span>
     </div>
   );
 }

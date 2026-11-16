@@ -31,8 +31,6 @@ import { publicOrderUrl } from "@/shared/config/public-urls";
 
 import Modal from "@/shared/components/FormModal";
 
-import GreenhouseButton from "@/shared/components/GreenhouseButton";
-
 import { PlusOutlined } from "@ant-design/icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -334,7 +332,7 @@ export default function StartSeedlingCycleFormModal({
                     style={{ imageRendering: "pixelated" }}
                   />
                 </div>
-                <span className="text-xs font-mono font-bold text-slate-500 mt-2 bg-slate-100 px-2 py-0.5 rounded">
+                <span className="text-xs font-mono font-bold text-slate-600 mt-2 bg-slate-100 px-2 py-0.5 rounded dark:bg-slate-800 dark:text-slate-200">
                   {selectedOrder.label}
                 </span>
               </div>
@@ -379,7 +377,7 @@ export default function StartSeedlingCycleFormModal({
                 </>
               )}
             />
-            <p className="text-[11px] text-slate-400 mt-1 mr-1">
+            <p className="text-[11px] text-slate-600 mt-1 mr-1 dark:text-slate-300">
               بعد از انتخاب، تاریخ ورود به گلخانه بصورت خودکار تکمیل می‌شود
             </p>
           </div>
@@ -532,20 +530,10 @@ export default function StartSeedlingCycleFormModal({
               ? { status: "error", message: INVALID_FORM_MESSAGE }
               : null)
           }
-        >
-          <GreenhouseButton
-            text="انصراف"
-            variant="secondary"
-            onClick={handleClose}
-            disabled={loading}
-          />
-          <GreenhouseButton
-            text={loading ? "در حال ثبت..." : isEdit ? "ویرایش" : "ثبت"}
-            variant="primary"
-            type="submit"
-            loading={loading}
-          />
-        </FormActions>
+          onCancel={handleClose}
+          loading={loading}
+          editing={isEdit}
+        />
       </form>
     </Modal>
   );

@@ -11,10 +11,8 @@ import type { WarehouseRecord } from "../types/record";
 import { deleteWarehouse } from "@/features/warehouses/actions";
 import DeleteModal from "@/shared/components/DeleteModal";
 import InsertionRow from "@/shared/components/InsertionRow";
-import Table from "@/shared/components/Table";
+import Table, { detailsColumn } from "@/shared/components/Table";
 import TableActions from "@/shared/components/TableActions";
-import { InfoCircleOutlined } from "@ant-design/icons";
-import { Button, Tooltip } from "antd";
 import { download, generateCsv, mkConfig } from "export-to-csv";
 import { useState } from "react";
 import { headers, warehousesCSVData } from "../exports/csv";
@@ -50,25 +48,9 @@ export default function WarehousesTable({
   }>({ open: false, data: null });
 
   const columns = [
-    {
-      title: "جزئیات",
-      key: "details",
-      width: 80,
-      align: "center" as const,
-      render: (_: unknown, record: WarehouseRecord) => (
-        <Tooltip title="مشاهده جزئیات">
-          <Button
-            type="text"
-            icon={
-              <InfoCircleOutlined
-                style={{ color: "#3b82f6", fontSize: "18px" }}
-              />
-            }
-            onClick={() => setDetailModal({ open: true, data: record })}
-          />
-        </Tooltip>
-      ),
-    },
+    detailsColumn<WarehouseRecord>((record) =>
+      setDetailModal({ open: true, data: record }),
+    ),
     { title: "کد انبار", dataIndex: "WarehouseCode", key: "WarehouseCode" },
     { title: "نام انبار", dataIndex: "WarehouseName", key: "WarehouseName" },
     {
@@ -149,7 +131,6 @@ export default function WarehousesTable({
         dataSource={data}
         loading={loading}
         rowKey="ID"
-        pagination={{ pageSize: 5 }}
       />
 
       <WarehousesInsUpModal

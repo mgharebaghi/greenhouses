@@ -18,14 +18,9 @@ import type { SeedPlantingRecord } from "@/features/seed-planting/types/record";
 import DeleteModal, { DeleteModalProps } from "@/shared/components/DeleteModal";
 import DetailModal, { InfoCard } from "@/shared/components/DetailModal";
 import InsertionRow from "@/shared/components/InsertionRow";
-import Table from "@/shared/components/Table";
+import Table, { detailsColumn } from "@/shared/components/Table";
 import TableActions from "@/shared/components/TableActions";
-import {
-  AppstoreOutlined,
-  ExperimentOutlined,
-  InfoCircleOutlined,
-} from "@ant-design/icons";
-import { Button } from "antd";
+import { AppstoreOutlined, ExperimentOutlined } from "@ant-design/icons";
 import { download, generateCsv, mkConfig } from "export-to-csv";
 import { useState } from "react";
 import SeedPlantingFormModal from "./SeedPlantingFormModal";
@@ -95,26 +90,10 @@ export default function SeedPlantingTable({
     return packageData;
   };
   const columns: Column<SeedPlantingDetails>[] = [
-    {
-      title: "جزئیات",
-      key: "details",
-      width: 80,
-      align: "center",
-      render: (_: unknown, record: SeedPlantingDetails) => (
-        <Button
-          type="text"
-          icon={
-            <InfoCircleOutlined
-              style={{ fontSize: "18px", color: "#10b981" }}
-            />
-          }
-          onClick={() => {
-            setViewRecord(record);
-            setViewModal(true);
-          }}
-        />
-      ),
-    },
+    detailsColumn<SeedPlantingDetails>((record) => {
+      setViewRecord(record);
+      setViewModal(true);
+    }),
     {
       title: "کد سفارش",
       dataIndex: "Tbl_Orders",
@@ -168,7 +147,7 @@ export default function SeedPlantingTable({
       key: "SeedPlantingNumber",
       render: (val: number) => (
         <span className="text-slate-600 font-mono">
-          {val ? val.toLocaleString() : "-"}
+          {val != null ? val.toLocaleString() : "-"}
         </span>
       ),
     },
@@ -275,14 +254,11 @@ export default function SeedPlantingTable({
           onClose={() => setViewModal(false)}
           title={`جزئیات کشت - سفارش ${viewRecord.Tbl_Orders?.OrderCode || ""}`}
           icon={<ExperimentOutlined />}
-          gradientFrom="emerald"
-          gradientTo="teal"
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <InfoCard
               title="اطلاعات کلی کشت"
               icon={<ExperimentOutlined />}
-              color="#10b981"
               items={[
                 { label: "کد سفارش", value: viewRecord.Tbl_Orders?.OrderCode },
                 {
@@ -322,7 +298,6 @@ export default function SeedPlantingTable({
             <InfoCard
               title="اطلاعات سینی و بستر"
               icon={<AppstoreOutlined />}
-              color="#0ea5e9"
               items={[
                 { label: "تعداد سینی", value: viewRecord.TrayNumber },
                 {
@@ -350,7 +325,6 @@ export default function SeedPlantingTable({
                   <InfoCard
                     title="اطلاعات بسته بذر"
                     icon={<AppstoreOutlined />} // You might want a different icon like DatabaseOutlined or FileTextOutlined
-                    color="#8b5cf6" // Violet color
                     items={[
                       {
                         label: "شرکت تولید کننده",

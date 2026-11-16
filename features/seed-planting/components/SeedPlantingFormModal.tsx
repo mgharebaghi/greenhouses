@@ -30,7 +30,6 @@ import {
   updateSeedPlanting,
 } from "@/features/seed-planting/actions";
 import type { SeedPlantingRecord } from "@/features/seed-planting/types/record";
-import GreenhouseButton from "@/shared/components/GreenhouseButton";
 
 import { ExperimentOutlined } from "@ant-design/icons";
 
@@ -358,7 +357,7 @@ export default function SeedPlantingFormModal({
                     style={{ imageRendering: "pixelated" }}
                   />
                 </div>
-                <span className="text-xs font-mono font-bold text-slate-500 mt-2 bg-slate-100 px-2 py-0.5 rounded">
+                <span className="text-xs font-mono font-bold text-slate-600 mt-2 bg-slate-100 px-2 py-0.5 rounded dark:bg-slate-800 dark:text-slate-200">
                   {selectedOrder.OrderCode}
                 </span>
               </div>
@@ -487,20 +486,12 @@ export default function SeedPlantingFormModal({
         </FormGrid>
 
         {/* Actions */}
-        <FormActions message={modalMsg}>
-          <GreenhouseButton
-            text="انصراف"
-            variant="secondary"
-            onClick={handleClose}
-            disabled={loading}
-          />
-          <GreenhouseButton
-            text={loading ? "در حال ثبت..." : isEdit ? "ویرایش" : "ثبت"}
-            variant="primary"
-            type="submit"
-            loading={loading}
-          />
-        </FormActions>
+        <FormActions
+          message={modalMsg}
+          onCancel={handleClose}
+          loading={loading}
+          editing={isEdit}
+        />
       </Form>
     </Modal>
   );

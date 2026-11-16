@@ -1,6 +1,7 @@
 "use client";
 
 import DetailModal, { InfoCard } from "@/shared/components/DetailModal";
+import PhoneNumberText from "@/shared/components/PhoneNumberText";
 import {
   DashboardOutlined,
   PhoneOutlined,
@@ -27,13 +28,10 @@ export default function PersonDetailModal({
       onClose={onClose}
       title="اطلاعات کامل شخص"
       icon={<ProfileOutlined />}
-      gradientFrom="emerald"
-      gradientTo="teal"
     >
       <InfoCard
         icon={<DashboardOutlined />}
         title="اطلاعات کلی"
-        color="#10b981"
         items={[
           { label: "نوع شخص", value: data.Legal ? "حقوقی" : "حقیقی" },
           ...(data.Legal
@@ -64,9 +62,11 @@ export default function PersonDetailModal({
       <InfoCard
         icon={<PhoneOutlined />}
         title="اطلاعات تماس"
-        color="#82a7d1ff"
         items={[
-          { label: "تلفن", value: data.PhoneNumber },
+          {
+            label: "تلفن",
+            value: <PhoneNumberText value={data.PhoneNumber} />,
+          },
           { label: "ایمیل", value: data.EmailAddress },
         ]}
       />

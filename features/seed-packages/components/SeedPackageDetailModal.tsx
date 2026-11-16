@@ -4,7 +4,10 @@ import { formatPersianDate } from "@/shared/dates/calendar";
 
 import type { SeedPackageDetails } from "../types/details";
 
-import DetailModal, { InfoCard } from "@/shared/components/DetailModal";
+import DetailModal, {
+  DetailIdentity,
+  InfoCard,
+} from "@/shared/components/DetailModal";
 import {
   CalendarOutlined,
   DashboardOutlined,
@@ -31,27 +34,18 @@ export default function SeedPackageDetailModal({
       onClose={onClose}
       title="جزئیات بسته بذر"
       icon={<ExperimentOutlined />}
-      gradientFrom="emerald"
-      gradientTo="teal"
     >
-      {/* Header Section */}
-      <div className="flex justify-between items-start mb-6 bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700">
-        <div>
-          <h4 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-1">
-            {data.SerialNumber}
-          </h4>
-          <p className="text-slate-500 dark:text-slate-400 text-sm">
-            شناسه سیستم: {data.ID}
-          </p>
-        </div>
-      </div>
+      <DetailIdentity
+        label="شماره سریال"
+        code={data.SerialNumber}
+        id={data.ID}
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* اطلاعات محصول */}
         <InfoCard
           title="اطلاعات محصول"
           icon={<DashboardOutlined />}
-          color="#10b981"
           items={[
             {
               label: "تامین کننده",
@@ -66,6 +60,10 @@ export default function SeedPackageDetailModal({
               label: "واریته",
               value: data.Tbl_plantVariety?.VarietyName || "—",
             },
+            {
+              label: "نوع گیاه",
+              value: data.Tbl_plantVariety?.Tbl_Plants?.CommonName,
+            },
             { label: "نوع بسته", value: data.PackageType },
           ]}
         />
@@ -74,15 +72,18 @@ export default function SeedPackageDetailModal({
         <InfoCard
           title="کنترل کیفیت"
           icon={<SafetyCertificateOutlined />}
-          color="#f59e0b"
           items={[
             {
               label: "نرخ جوانه زنی",
-              value: data.GerminationRate ? `${data.GerminationRate} %` : "—",
+              value:
+                data.GerminationRate != null
+                  ? `${data.GerminationRate} %`
+                  : "—",
             },
             {
               label: "درصد خلوص",
-              value: data.PurityPercent ? `${data.PurityPercent} %` : "—",
+              value:
+                data.PurityPercent != null ? `${data.PurityPercent} %` : "—",
             },
             { label: "درجه کیفی", value: data.QualityGrade },
             {
@@ -96,23 +97,24 @@ export default function SeedPackageDetailModal({
         <InfoCard
           title="مقادیر و بسته‌بندی"
           icon={<ExperimentOutlined />}
-          color="#8b5cf6"
           items={[
             {
               label: "تعداد کل بسته‌ها",
-              value: data.PackageNumber
-                ? `${data.PackageNumber.toLocaleString()} عدد`
-                : "—",
+              value:
+                data.PackageNumber != null
+                  ? `${data.PackageNumber.toLocaleString()} عدد`
+                  : "—",
             },
             {
               label: "تعداد بذر در بسته",
-              value: data.SeedCount
-                ? `${data.SeedCount.toLocaleString()} عدد`
-                : "—",
+              value:
+                data.SeedCount != null
+                  ? `${data.SeedCount.toLocaleString()} عدد`
+                  : "—",
             },
             {
               label: "وزن هر بسته",
-              value: data.WeightGram ? `${data.WeightGram} گرم` : "—",
+              value: data.WeightGram != null ? `${data.WeightGram} گرم` : "—",
             },
           ]}
         />
@@ -121,7 +123,6 @@ export default function SeedPackageDetailModal({
         <InfoCard
           title="اطلاعات زمان‌بندی"
           icon={<CalendarOutlined />}
-          color="#3b82f6"
           items={[
             {
               label: "تاریخ تولید",

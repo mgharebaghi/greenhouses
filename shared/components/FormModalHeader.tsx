@@ -1,5 +1,6 @@
 import { CloseOutlined } from "@ant-design/icons";
 import type { ReactNode } from "react";
+import GreenhouseButton from "./GreenhouseButton";
 
 export default function FormModalHeader({
   heading,
@@ -32,14 +33,12 @@ export default function FormModalHeader({
           </p>
         )}
       </div>
-      <button
-        type="button"
+      <GreenhouseButton
         onClick={onClose}
-        className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
         aria-label="بستن"
-      >
-        <CloseOutlined />
-      </button>
+        variant="secondary"
+        icon={<CloseOutlined />}
+      />
     </header>
   );
 }

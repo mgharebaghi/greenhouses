@@ -1,5 +1,7 @@
 import { z } from "zod";
 import { recordIdSchema } from "@/shared/validation/input";
+import { toLatinDigits } from "@/shared/utils/digits";
+import { normalizeIranianPhone } from "@/shared/utils/phone";
 
 export const LEGAL_PERSON_POST_ID = 13;
 
@@ -15,7 +17,7 @@ const databaseItemsSchema = z.object({
   LastName: z.string().nullable(),
   PersonCode: z.string().nullable(),
   NationalCode: z.string().nullable(),
-  PhoneNumber: z.string().nullable(),
+  PhoneNumber: z.string().transform(normalizeIranianPhone).nullable(),
   EmailAddress: z.string().nullable(),
   Profession: z.string().nullable(),
   CompanyName: z.string().nullable(),
@@ -47,7 +49,8 @@ export const commonPersonFields = {
     .string({ error: "شماره تماس الزامی است" })
     .trim()
     .min(10, "شماره تماس حداقل ۱۰ کاراکتر باشد")
-    .max(150, "شماره تماس حداکثر ۱۵۰ کاراکتر باشد"),
+    .max(150, "شماره تماس حداکثر ۱۵۰ کاراکتر باشد")
+    .transform(normalizeIranianPhone),
   EmailAddress: nullableText(
     z
       .string()
@@ -76,7 +79,8 @@ export const naturalPersonFields = {
   NationalCode: z
     .string({ error: "کد ملی الزامی است" })
     .trim()
-    .regex(/^[0-9]{10}$/, "کد ملی باید دقیقاً ۱۰ رقم انگلیسی باشد"),
+    .transform(toLatinDigits)
+    .pipe(z.string().regex(/^[0-9]{10}$/, "کد ملی باید دقیقاً ۱۰ رقم باشد")),
   PostID: recordIdSchema.refine(
     (id) => id !== LEGAL_PERSON_POST_ID,
     "سمت شخصیت حقوقی فقط برای شخص حقوقی قابل انتخاب است",
@@ -88,11 +92,7 @@ export const legalPersonFields = {
     .string({ error: "شناسه ملی الزامی است" })
     .trim()
     .regex(/^[0-9۰-۹٠-٩]{1,11}$/, "شناسه ملی باید بین ۱ تا ۱۱ رقم باشد")
-    .transform((code) =>
-      code.replace(/[۰-۹٠-٩]/g, (digit) =>
-        String("۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩".indexOf(digit) % 10),
-      ),
-    ),
+    .transform(toLatinDigits),
   CompanyName: z
     .string({ error: "نام شرکت الزامی است" })
     .trim()

@@ -1,4 +1,6 @@
 import { recordIdSchema } from "@/shared/validation/input";
+import { toLatinDigits } from "@/shared/utils/digits";
+import { normalizeIranianPhone } from "@/shared/utils/phone";
 import { z } from "zod";
 
 const optionalSupplierText = (length: number) =>
@@ -9,7 +11,18 @@ const optionalSupplierText = (length: number) =>
     .nullish()
     .transform((value) => (value === "" ? null : value));
 
-export const supplierInputSchema = z.object({
+export function supplierPhoneNumber(
+  phone: string,
+  country: string | null | undefined,
+) {
+  const isIran =
+    /^(?:ایران|ايران|جمهوری اسلامی ایران|iran|islamic republic of iran)$/i.test(
+      country?.trim() ?? "",
+    );
+  return isIran ? normalizeIranianPhone(phone) : toLatinDigits(phone);
+}
+
+export const supplierFieldsSchema = z.object({
   People_CompaniesID: recordIdSchema,
   CompanyName: optionalSupplierText(150),
   BrandName: optionalSupplierText(150),
@@ -26,4 +39,9 @@ export const supplierInputSchema = z.object({
     .transform((value) => (value === "" ? null : value)),
   LicenseNumber: optionalSupplierText(50),
 });
+
+export const supplierInputSchema = supplierFieldsSchema.transform((input) => ({
+  ...input,
+  ContactTel: supplierPhoneNumber(input.ContactTel, input.SupplierCountry),
+}));
 export type SupplierInput = z.infer<typeof supplierInputSchema>;

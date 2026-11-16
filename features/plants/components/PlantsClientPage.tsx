@@ -2,8 +2,6 @@
 
 import PlantsTable from "@/features/plants/components/PlantsTable";
 import type { PlantRecord } from "@/features/plants/types/record";
-import PageHeader from "@/shared/components/PageHeader";
-import { FileTextOutlined } from "@ant-design/icons";
 import { useState } from "react";
 
 export default function PlantsClientPage({
@@ -15,11 +13,6 @@ export default function PlantsClientPage({
   const [loading, setLoading] = useState(false);
   return (
     <div className="dashboard-page">
-      <PageHeader
-        title="انواع گیاه"
-        subtitle="مدیریت اطلاعات پایه انواع گیاه"
-        icon={<FileTextOutlined />}
-      />
       <div className="w-full">
         <PlantsTable
           data={data}

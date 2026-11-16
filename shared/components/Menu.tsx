@@ -1,5 +1,6 @@
 "use client";
 
+import GreenhouseButton from "./GreenhouseButton";
 import { formatPersianDate, formatTehranTime } from "@/shared/dates/calendar";
 import { useServerDay, useServerTime } from "@/shared/dates/ServerClock";
 import {
@@ -229,14 +230,13 @@ export default function DashboardMenu({
               مدیر سیستم
             </p>
           </div>
-          <button
-            type="button"
+          <GreenhouseButton
             onClick={onClose}
             aria-label="بستن منو"
-            className={`grid size-9 shrink-0 cursor-pointer place-items-center rounded-xl border border-white/15 bg-white/8 text-emerald-50 transition-colors hover:border-white/35 hover:bg-white/20 ${focusStyle}`}
-          >
-            <CloseOutlined aria-hidden />
-          </button>
+            variant="ghost"
+            icon={<CloseOutlined />}
+            className="text-white [--button-hover:rgb(255_255_255/0.16)]"
+          />
         </header>
 
         <nav
@@ -251,7 +251,7 @@ export default function DashboardMenu({
                 ? pathname === page
                 : activeGroup === item.title;
               const submenuId = `dashboard-submenu-${index}`;
-              const itemStyle = `group flex min-h-12 w-full items-center gap-3 rounded-xl px-2.5 py-1.5 text-start text-sm transition-colors ${focusStyle}`;
+              const itemStyle = `group flex min-h-12 w-full items-center gap-3 rounded-xl px-2.5 py-1.5 text-start text-sm motion-safe:transition-colors motion-safe:duration-200 motion-safe:ease-[var(--button-ease)] ${focusStyle}`;
               const mainItemStyle = isActive
                 ? page
                   ? currentPageStyle
@@ -295,14 +295,14 @@ export default function DashboardMenu({
                     </Link>
                   ) : (
                     <>
-                      <button
-                        type="button"
+                      <GreenhouseButton
+                        variant="ghost"
                         aria-expanded={isExpanded}
                         aria-controls={submenuId}
                         onClick={() =>
                           setExpandedTitle(isExpanded ? null : item.title)
                         }
-                        className={`cursor-pointer ${itemStyle} ${mainItemStyle}`}
+                        className={`justify-start ${itemStyle} ${mainItemStyle}`}
                       >
                         {itemContent}
                         <span
@@ -313,7 +313,7 @@ export default function DashboardMenu({
                             className={`motion-safe:transition-transform ${isExpanded ? "rotate-180" : ""}`}
                           />
                         </span>
-                      </button>
+                      </GreenhouseButton>
                       <ul
                         id={submenuId}
                         hidden={!isExpanded}
@@ -382,17 +382,14 @@ export default function DashboardMenu({
             </span>
           </div>
 
-          <button
-            type="button"
+          <GreenhouseButton
             onClick={handleLogout}
-            className={`group flex min-h-10 w-full cursor-pointer items-center gap-2.5 rounded-xl border border-rose-200 bg-rose-50/65 px-2.5 py-1.5 text-start text-sm font-semibold text-rose-800 transition-colors hover:border-rose-300 hover:bg-rose-100 dark:border-rose-900/70 dark:bg-rose-950/35 dark:text-rose-300 dark:hover:bg-rose-950/80 ${focusStyle}`}
-          >
-            <LogoutOutlined
-              aria-hidden
-              className="grid size-8 shrink-0 place-items-center rounded-lg bg-rose-100 transition-colors group-hover:bg-rose-200 dark:bg-rose-900/50 dark:group-hover:bg-rose-900"
-            />
-            خروج از حساب کاربری
-          </button>
+            text="خروج از حساب کاربری"
+            icon={<LogoutOutlined />}
+            variant="danger-soft"
+            fullWidth
+            className="justify-start"
+          />
         </footer>
       </div>
     </Drawer>

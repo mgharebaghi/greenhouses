@@ -28,7 +28,6 @@ import { getLegacyPersonOptions } from "@/features/people/actions";
 import { getAllSeedPackages } from "@/features/seed-packages/actions";
 import { getSuppliers } from "@/features/suppliers/actions";
 import { supplierName } from "@/features/suppliers/domain/name";
-import GreenhouseButton from "@/shared/components/GreenhouseButton";
 
 import { CheckCircleOutlined, PlusOutlined } from "@ant-design/icons";
 
@@ -285,12 +284,14 @@ export default function OrdersFormModal({
   const renderInfoCard = (label: string, value: string | null | undefined) => {
     if (!value) return null;
     return (
-      <div className="mt-2 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-lg px-3 py-1.5 flex items-center justify-between shadow-sm animate-fadeIn">
+      <div className="mt-2 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-lg px-3 py-1.5 flex items-center justify-between shadow-sm animate-fadeIn dark:border-sky-800 dark:from-sky-950 dark:to-slate-900">
         <div className="flex items-center gap-2">
-          <CheckCircleOutlined className="text-blue-500 text-xs" />
-          <span className="text-xs text-blue-600 font-bold">{label}</span>
+          <CheckCircleOutlined className="text-blue-600 text-xs dark:text-sky-300" />
+          <span className="text-xs text-blue-700 font-bold dark:text-sky-200">
+            {label}
+          </span>
         </div>
-        <span className="text-sm font-mono font-bold text-slate-700 tracking-wider bg-white/50 px-2 rounded">
+        <span className="text-sm font-mono font-bold text-slate-700 tracking-wider bg-white/50 px-2 rounded dark:bg-slate-800 dark:text-slate-100">
           {value}
         </span>
       </div>
@@ -442,20 +443,12 @@ export default function OrdersFormModal({
           handleScionChange,
         )}
 
-        <FormActions message={message}>
-          <GreenhouseButton
-            text="انصراف"
-            variant="secondary"
-            onClick={handleClose}
-            disabled={internalLoading}
-          />
-          <GreenhouseButton
-            text="ثبت سفارش"
-            variant="primary"
-            type="submit"
-            loading={internalLoading}
-          />
-        </FormActions>
+        <FormActions
+          message={message}
+          onCancel={handleClose}
+          loading={internalLoading}
+          editing={isEditMode}
+        />
       </Form>
     </Modal>
   );

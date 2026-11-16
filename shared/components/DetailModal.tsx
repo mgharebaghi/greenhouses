@@ -1,15 +1,14 @@
 import { CloseOutlined } from "@ant-design/icons";
-import Modal from "@/shared/components/ResponsiveModal";
-import { Card } from "antd";
-import { ReactNode } from "react";
+import { toPersianDigits } from "@/shared/utils/digits";
+import { useId, type ReactNode } from "react";
+import ResponsiveModal from "./ResponsiveModal";
+import GreenhouseButton from "./GreenhouseButton";
 
 interface DetailModalProps {
   open: boolean;
   onClose: () => void;
   title: string;
   icon?: ReactNode;
-  gradientFrom: string;
-  gradientTo: string;
   children: ReactNode;
   width?: string | number;
 }
@@ -17,170 +16,131 @@ interface DetailModalProps {
 interface InfoCardProps {
   title: string;
   icon: ReactNode;
-  color: string;
   items: { label: string; value: ReactNode; span?: boolean }[];
 }
 
-export const InfoCard = ({ title, icon, color, items }: InfoCardProps) => (
-  <Card
-    className="shadow-sm hover:shadow-md transition-shadow dark:bg-slate-800 dark:border-slate-700"
-    styles={{
-      header: {
-        background: `linear-gradient(135deg, ${color}15 0%, ${color}05 100%)`, // Keep subtle for light mode
-        borderBottom: `1px solid ${color}30`,
-      },
-      body: { padding: "16px" },
-    }}
-    variant="borderless"
-    title={
-      <div className="flex items-center gap-2">
-        <span style={{ color }} className="dark:brightness-125 transition-all">
+export function InfoCard({ title, icon, items }: InfoCardProps) {
+  const heading = useId();
+  return (
+    <section
+      aria-labelledby={heading}
+      className="record-detail-section min-w-0 rounded-xl border"
+    >
+      <h3
+        id={heading}
+        className="record-detail-section-title flex items-center gap-2.5 rounded-t-xl border-b px-3 py-2.5 text-sm font-bold sm:px-4"
+      >
+        <span
+          aria-hidden
+          className="shrink-0 text-emerald-700 dark:text-emerald-300"
+        >
           {icon}
         </span>
-        <span className="font-semibold text-slate-800 dark:text-slate-200">
-          {title}
-        </span>
-      </div>
-    }
-  >
-    <div className="space-y-3">
-      {items.map((item, idx) => (
-        <div
-          key={idx}
-          className={`flex ${item.span ? "flex-col gap-1" : "items-baseline justify-between gap-3"} ${
-            idx !== items.length - 1
-              ? "pb-3 border-b border-slate-100 dark:border-slate-700"
-              : ""
-          }`}
-        >
-          <span className="min-w-0 text-sm text-slate-600 dark:text-slate-400">
-            {item.label}
-          </span>
-          <span
-            className={`min-w-0 [overflow-wrap:anywhere] text-end font-bold text-slate-900 dark:text-slate-100 ${item.span ? "text-sm" : ""}`}
+        {title}
+      </h3>
+      <dl className="record-detail-fields grid gap-x-4 px-3 py-1 sm:px-4">
+        {items.map(({ label, value, span }) => (
+          <div
+            key={label}
+            className={`min-w-0 py-2 ${span ? "col-span-full" : ""}`}
           >
-            {item.value ?? "—"}
-          </span>
-        </div>
-      ))}
-    </div>
-  </Card>
-);
+            <dt className="record-detail-label text-xs leading-5">{label}</dt>
+            <dd className="min-w-0 text-sm leading-6 font-semibold [overflow-wrap:anywhere]">
+              {typeof value === "string" ||
+              typeof value === "number" ||
+              typeof value === "bigint"
+                ? toPersianDigits(value) || "—"
+                : (value ?? "—")}
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+  );
+}
 
-// Safelist keys for Tailwind
-const themeConfig: Record<
-  string,
-  {
-    headerBg: string;
-    iconBg: string;
-    closeBtnHover: string;
-    iconColor: string;
-  }
-> = {
-  purple: {
-    headerBg: "from-purple-50/80 via-indigo-50/60",
-    iconBg: "from-purple-500 to-indigo-600",
-    closeBtnHover: "hover:bg-purple-50 dark:hover:bg-purple-900/20",
-    iconColor: "text-purple-600 dark:text-purple-500",
-  },
-  indigo: {
-    headerBg: "from-indigo-50/80 via-blue-50/60",
-    iconBg: "from-indigo-500 to-blue-600",
-    closeBtnHover: "hover:bg-indigo-50 dark:hover:bg-indigo-900/20",
-    iconColor: "text-indigo-600 dark:text-indigo-500",
-  },
-  emerald: {
-    headerBg: "from-emerald-50/80 via-teal-50/60",
-    iconBg: "from-emerald-500 to-teal-600",
-    closeBtnHover: "hover:bg-emerald-50 dark:hover:bg-emerald-900/20",
-    iconColor: "text-emerald-600 dark:text-emerald-500",
-  },
-  blue: {
-    headerBg: "from-blue-50/80 via-sky-50/60",
-    iconBg: "from-blue-500 to-sky-600",
-    closeBtnHover: "hover:bg-blue-50 dark:hover:bg-blue-900/20",
-    iconColor: "text-blue-600 dark:text-blue-500",
-  },
-  orange: {
-    headerBg: "from-orange-50/80 via-amber-50/60",
-    iconBg: "from-orange-500 to-amber-600",
-    closeBtnHover: "hover:bg-orange-50 dark:hover:bg-orange-900/20",
-    iconColor: "text-orange-600 dark:text-orange-500",
-  },
-  teal: {
-    headerBg: "from-teal-50/80 via-emerald-50/60",
-    iconBg: "from-teal-500 to-emerald-600",
-    closeBtnHover: "hover:bg-teal-50 dark:hover:bg-teal-900/20",
-    iconColor: "text-teal-600 dark:text-teal-500",
-  },
-};
+export function DetailIdentity({
+  label,
+  code,
+  id,
+  children,
+}: {
+  label: string;
+  code: string | null | undefined;
+  id: number;
+  children?: ReactNode;
+}) {
+  return (
+    <section className="record-detail-section flex min-w-0 items-center gap-4 rounded-xl border p-3 sm:px-4">
+      {children && (
+        <div className="shrink-0 rounded-lg bg-white p-1.5">{children}</div>
+      )}
+      <dl className="min-w-0 flex-1">
+        <div>
+          <dt className="record-detail-label text-xs">{label}</dt>
+          <dd className="text-base font-bold">
+            <bdi>{code ? toPersianDigits(code) : "—"}</bdi>
+          </dd>
+        </div>
+        <div className="mt-1.5">
+          <dt className="record-detail-label text-xs">شناسهٔ سیستم</dt>
+          <dd className="text-sm font-semibold">{toPersianDigits(id)}</dd>
+        </div>
+      </dl>
+    </section>
+  );
+}
 
 export default function DetailModal({
   open,
   onClose,
   title,
   icon,
-  gradientFrom,
   children,
-  width,
+  width = 880,
 }: DetailModalProps) {
-  // Fallback to 'emerald' or use the provided 'gradientFrom' as key
-  const theme = themeConfig[gradientFrom] || themeConfig["emerald"];
-  const modalWidth = width || 1100;
-
   return (
-    <Modal
-      title={null}
+    <ResponsiveModal
+      className="record-detail-dialog"
+      title={
+        <div className="record-detail-heading flex min-w-0 items-center gap-3 px-3.5 py-3 sm:px-5">
+          {icon && (
+            <span
+              aria-hidden
+              className="grid size-9 shrink-0 place-items-center rounded-lg bg-emerald-100 text-lg text-emerald-800 dark:bg-emerald-900 dark:text-emerald-100"
+            >
+              {icon}
+            </span>
+          )}
+          <h2 className="min-w-0 flex-1 text-base leading-6 font-bold sm:text-lg">
+            {toPersianDigits(title)}
+          </h2>
+          <GreenhouseButton
+            onClick={onClose}
+            aria-label="بستن جزئیات"
+            variant="secondary"
+            icon={<CloseOutlined />}
+          />
+        </div>
+      }
       open={open}
       onCancel={onClose}
       footer={null}
       centered
-      closeIcon={null}
-      width={modalWidth}
+      closable={false}
+      width={width}
       styles={{
-        content: {
-          padding: 0,
-          borderRadius: "1rem",
-          overflow: "hidden",
-        },
-        body: {
-          padding: 0,
-        },
-        mask: {
-          backdropFilter: "blur(4px)",
-        },
+        content: { padding: 0, borderRadius: "1rem" },
+        header: { margin: 0, background: "transparent" },
+        mask: { backdropFilter: "blur(4px)" },
       }}
     >
-      {/* Header */}
       <div
-        className={`sticky top-0 z-10 px-4 py-3 pe-14 sm:px-6 sm:py-5 sm:pe-16 bg-gradient-to-br ${theme.headerBg} to-white dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 border-b border-slate-200 dark:border-slate-700 backdrop-blur-sm`}
+        className="record-detail-body grid min-w-0 gap-3 p-3.5 sm:p-5"
+        dir="rtl"
       >
-        <button
-          onClick={onClose}
-          className={`absolute top-4 left-4 h-8 w-8 rounded-lg bg-white dark:bg-slate-800 ${theme.closeBtnHover} border border-slate-200 dark:border-slate-600 hover:border-slate-300 dark:hover:border-slate-500 transition-all flex items-center justify-center text-slate-600 dark:text-slate-400 hover:text-slate-700`}
-          aria-label="بستن"
-        >
-          <CloseOutlined className="text-sm" />
-        </button>
-
-        <div className="flex min-w-0 items-center gap-3 sm:gap-4">
-          <div
-            className={`size-10 shrink-0 rounded-xl bg-gradient-to-br ${theme.iconBg} flex items-center justify-center text-white text-xl shadow-lg sm:size-12`}
-          >
-            {icon}
-          </div>
-          <div className="min-w-0">
-            <h2 className="font-bold text-base sm:text-xl text-slate-900 dark:text-slate-100">
-              {title}
-            </h2>
-          </div>
-        </div>
-      </div>
-
-      {/* Body */}
-      <div className="p-4 sm:p-6 bg-slate-50/50 dark:bg-slate-950">
         {children}
       </div>
-    </Modal>
+    </ResponsiveModal>
   );
 }

@@ -13,7 +13,6 @@ import {
   updateNurseryRoom,
 } from "@/features/nursery-rooms/actions";
 import Modal from "@/shared/components/FormModal";
-import GreenhouseButton from "@/shared/components/GreenhouseButton";
 import { applyFieldErrors } from "@/shared/forms/field-errors";
 import { refreshSavedForm, submitForm } from "@/shared/forms/submit";
 import { PlusOutlined } from "@ant-design/icons";
@@ -289,30 +288,12 @@ export default function NurseryRoomsInsUpModal({
           </FormItem>
         </FormGrid>
 
-        <FormActions message={message}>
-          <GreenhouseButton
-            text="انصراف"
-            variant="secondary"
-            onClick={handleClose}
-            disabled={internalLoading}
-
-            type="button"
-          />
-          <GreenhouseButton
-            text={
-              internalLoading
-                ? isEditMode
-                  ? "در حال ویرایش..."
-                  : "در حال ثبت..."
-                : isEditMode
-                  ? "ویرایش اتاق"
-                  : "ثبت اتاق"
-            }
-            variant="primary"
-            type="submit"
-            loading={internalLoading}
-          />
-        </FormActions>
+        <FormActions
+          message={message}
+          onCancel={handleClose}
+          loading={internalLoading}
+          editing={isEditMode}
+        />
       </Form>
     </Modal>
   );

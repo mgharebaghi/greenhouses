@@ -8,10 +8,8 @@ import { csvRows } from "@/shared/exports/csv";
 
 import DeleteModal, { DeleteModalProps } from "@/shared/components/DeleteModal";
 import InsertionRow from "@/shared/components/InsertionRow";
-import Table from "@/shared/components/Table";
+import Table, { detailsColumn } from "@/shared/components/Table";
 import TableActions from "@/shared/components/TableActions";
-import { EyeOutlined } from "@ant-design/icons";
-import { Button, Tooltip } from "antd";
 import { download, generateCsv, mkConfig } from "export-to-csv";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -65,26 +63,10 @@ export default function GraftingTable({ initialData, formData }: Props) {
   };
 
   const columns = [
-    {
-      title: "جزئیات",
-      key: "details",
-      width: 80,
-      align: "center" as const,
-      render: (_: unknown, record: GraftingOperationWithDetails) => (
-        <Tooltip title="مشاهده جزئیات">
-          <Button
-            icon={<EyeOutlined />}
-            shape="circle"
-            type="text"
-            onClick={() => {
-              setDetailRecord(record);
-              setDetailOpen(true);
-            }}
-            className="text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
-          />
-        </Tooltip>
-      ),
-    },
+    detailsColumn<GraftingOperationWithDetails>((record) => {
+      setDetailRecord(record);
+      setDetailOpen(true);
+    }),
     {
       title: "کد سفارش",
       key: "OrderCode",
@@ -202,7 +184,6 @@ export default function GraftingTable({ initialData, formData }: Props) {
           columns={columns}
           dataSource={initialData}
           rowKey="ID"
-          pagination={{ pageSize: 10 }}
           loading={false}
         />
       </div>

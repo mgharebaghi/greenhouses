@@ -18,7 +18,6 @@ import { greenhouseInputSchema } from "@/features/greenhouses/schema";
 import type { GreenhouseRecord } from "@/features/greenhouses/types/record";
 import { getLegacyPersonOptions } from "@/features/people/actions";
 import Modal from "@/shared/components/FormModal";
-import GreenhouseButton from "@/shared/components/GreenhouseButton";
 
 import type { ActionMessage as ModalMsg } from "@/shared/contracts/action-result";
 import { applyFieldErrors } from "@/shared/forms/field-errors";
@@ -298,20 +297,12 @@ export default function GreenhouseFormModal({
           </FormItem>
         </FormGrid>
 
-        <FormActions message={modalMsg}>
-          <GreenhouseButton
-            text={
-              loading
-                ? "در حال ثبت..."
-                : isEdit
-                  ? "ویرایش گلخانه"
-                  : "ثبت گلخانه"
-            }
-            variant="primary"
-            type="submit"
-            loading={loading}
-          />
-        </FormActions>
+        <FormActions
+          message={modalMsg}
+          onCancel={handleClose}
+          loading={loading}
+          editing={isEdit}
+        />
       </Form>
     </Modal>
   );

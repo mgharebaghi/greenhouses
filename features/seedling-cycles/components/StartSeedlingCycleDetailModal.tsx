@@ -57,8 +57,6 @@ export default function StartSeedlingCycleDetailModal({
       onClose={onCancel}
       title={`جزئیات سیکل نشاء - ${record.Tbl_Orders?.OrderCode || ""}`}
       icon={<ExperimentOutlined />}
-      gradientFrom="emerald"
-      gradientTo="teal"
       width={850}
     >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -66,7 +64,6 @@ export default function StartSeedlingCycleDetailModal({
         <InfoCard
           title="اطلاعات پایه و سفارش"
           icon={<BarcodeOutlined />}
-          color="#10b981"
           items={[
             { label: "کد سفارش", value: record.Tbl_Orders?.OrderCode || "---" },
             {
@@ -107,7 +104,6 @@ export default function StartSeedlingCycleDetailModal({
         <InfoCard
           title="تاریخ‌ها و زمان‌بندی"
           icon={<CalendarOutlined />}
-          color="#0ea5e9"
           items={[
             {
               label: "تاریخ خروج از اتاق جوانه زنی",
@@ -134,7 +130,6 @@ export default function StartSeedlingCycleDetailModal({
         <InfoCard
           title="آمار و تلفات"
           icon={<HistoryOutlined />}
-          color="#f43f5e"
           items={[
             {
               label: "تعداد تلفات بعد از خروج از اتاق جوانه زنی",
@@ -157,7 +152,6 @@ export default function StartSeedlingCycleDetailModal({
           <InfoCard
             title="کد QR سفارش"
             icon={<BarcodeOutlined />}
-            color="#8b5cf6"
             items={[
               {
                 label: "",

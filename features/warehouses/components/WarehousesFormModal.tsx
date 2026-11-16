@@ -14,7 +14,6 @@ import {
   updateWarehouse,
 } from "@/features/warehouses/actions";
 import Modal from "@/shared/components/FormModal";
-import GreenhouseButton from "@/shared/components/GreenhouseButton";
 import { applyFieldErrors } from "@/shared/forms/field-errors";
 import { loadFormOptions } from "@/shared/forms/load-options";
 import { refreshSavedForm, submitForm } from "@/shared/forms/submit";
@@ -273,30 +272,12 @@ export default function WarehousesInsUpModal({
           </FormItem>
         </FormGrid>
 
-        <FormActions message={message}>
-          <GreenhouseButton
-            text="انصراف"
-            variant="secondary"
-            onClick={handleClose}
-            disabled={internalLoading}
-
-            type="button"
-          />
-          <GreenhouseButton
-            text={
-              internalLoading
-                ? isEditMode
-                  ? "در حال ویرایش..."
-                  : "در حال ثبت..."
-                : isEditMode
-                  ? "ویرایش انبار"
-                  : "ثبت انبار"
-            }
-            variant="primary"
-            type="submit"
-            loading={internalLoading}
-          />
-        </FormActions>
+        <FormActions
+          message={message}
+          onCancel={handleClose}
+          loading={internalLoading}
+          editing={isEditMode}
+        />
       </Form>
     </Modal>
   );

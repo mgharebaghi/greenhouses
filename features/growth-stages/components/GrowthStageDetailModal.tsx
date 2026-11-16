@@ -23,13 +23,10 @@ export default function GrowthStageDetailModal({
       onClose={onClose}
       title="جزئیات مرحله رشد"
       icon={<span className="text-2xl">🌱</span>}
-      gradientFrom="green"
-      gradientTo="emerald"
     >
       <InfoCard
         title="اطلاعات کلی"
         icon={<span className="text-xl">📋</span>}
-        color="#10b981"
         items={[
           {
             label: "واریته - رقم",
@@ -46,15 +43,14 @@ export default function GrowthStageDetailModal({
       <InfoCard
         title="زمان‌بندی"
         icon={<span className="text-xl">⏱️</span>}
-        color="#3b82f6"
         items={[
           {
             label: "تعداد روز شروع",
-            value: data.StartDay ? `${data.StartDay} روز` : "---",
+            value: data.StartDay != null ? `${data.StartDay} روز` : "---",
           },
           {
             label: "تعداد روز پایان",
-            value: data.EndDay ? `${data.EndDay} روز` : "---",
+            value: data.EndDay != null ? `${data.EndDay} روز` : "---",
           },
         ]}
       />
@@ -63,7 +59,6 @@ export default function GrowthStageDetailModal({
         <InfoCard
           title="علائم و معیارها"
           icon={<span className="text-xl">🔍</span>}
-          color="#f59e0b"
           items={[
             { label: "علائم ورود", value: data.EntryCriteria, span: true },
             { label: "علائم خروج", value: data.ExitCriteria, span: true },
@@ -76,7 +71,6 @@ export default function GrowthStageDetailModal({
           <InfoCard
             title="یادداشت‌ها"
             icon={<span className="text-xl">📝</span>}
-            color="#64748b"
             items={[{ label: "توضیحات", value: data.note, span: true }]}
           />
         </div>

@@ -8,7 +8,6 @@ import {
 import { createPlant, getPlants, updatePlant } from "@/features/plants/actions";
 import type { PlantRecord } from "@/features/plants/types/record";
 import Modal from "@/shared/components/FormModal";
-import GreenhouseButton from "@/shared/components/GreenhouseButton";
 import { applyFieldErrors } from "@/shared/forms/field-errors";
 import { refreshSavedForm, submitForm } from "@/shared/forms/submit";
 import type { FormValues } from "@/shared/forms/types";
@@ -213,16 +212,12 @@ export default function PlantFormModal({
           </FormItem>
         </FormGrid>
 
-        <FormActions message={modalMsg}>
-          <GreenhouseButton
-            text={
-              loading ? "در حال ثبت..." : isEdit ? "ویرایش گیاه" : "ثبت گیاه"
-            }
-            variant="primary"
-            type="submit"
-            loading={loading}
-          />
-        </FormActions>
+        <FormActions
+          message={modalMsg}
+          onCancel={handleClose}
+          loading={loading}
+          editing={isEdit}
+        />
       </Form>
     </Modal>
   );

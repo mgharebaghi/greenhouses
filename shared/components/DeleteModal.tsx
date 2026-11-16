@@ -63,13 +63,13 @@ export default function DeleteModal({
     >
       {/* Header Section */}
       <div className="relative px-4 py-3 pe-14 sm:px-6 sm:py-5 sm:pe-16 bg-gradient-to-br from-rose-50/60 via-orange-50/40 to-white dark:from-rose-950 dark:via-rose-900/50 dark:to-slate-900 border-b border-slate-200 dark:border-slate-800">
-        <button
+        <GreenhouseButton
           onClick={onClose}
-          className="absolute top-4 left-4 h-8 w-8 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 hover:border-slate-300 transition-all flex items-center justify-center text-slate-600 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+          className="absolute end-4 top-4"
           aria-label="بستن"
-        >
-          <CloseOutlined className="text-sm" />
-        </button>
+          variant="secondary"
+          icon={<CloseOutlined />}
+        />
 
         <div className="flex items-center gap-3">
           <div className="h-12 w-12 rounded-full bg-gradient-to-br from-rose-500 to-rose-600 shadow-md flex items-center justify-center text-white">
@@ -121,16 +121,10 @@ export default function DeleteModal({
           />
           <GreenhouseButton
             text={deleting ? "در حال حذف..." : "حذف کامل"}
-            variant="primary"
+            variant="danger"
             loading={deleting}
             onClick={handleDelete}
             className="min-w-[120px]"
-            style={{
-              background: deleteLoading
-                ? undefined
-                : "linear-gradient(135deg, #be123c 0%, #e11d48 100%)",
-              borderColor: "#be123c",
-            }}
           />
         </div>
       </div>

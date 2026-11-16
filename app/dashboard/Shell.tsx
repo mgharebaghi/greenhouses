@@ -2,40 +2,48 @@
 
 import { removeAuth } from "@/server/auth/actions";
 import DashboardMenu from "@/shared/components/Menu";
-import { MenuOutlined, UserOutlined } from "@ant-design/icons";
-import { Layout } from "antd";
-import { Content } from "antd/es/layout/layout";
-import { useState } from "react";
-
+import GreenhouseButton from "@/shared/components/GreenhouseButton";
 import ThemeToggle from "@/shared/components/ThemeToggle";
 import { formatPersianDate, formatTehranTime } from "@/shared/dates/calendar";
 import { useServerDay, useServerTime } from "@/shared/dates/ServerClock";
+import { MenuOutlined } from "@ant-design/icons";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 
-// Mapping of paths to titles
-const PAGE_TITLES: Record<string, string> = {
-  "/dashboard": "داشبورد",
-  "/dashboard/people": "اطلاعات اشخاص",
-  "/dashboard/suppliers": "اطلاعات تامین کنندگان",
-  "/dashboard/greenhouse": "اطلاعات گلخانه ها",
-  "/dashboard/plants": "اطلاعات پایه گیاهی",
-  "/dashboard/plantvarities": "اطلاعات واریته",
-  "/dashboard/growthstages": "مراحل رشد گیاه",
-  "/dashboard/planting": "اطلاعات کاشت",
-  "/dashboard/grafting": "پیوند زنی",
-
-  "/dashboard/climatedaily": "ثبت اطلاعات اقلیمی",
-  "/dashboard/irrigation": "آبیاری",
-  "/dashboard/seed-production": "تولید بذر",
-  "/dashboard/seed-package": "بسته بذر",
-  "/dashboard/seed-warehousing": "انبارداری بذر",
-  "/dashboard/warehouses": "مدیریت انبارها",
-  "/dashboard/nursery-rooms": "مدیریت اتاق های نشاء",
-  "/dashboard/orders": "ثبت سفارش",
-  "/dashboard/seed-planting": "کاشت بذور",
-  "/dashboard/start-seedling-cycle": "شروع چرخه نشاء",
-  "/dashboard/recoveryRoom": "اتاق ریکاوری",
+const pages: Record<string, readonly [title: string, description?: string]> = {
+  "/dashboard": ["داشبورد", "سامانه مدیریت هوشمند گلخانه"],
+  "/dashboard/people": ["اشخاص", "اطلاعات اشخاص حقیقی و حقوقی"],
+  "/dashboard/suppliers": ["تأمین‌کنندگان", "مدیریت تأمین‌کنندگان بذر"],
+  "/dashboard/greenhouse": ["گلخانه‌ها", "اطلاعات پایه گلخانه‌ها"],
+  "/dashboard/plants": ["انواع گیاه", "اطلاعات پایه و نام علمی گیاهان"],
+  "/dashboard/plantvarities": [
+    "واریته و رقم",
+    "مدیریت واریته‌های مرتبط با هر گیاه",
+  ],
+  "/dashboard/growthstages": ["مراحل رشد", "مدیریت مراحل رشد انواع گیاهان"],
+  "/dashboard/planting": ["اطلاعات کاشت"],
+  "/dashboard/grafting": ["عملیات پیوندزنی", "مدیریت عملیات و پیوندزنان"],
+  "/dashboard/climatedaily": ["ثبت اطلاعات اقلیمی"],
+  "/dashboard/irrigation": ["آبیاری"],
+  "/dashboard/seed-production": ["تولید بذر"],
+  "/dashboard/seed-package": [
+    "بسته‌های بذر",
+    "مدیریت بسته‌ها و شماره‌های سریال",
+  ],
+  "/dashboard/seed-warehousing": ["انبارداری بذر", "ورود و خروج بسته‌های بذر"],
+  "/dashboard/warehouses": ["مدیریت انبارها", "اطلاعات پایه انبارهای بذر"],
+  "/dashboard/nursery-rooms": [
+    "اتاق‌های ریکاوری",
+    "اطلاعات پایه اتاق‌های نرسری",
+  ],
+  "/dashboard/orders": ["ثبت سفارش", "مدیریت سفارش‌های ثبت‌شده"],
+  "/dashboard/seed-planting": ["کاشت بذور", "مدیریت کاشت بذر در سینی"],
+  "/dashboard/start-seedling-cycle": [
+    "شروع سیکل نشاء",
+    "انتقال سینی‌ها به گلخانه",
+  ],
+  "/dashboard/recoveryRoom": ["اتاق ریکاوری", "مدیریت و مشاهده وضعیت سینی‌ها"],
 };
 
 export default function DashboardShell({
@@ -45,124 +53,71 @@ export default function DashboardShell({
 }) {
   const [openDrawer, setOpenDrawer] = useState(false);
   const pathname = usePathname();
-  const currentTitle = PAGE_TITLES[pathname] || "سامانه گلخانه";
+  const [title, description] = pages[pathname] ?? ["سامانه گلخانه"];
   const time = useServerTime();
   const today = useServerDay();
 
   return (
-    <Layout className="h-dvh min-w-0 overflow-hidden flex flex-col bg-gradient-to-br from-emerald-50/50 via-white to-lime-50/50">
-      {/* Light Header */}
-      {/* Distinct Modern Header with Themed Gradient & Stronger Depth */}
-      <header className="relative z-50 h-16 shrink-0 sm:h-[90px] bg-white/95 dark:bg-slate-900/90 backdrop-blur-2xl border-b border-emerald-200/80 dark:border-slate-700/80 shadow-[0_4px_20px_-2px_rgba(16,185,129,0.15),0_10px_40px_-10px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_20px_-2px_rgba(0,0,0,0.5)] transition-all duration-300">
-        <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-400 opacity-80 dark:opacity-60"></div>
-        <div className="h-full min-w-0 px-2.5 sm:px-6 flex items-center justify-between gap-2 mx-auto max-w-[1920px] pt-1 sm:pt-2">
-          {/* Left: Menu + Brand Identity */}
-          <div className="flex min-w-0 items-center gap-2 sm:gap-5">
-            <button
+    <div
+      dir="rtl"
+      className="dashboard-shell flex h-dvh min-w-0 flex-col overflow-hidden"
+    >
+      <header className="z-10 shrink-0 border-b border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900">
+        <div className="mx-auto flex min-h-16 max-w-[1920px] min-w-0 items-center justify-between gap-2 px-2.5 py-2 sm:gap-4 sm:px-6">
+          <div className="flex min-w-0 items-center gap-2.5 sm:gap-4">
+            <GreenhouseButton
               onClick={() => setOpenDrawer(true)}
-              className="group relative h-10 w-10 rounded-xl bg-white/60 dark:bg-slate-800/60 border border-emerald-100 dark:border-slate-700 hover:border-emerald-400 dark:hover:border-emerald-500 hover:bg-white dark:hover:bg-slate-800 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all duration-300 flex items-center justify-center text-emerald-800/70 dark:text-slate-300 cursor-pointer shadow-sm flex-shrink-0"
+              className="sm:size-10"
+              icon={<MenuOutlined />}
+              variant="soft"
               aria-label="باز کردن منو"
-            >
-              <MenuOutlined className="text-lg transition-transform group-hover:scale-110" />
-            </button>
-
-            {/* Brand Section */}
-            <div className="flex min-w-0 items-center gap-2 sm:gap-3 select-none">
-              <div className="relative h-10 w-10 sm:h-12 sm:w-12 flex items-center justify-center rounded-xl bg-white dark:bg-slate-800 shadow-[0_4px_15px_-3px_rgba(0,0,0,0.1)] dark:shadow-none border border-emerald-50 dark:border-slate-700 overflow-hidden p-1.5 flex-shrink-0">
-                <Image
-                  src="/fakoor-logo.png"
-                  alt="Logo"
-                  width={44}
-                  height={44}
-                  className="object-contain"
-                />
-              </div>
-
-              <div className="flex flex-col justify-center min-w-0 max-w-[140px] sm:max-w-xs">
-                <h1 className="text-emerald-950 dark:text-slate-100 font-black text-sm sm:text-xl tracking-tight leading-tight drop-shadow-sm transition-colors whitespace-nowrap truncate">
-                  فکور پیوند آریا
-                </h1>
-                <p className="text-emerald-700/80 dark:text-emerald-400/80 font-medium text-[10px] sm:text-[13px] leading-none mt-0.5 transition-colors whitespace-nowrap truncate block">
-                  {currentTitle}
+              aria-expanded={openDrawer}
+            />
+            <Image
+              src="/fakoor-logo.png"
+              alt="فکور پیوند آریا"
+              width={42}
+              height={42}
+              className="size-8 shrink-0 rounded-lg border border-slate-200 bg-white object-contain p-0.5 sm:size-10 dark:border-slate-600"
+            />
+            <div className="min-w-0 border-s border-slate-200 ps-2.5 sm:ps-4 dark:border-slate-700">
+              <h1 className="text-sm leading-5 font-bold text-slate-900 sm:text-lg sm:leading-6 dark:text-slate-50">
+                {title}
+              </h1>
+              {description && (
+                <p className="text-[11px] leading-4 text-slate-600 sm:text-xs dark:text-slate-300">
+                  {description}
                 </p>
-              </div>
+              )}
             </div>
           </div>
 
-          {/* Right: Functional Widgets & Profile */}
-          <div className="flex shrink-0 items-center gap-2 sm:gap-4">
-            {/* Theme Toggle */}
-            <ThemeToggle />
-
-            {/* Date/Time Widget (Useful) */}
-            <div className="hidden md:flex flex-col items-end mr-2 px-3 border-r-2 border-slate-100 dark:border-slate-700">
-              <span className="text-slate-900 dark:text-slate-200 font-bold text-sm tracking-widest leading-none numbers-fa transition-colors">
+          <div className="flex shrink-0 items-center gap-3 sm:gap-4">
+            <div className="hidden border-e border-slate-200 pe-4 text-end md:block dark:border-slate-700">
+              <bdi className="block text-sm font-bold text-slate-900 tabular-nums dark:text-slate-100">
                 {formatTehranTime(time)}
-              </span>
-              <span className="text-slate-400 dark:text-slate-500 text-[10px] font-medium mt-1 leading-none transition-colors">
+              </bdi>
+              <time
+                dateTime={today}
+                className="block text-xs text-slate-600 dark:text-slate-300"
+              >
                 {formatPersianDate(today, { format: "D MMMM" })}
-              </span>
+              </time>
             </div>
-
-            {/* Simplified Profile Action */}
-            <div className="h-10 w-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-300 dark:hover:border-emerald-600 hover:bg-emerald-50 dark:hover:bg-slate-700 transition-all cursor-pointer shadow-sm flex-shrink-0">
-              <UserOutlined className="text-lg" />
-            </div>
+            <ThemeToggle />
           </div>
         </div>
       </header>
 
-      <Content className="flex-1 min-h-0 min-w-0 relative bg-gradient-to-br from-emerald-50 via-lime-50 to-white dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 overflow-hidden transition-colors duration-500">
-        {/* Animated Background Patterns */}
-        <div className="absolute inset-0 opacity-30 dark:opacity-10 pointer-events-none overflow-hidden">
-          <div className="absolute top-0 left-0 w-96 h-96 bg-emerald-200 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
-          <div className="absolute top-0 right-0 w-96 h-96 bg-lime-200 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
-          <div className="absolute bottom-0 left-1/2 w-96 h-96 bg-emerald-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
-        </div>
-
-        {/* Grid Pattern Overlay */}
-        <div
-          className="absolute inset-0 opacity-[0.03] pointer-events-none"
-          style={{
-            backgroundImage: `radial-gradient(circle at 2px 2px, rgb(16 185 129) 1px, transparent 0)`,
-            backgroundSize: "40px 40px",
-          }}
-        ></div>
-
-        <div className="dashboard-scroll relative z-10 h-full min-w-0 w-full overflow-x-hidden overflow-y-auto">
-          {children}
-        </div>
-
-        <style jsx>{`
-          @keyframes blob {
-            0%,
-            100% {
-              transform: translate(0, 0) scale(1);
-            }
-            33% {
-              transform: translate(20px, -30px) scale(1.05);
-            }
-            66% {
-              transform: translate(-15px, 15px) scale(0.95);
-            }
-          }
-          .animate-blob {
-            animation: blob 7s infinite;
-          }
-          .animation-delay-2000 {
-            animation-delay: 2s;
-          }
-          .animation-delay-4000 {
-            animation-delay: 4s;
-          }
-        `}</style>
-      </Content>
+      <main className="dashboard-scroll min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto">
+        {children}
+      </main>
 
       <DashboardMenu
         open={openDrawer}
         onClose={() => setOpenDrawer(false)}
         onSignOut={removeAuth}
       />
-    </Layout>
+    </div>
   );
 }

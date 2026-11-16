@@ -22,14 +22,11 @@ export default function PlantVarietyDetailModal({
       onClose={onClose}
       title="جزئیات واریته"
       icon={<span className="text-2xl">🌿</span>}
-      gradientFrom="green"
-      gradientTo="emerald"
     >
       {/* اطلاعات اولیه */}
       <InfoCard
         title="اطلاعات اولیه"
         icon={<span className="text-xl">🌱</span>}
-        color="#10b981"
         items={[
           { label: "واریته", value: data.VarietyName },
           { label: "نام رایج", value: data.Tbl_Plants?.CommonName },
@@ -42,7 +39,6 @@ export default function PlantVarietyDetailModal({
       <InfoCard
         title="زمان‌بندی رشد"
         icon={<span className="text-xl">⏱️</span>}
-        color="#3b82f6"
         items={[
           {
             label: "تعداد روز تا جوانه زنی",
@@ -52,15 +48,17 @@ export default function PlantVarietyDetailModal({
           },
           {
             label: "تعداد روز تا رویش",
-            value: data.DaysToSprout ? `${data.DaysToSprout} روز` : "—",
+            value: data.DaysToSprout != null ? `${data.DaysToSprout} روز` : "—",
           },
           {
             label: "تعداد روز تا نشاء",
-            value: data.DaysToSeedling ? `${data.DaysToSeedling} روز` : "—",
+            value:
+              data.DaysToSeedling != null ? `${data.DaysToSeedling} روز` : "—",
           },
           {
             label: "تعداد روز تا بلوغ",
-            value: data.DaysToMaturity ? `${data.DaysToMaturity} روز` : "—",
+            value:
+              data.DaysToMaturity != null ? `${data.DaysToMaturity} روز` : "—",
           },
         ]}
       />
@@ -69,15 +67,14 @@ export default function PlantVarietyDetailModal({
       <InfoCard
         title="شرایط دمایی"
         icon={<span className="text-xl">🌡️</span>}
-        color="#f59e0b"
         items={[
           {
             label: "حداقل دمای ایده‌آل",
-            value: data.IdealTempMin ? `${data.IdealTempMin}°C` : "—",
+            value: data.IdealTempMin != null ? `${data.IdealTempMin}°C` : "—",
           },
           {
             label: "حداکثر دمای ایده‌آل",
-            value: data.IdealTempMax ? `${data.IdealTempMax}°C` : "—",
+            value: data.IdealTempMax != null ? `${data.IdealTempMax}°C` : "—",
           },
         ]}
       />
@@ -86,15 +83,16 @@ export default function PlantVarietyDetailModal({
       <InfoCard
         title="شرایط رطوبتی"
         icon={<span className="text-xl">💧</span>}
-        color="#06b6d4"
         items={[
           {
             label: "حداقل رطوبت ایده‌آل",
-            value: data.IdealHumidityMin ? `${data.IdealHumidityMin}%` : "—",
+            value:
+              data.IdealHumidityMin != null ? `${data.IdealHumidityMin}%` : "—",
           },
           {
             label: "حداکثر رطوبت ایده‌آل",
-            value: data.IdealHumidityMax ? `${data.IdealHumidityMax}%` : "—",
+            value:
+              data.IdealHumidityMax != null ? `${data.IdealHumidityMax}%` : "—",
           },
         ]}
       />
@@ -103,7 +101,6 @@ export default function PlantVarietyDetailModal({
       <InfoCard
         title="نور و عملکرد"
         icon={<span className="text-xl">☀️</span>}
-        color="#8b5cf6"
         items={[{ label: "نیاز نوری", value: data.LightRequirement }]}
       />
 
@@ -113,7 +110,6 @@ export default function PlantVarietyDetailModal({
           <InfoCard
             title="یادداشت‌ها"
             icon={<span className="text-xl">📝</span>}
-            color="#64748b"
             items={[{ label: "توضیحات", value: data.Notes, span: true }]}
           />
         </div>

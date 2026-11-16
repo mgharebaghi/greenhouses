@@ -6,6 +6,15 @@
 @font-face {
   font-family: "IransansR";
   src: url("/fonts/IRANSansX-Regular.woff2") format("woff2");
+  font-display: swap;
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: "IransansR";
+  src: url("/fonts/IRANSansX-Bold.woff2") format("woff2");
+  font-display: swap;
+  font-weight: 700;
 }
 
 @font-face {
@@ -13,14 +22,40 @@
   src: url("/fonts/IRANSansX-Bold.woff2") format("woff2");
 }
 
+/* Keep Latin letters monospaced while using IRANSansX for digits. */
+@font-face {
+  font-family: "IranDigits";
+  src: url("/fonts/IRANSansX-Regular.woff2") format("woff2");
+  font-display: swap;
+  unicode-range: U+0030-0039, U+0660-0669, U+06F0-06F9;
+}
+
+@theme {
+  --font-mono: "IranDigits", ui-monospace, Consolas, monospace;
+}
+
 :root {
+  color-scheme: light;
   --scroll-thumb: #a7b6c5;
   --scroll-thumb-hover: #778a9e;
+  --ui-canvas: #f2f6f5;
+  --ui-panel: #ffffff;
+  --ui-muted-panel: #f5f8fa;
+  --ui-border: #d9e3e9;
+  --ui-text: #172436;
+  --ui-muted-text: #4c6075;
 }
 
 .dark {
+  color-scheme: dark;
   --scroll-thumb: #53657d;
   --scroll-thumb-hover: #788da6;
+  --ui-canvas: #0b1423;
+  --ui-panel: #142033;
+  --ui-muted-panel: #19283d;
+  --ui-border: #3a4a60;
+  --ui-text: #f1f5fb;
+  --ui-muted-text: #bac8da;
 }
 
 * {
@@ -87,7 +122,19 @@
 
 body {
   direction: rtl;
-  @apply bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-500;
+  background: var(--ui-canvas);
+  color: var(--ui-text);
+  font-family: "IransansR", sans-serif;
+  /* IRANSansX's numeral variants are visual and keep input values intact. */
+  font-feature-settings: "ss01" on;
+}
+
+[data-latin-digits] {
+  font-feature-settings: normal;
+}
+
+.dashboard-shell {
+  background: var(--ui-canvas);
 }
 
 .dashboard-page {
@@ -105,6 +152,99 @@ body {
 
 .table-card-grid {
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+}
+
+.record-detail-heading {
+  color: var(--ui-text);
+  background: var(--ui-panel);
+  border-block-end: 1px solid var(--ui-border);
+}
+
+.record-detail-body {
+  background: var(--ui-canvas);
+  color: var(--ui-text);
+}
+
+.record-detail-section,
+.record-detail-section-title {
+  border-color: var(--ui-border);
+}
+
+.record-detail-section {
+  container-type: inline-size;
+  background: var(--ui-panel);
+}
+
+.record-detail-section-title {
+  background: var(--ui-muted-panel);
+}
+
+.record-detail-label {
+  color: var(--ui-muted-text);
+}
+
+.record-detail-fields {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@container (min-width: 20rem) {
+  .record-detail-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container (min-width: 37rem) {
+  .record-detail-fields {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.dark .rmdp-wrapper.greenhouse-calendar {
+  background: var(--ui-panel);
+  border-color: var(--ui-border);
+  box-shadow: 0 12px 30px #030712a0;
+}
+
+.dark .rmdp-ep-arrow.greenhouse-calendar[direction="bottom"] {
+  border-top-color: var(--ui-panel);
+}
+
+.dark .rmdp-ep-arrow.greenhouse-calendar[direction="top"] {
+  border-bottom-color: var(--ui-panel);
+}
+
+.dark
+  .greenhouse-calendar
+  :is(.rmdp-header-values, .rmdp-day, .rmdp-month-picker, .rmdp-year-picker) {
+  color: var(--ui-text);
+}
+
+.dark .greenhouse-calendar :is(.rmdp-week-day, .rmdp-day.rmdp-deactive) {
+  color: var(--ui-muted-text);
+}
+
+.dark .greenhouse-calendar .rmdp-arrow {
+  border-color: #6ee7b7;
+}
+
+.dark .greenhouse-calendar .rmdp-day.rmdp-disabled {
+  color: #8a9aaf;
+}
+
+.dark .greenhouse-calendar .rmdp-day.rmdp-selected span:not(.highlight) {
+  color: #052e25;
+  background: #6ee7b7;
+  box-shadow: none;
+}
+
+.dark
+  .greenhouse-calendar
+  .rmdp-day:not(.rmdp-disabled):not(.rmdp-selected)
+  span:hover,
+.dark .greenhouse-calendar .rmdp-arrow-container:hover {
+  color: var(--ui-text);
+  background: #23574e;
+  box-shadow: none;
 }
 
 .dialog-print-only {
@@ -214,7 +354,7 @@ body {
     gap: 0.5rem;
   }
 
-  .greenhouse-dialog .ant-modal-footer > .ant-btn {
+  .greenhouse-dialog .ant-modal-footer > :is(.ant-btn, .greenhouse-button) {
     margin-inline-start: 0;
   }
 
@@ -242,13 +382,13 @@ body {
       inline-size: clamp(1.6rem, 8.5vw, 2.125rem);
     }
 
-    .qr-modal .ant-btn {
+    .qr-modal :is(.ant-btn, .greenhouse-button:not(.greenhouse-icon-button)) {
       height: auto;
       min-height: 2.75rem;
       white-space: normal;
     }
 
-    .greenhouse-dialog .ant-modal-footer > .ant-btn,
+    .greenhouse-dialog .ant-modal-footer > :is(.ant-btn, .greenhouse-button),
     .record-form-buttons > button {
       flex: 1 1 auto;
     }
@@ -280,13 +420,13 @@ body {
 }
 
 .dark .record-form {
-  --form-surface: #111b2b;
-  --form-control: #182638;
-  --form-border: #35475d;
-  --form-label: #d7e2ee;
+  --form-surface: var(--ui-panel);
+  --form-control: #101a2b;
+  --form-border: var(--ui-border);
+  --form-label: var(--ui-text);
   --form-section-title: #a7f3d0;
   --form-section-title-bg: #17382f;
-  --form-placeholder: #9aa9bc;
+  --form-placeholder: var(--ui-muted-text);
 }
 
 .record-form .grid {
@@ -469,6 +609,130 @@ body {
   margin-block-start: 1rem;
   border-block-start: 1px solid var(--form-border);
   padding-block: 0.625rem;
+}
+
+:root {
+  --button-fill: #147960;
+  --button-fill-hover: #106650;
+  --button-fill-pressed: #0c5746;
+  --button-on-fill: #fff;
+  --button-accent: #126650;
+  --button-tint: #eaf5f1;
+  --button-tint-hover: #dcefe8;
+  --button-neutral: #f1f4f6;
+  --button-neutral-hover: #e7eef0;
+  --button-danger: #b3334c;
+  --button-danger-hover: #982840;
+  --button-danger-ink: #a62b43;
+  --button-danger-tint: #faedf0;
+  --button-danger-tint-hover: #f6e1e7;
+  --button-focus: #13836b;
+  --button-ease: cubic-bezier(0.2, 0.75, 0.25, 1);
+}
+
+.dark {
+  --button-fill: #67c6a4;
+  --button-fill-hover: #81d5b7;
+  --button-fill-pressed: #54b794;
+  --button-on-fill: #092b22;
+  --button-accent: #a0d8c6;
+  --button-tint: #18362f;
+  --button-tint-hover: #24463c;
+  --button-neutral: #202d40;
+  --button-neutral-hover: #2b3a4d;
+  --button-danger: #a52c46;
+  --button-danger-hover: #b63a53;
+  --button-danger-ink: #f5a8b6;
+  --button-danger-tint: #36242e;
+  --button-danger-tint-hover: #49303d;
+  --button-focus: #79cfb2;
+}
+
+@layer components {
+  .greenhouse-button {
+    @apply inline-flex h-10 min-w-0 cursor-pointer items-center justify-center gap-1.5 rounded-[10px] px-3.5 text-sm leading-5 font-semibold disabled:cursor-not-allowed;
+    border: 1px solid var(--button-border, transparent);
+    background-color: var(--button-bg, var(--button-neutral));
+    color: var(--button-ink, var(--ui-text));
+    transition:
+      background-color 200ms var(--button-ease),
+      border-color 200ms var(--button-ease),
+      color 200ms var(--button-ease);
+  }
+
+  .greenhouse-icon-button {
+    @apply size-9 shrink-0 p-0;
+  }
+
+  .greenhouse-button[data-variant="primary"] {
+    --button-bg: var(--button-fill);
+    --button-hover: var(--button-fill-hover);
+    --button-pressed: var(--button-fill-pressed);
+    --button-ink: var(--button-on-fill);
+  }
+
+  .greenhouse-button[data-variant="outline"] {
+    --button-bg: transparent;
+    --button-border: var(--ui-border);
+    --button-hover: var(--button-tint);
+    --button-ink: var(--button-accent);
+  }
+
+  .greenhouse-button[data-variant="soft"] {
+    --button-bg: var(--button-tint);
+    --button-hover: var(--button-tint-hover);
+    --button-ink: var(--button-accent);
+  }
+
+  .greenhouse-button[data-variant="ghost"] {
+    --button-bg: transparent;
+    --button-hover: var(--button-tint);
+    --button-ink: var(--button-accent);
+  }
+
+  .greenhouse-button[data-variant="danger"] {
+    --button-bg: var(--button-danger);
+    --button-hover: var(--button-danger-hover);
+    --button-ink: #fff;
+  }
+
+  .greenhouse-button[data-variant="danger-soft"] {
+    --button-bg: var(--button-danger-tint);
+    --button-hover: var(--button-danger-tint-hover);
+    --button-ink: var(--button-danger-ink);
+  }
+
+  @media (hover: hover) {
+    .greenhouse-button:hover:not(:disabled) {
+      background-color: var(--button-hover, var(--button-neutral-hover));
+    }
+  }
+
+  .greenhouse-button:active:not(:disabled) {
+    background-color: var(
+      --button-pressed,
+      var(--button-hover, var(--button-neutral-hover))
+    );
+  }
+
+  .greenhouse-button:focus-visible {
+    outline: 2px solid var(--button-focus);
+    outline-offset: 3px;
+  }
+
+  .greenhouse-button:disabled {
+    opacity: 0.5;
+  }
+
+  .greenhouse-button[aria-busy="true"] {
+    opacity: 0.85;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .greenhouse-button {
+      transition: none;
+    }
+  }
 }
 
 .record-form-buttons {

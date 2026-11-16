@@ -14,10 +14,8 @@ import {
 } from "@/features/seed-packages/actions";
 import DeleteModal from "@/shared/components/DeleteModal";
 import InsertionRow from "@/shared/components/InsertionRow";
-import Table from "@/shared/components/Table";
+import Table, { detailsColumn } from "@/shared/components/Table";
 import TableActions from "@/shared/components/TableActions";
-import { InfoCircleOutlined } from "@ant-design/icons";
-import { Button, Tooltip } from "antd";
 import { download, generateCsv, mkConfig } from "export-to-csv";
 import { useState } from "react";
 import { headers, seedPackageCSVData } from "../exports/csv";
@@ -57,25 +55,9 @@ export default function SeedPackageTable({
   }>({ open: false, data: null });
 
   const columns = [
-    {
-      title: "جزئیات",
-      key: "details",
-      width: 80,
-      align: "center" as const,
-      render: (_: unknown, record: SeedPackageDetails) => (
-        <Tooltip title="مشاهده جزئیات">
-          <Button
-            type="text"
-            icon={
-              <InfoCircleOutlined
-                style={{ color: "#3b82f6", fontSize: "18px" }}
-              />
-            }
-            onClick={() => setDetailModal({ open: true, data: record })}
-          />
-        </Tooltip>
-      ),
-    },
+    detailsColumn<SeedPackageDetails>((record) =>
+      setDetailModal({ open: true, data: record }),
+    ),
     {
       title: "شماره سریال بسته",
       dataIndex: "SerialNumber",
@@ -100,13 +82,14 @@ export default function SeedPackageTable({
       title: "تعداد",
       dataIndex: "SeedCount",
       key: "SeedCount",
-      render: (val: number | null) => (val ? val.toLocaleString() : "—"),
+      render: (val: number | null) =>
+        val != null ? val.toLocaleString() : "—",
     },
     {
       title: "وزن (g)",
       dataIndex: "WeightGram",
       key: "WeightGram",
-      render: (val: number | null) => (val ? val : "—"),
+      render: (val: number | null) => (val != null ? val : "—"),
     },
     {
       title: "تاریخ تولید",
@@ -181,7 +164,6 @@ export default function SeedPackageTable({
         dataSource={data}
         loading={loading}
         rowKey="ID"
-        pagination={{ pageSize: 5 }}
       />
 
       <SeedPackageInsUpModal

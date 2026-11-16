@@ -8,15 +8,10 @@ import DeleteModal, { DeleteModalProps } from "@/shared/components/DeleteModal";
 import DetailModal, { InfoCard } from "@/shared/components/DetailModal";
 import InsertionRow from "@/shared/components/InsertionRow";
 import type { Column } from "@/shared/components/Table";
-import Table from "@/shared/components/Table";
+import Table, { detailsColumn } from "@/shared/components/Table";
 import TableActions from "@/shared/components/TableActions";
 import { ActionFailure, runDeletion } from "@/shared/forms/delete-record";
-import {
-  EnvironmentOutlined,
-  InfoCircleOutlined,
-  ShopOutlined,
-} from "@ant-design/icons";
-import { Button } from "antd";
+import { EnvironmentOutlined, ShopOutlined } from "@ant-design/icons";
 import { download, generateCsv, mkConfig } from "export-to-csv";
 import { useState } from "react";
 import { greenhousesCSVData } from "../exports/csv";
@@ -50,26 +45,10 @@ export default function GreenhousesTable({
   });
 
   const columns: Column<GreenhouseDetails>[] = [
-    {
-      title: "جزئیات",
-      key: "details",
-      width: 80,
-      align: "center",
-      render: (_: unknown, record: GreenhouseRecord) => (
-        <Button
-          type="text"
-          icon={
-            <InfoCircleOutlined
-              style={{ fontSize: "18px", color: "#10b981" }}
-            />
-          }
-          onClick={() => {
-            setViewRecord(record);
-            setViewModal(true);
-          }}
-        />
-      ),
-    },
+    detailsColumn<GreenhouseRecord>((record) => {
+      setViewRecord(record);
+      setViewModal(true);
+    }),
     {
       title: "نام گلخانه",
       dataIndex: "GreenhouseName",
@@ -102,7 +81,7 @@ export default function GreenhousesTable({
       key: "AreaSqM",
       render: (val: number) => (
         <span className="text-slate-600">
-          {val ? Number(val).toLocaleString() : "-"}
+          {val != null ? Number(val).toLocaleString() : "-"}
         </span>
       ),
     },
@@ -232,14 +211,11 @@ export default function GreenhousesTable({
           onClose={() => setViewModal(false)}
           title={viewRecord.GreenhouseName || "جزئیات گلخانه"}
           icon={<ShopOutlined />}
-          gradientFrom="emerald"
-          gradientTo="teal"
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <InfoCard
               title="اطلاعات کلی"
               icon={<ShopOutlined />}
-              color="#10b981"
               items={[
                 { label: "نام گلخانه", value: viewRecord.GreenhouseName },
                 { label: "نوع سازه", value: viewRecord.GreenhouseType },
@@ -260,7 +236,6 @@ export default function GreenhousesTable({
             <InfoCard
               title="اطلاعات تکمیلی و آدرس"
               icon={<EnvironmentOutlined />}
-              color="#0ea5e9"
               items={[
                 {
                   label: "تاریخ احداث",

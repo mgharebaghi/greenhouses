@@ -5,12 +5,10 @@ import {
 import type { GrowthStageRecord } from "@/features/growth-stages/types/record";
 import DeleteModal, { DeleteModalProps } from "@/shared/components/DeleteModal";
 import InsertionRow from "@/shared/components/InsertionRow";
-import Table from "@/shared/components/Table";
+import Table, { detailsColumn } from "@/shared/components/Table";
 import TableActions from "@/shared/components/TableActions";
 import { csvRows } from "@/shared/exports/csv";
 import { ActionFailure, runDeletion } from "@/shared/forms/delete-record";
-import { InfoCircleOutlined } from "@ant-design/icons";
-import { Button } from "antd";
 import { download, generateCsv, mkConfig } from "export-to-csv";
 import { useState } from "react";
 import { growthStagesCSVData, headers } from "../exports/csv";
@@ -44,21 +42,9 @@ export default function GrowthStagesTable(props: GrowthStagesTableProps) {
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   const columns = [
-    {
-      title: "جزئیات",
-      key: "details",
-      width: 80,
-      align: "center" as const,
-      render: (_: unknown, record: GrowthStageRecord) => (
-        <Button
-          type="text"
-          shape="circle"
-          className="text-slate-500 hover:text-blue-500 hover:bg-blue-50 dark:text-slate-400 dark:hover:text-blue-400 dark:hover:bg-blue-900/20"
-          icon={<InfoCircleOutlined />}
-          onClick={() => setDetailModal({ open: true, data: record })}
-        />
-      ),
-    },
+    detailsColumn<GrowthStageRecord>((record) =>
+      setDetailModal({ open: true, data: record }),
+    ),
     {
       title: "واریته",
       key: "varietyName",
@@ -187,7 +173,6 @@ export default function GrowthStagesTable(props: GrowthStagesTableProps) {
         loading={props.loading}
         rowKey="ID"
         scroll={{ x: 1000 }}
-        pagination={{ pageSize: 5 }}
       />
 
       <GrowthStageFormModal

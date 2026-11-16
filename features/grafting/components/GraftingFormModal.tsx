@@ -27,16 +27,9 @@ import { publicOrderUrl } from "@/shared/config/public-urls";
 
 import Modal from "@/shared/components/FormModal";
 
-import GreenhouseButton from "@/shared/components/GreenhouseButton";
-
 import QRCodeCanvas from "@/shared/components/QRCodeCanvas";
-import {
-  ArrowLeftOutlined,
-  ArrowRightOutlined,
-  ExperimentOutlined,
-} from "@ant-design/icons";
+import { ExperimentOutlined } from "@ant-design/icons";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "antd";
 import { useEffect, useState, type ComponentProps } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { createGraftingOperation, updateGraftingOperation } from "../actions";
@@ -352,7 +345,7 @@ export default function GraftingFormModal({
                   {selectedOrder && (
                     <div className="flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900 p-3 rounded-2xl shadow-inner min-w-[100px]">
                       <QRCodeCanvas value={orderQrContent} size={64} />
-                      <span className="text-[10px] text-slate-400 mt-1 font-mono">
+                      <span className="text-[10px] text-slate-600 mt-1 font-mono dark:text-slate-300">
                         {selectedOrder.OrderCode}
                       </span>
                     </div>
@@ -615,7 +608,7 @@ export default function GraftingFormModal({
               {/* Top Info Bar (Order & Main QR) */}
               <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 mb-6">
                 <div className="flex-1 text-center">
-                  <span className="block text-sm text-slate-500 mb-1">
+                  <span className="block text-sm text-slate-600 mb-1 dark:text-slate-300">
                     کد سفارش
                   </span>
                   <span className="block text-2xl font-bold text-slate-800 dark:text-white tracking-wider">
@@ -653,46 +646,12 @@ export default function GraftingFormModal({
                 ? { status: "error", message: INVALID_FORM_MESSAGE }
                 : null)
             }
-          >
-            <GreenhouseButton
-              text="انصراف"
-              variant="secondary"
-              onClick={handleClose}
-              disabled={loading}
-            />
-
-            <div className="flex gap-3 w-full sm:w-auto">
-              {step === 2 && (
-                <Button
-                  onClick={handleBack}
-                  size="large"
-                  className="w-full sm:w-auto h-11 px-6 rounded-xl border-slate-300 text-slate-600 hover:text-slate-800 hover:border-slate-400"
-                >
-                  <ArrowRightOutlined /> مرحله قبل
-                </Button>
-              )}
-
-              {step === 1 ? (
-                <Button type="primary" onClick={handleNext} size="large">
-                  مرحله بعد <ArrowLeftOutlined />
-                </Button>
-              ) : (
-                <GreenhouseButton
-                  text={
-                    loading
-                      ? "در حال ثبت..."
-                      : isEdit
-                        ? "ویرایش نهایی"
-                        : "ثبت نهایی"
-                  }
-                  variant="primary"
-                  type="submit"
-                  loading={loading}
-                  className="w-full sm:w-auto min-w-[140px] h-11 shadow-lg hover:shadow-xl"
-                />
-              )}
-            </div>
-          </FormActions>
+            onCancel={handleClose}
+            loading={loading}
+            editing={isEdit}
+            nextStep={step === 1}
+            onBack={step === 2 ? handleBack : undefined}
+          />
         </form>
       </FormProvider>
     </Modal>

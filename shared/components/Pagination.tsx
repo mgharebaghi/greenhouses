@@ -2,6 +2,8 @@
 
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import React from "react";
+import { toPersianDigits } from "@/shared/utils/digits";
+import GreenhouseButton from "./GreenhouseButton";
 
 interface PaginationProps {
   current: number;
@@ -55,7 +57,9 @@ export default function Pagination({
             </span>
           ) : (
             <span dir="ltr">
-              {`${(current - 1) * pageSize + 1}-${Math.min(current * pageSize, total)} / ${total}`}
+              {toPersianDigits(
+                `${(current - 1) * pageSize + 1}-${Math.min(current * pageSize, total)} / ${total}`,
+              )}
             </span>
           )}
         </div>
@@ -70,36 +74,35 @@ export default function Pagination({
             >
               {pageSizes.map((value) => (
                 <option key={value} value={value}>
-                  {value}
+                  {toPersianDigits(value)}
                 </option>
               ))}
             </select>
           )}
 
-          <div className="flex items-center gap-1 bg-slate-100/50 dark:bg-slate-800/50 p-1 rounded-full">
-            <button
-              type="button"
+          <div className="flex items-center gap-1">
+            <GreenhouseButton
               aria-label="صفحهٔ قبلی"
               disabled={current === 1}
               onClick={() => handlePageChange(current - 1)}
-              className="h-8 w-8 flex items-center justify-center rounded-full text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-white dark:hover:bg-slate-700 hover:shadow-sm disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:shadow-none transition-all duration-200"
+              variant="secondary"
+              icon={<RightOutlined />}
+            />
+
+            <span
+              aria-current="page"
+              className="grid size-9 place-items-center rounded-xl bg-emerald-100 px-1 text-sm font-bold text-emerald-900 dark:bg-emerald-900 dark:text-emerald-100"
             >
-              <RightOutlined className="text-xs" />
-            </button>
+              {toPersianDigits(current)}
+            </span>
 
-            <div className="h-8 w-8 flex items-center justify-center rounded-full bg-emerald-500 text-white shadow-md shadow-emerald-200 text-sm font-bold mx-1">
-              {current}
-            </div>
-
-            <button
-              type="button"
+            <GreenhouseButton
               aria-label="صفحهٔ بعدی"
               disabled={current >= totalPages}
               onClick={() => handlePageChange(current + 1)}
-              className="h-8 w-8 flex items-center justify-center rounded-full text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-white dark:hover:bg-slate-700 hover:shadow-sm disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:shadow-none transition-all duration-200"
-            >
-              <LeftOutlined className="text-xs" />
-            </button>
+              variant="secondary"
+              icon={<LeftOutlined />}
+            />
           </div>
         </div>
       </div>

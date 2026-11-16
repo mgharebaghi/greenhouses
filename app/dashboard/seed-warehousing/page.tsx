@@ -2,8 +2,6 @@ import { getAllSeedPackages } from "@/features/seed-packages/actions";
 import { getAllSeedWarehousing } from "@/features/seed-warehousing/actions";
 import SeedWarehousingTable from "@/features/seed-warehousing/components/SeedWarehousingTable";
 import { getAllWarehouses } from "@/features/warehouses/actions";
-import PageHeader from "@/shared/components/PageHeader";
-import { DatabaseOutlined } from "@ant-design/icons";
 
 import type { Metadata } from "next";
 
@@ -20,11 +18,6 @@ export default async function SeedWarehousingPage() {
 
   return (
     <div className="dashboard-page">
-      <PageHeader
-        title="انبارداری بذر"
-        subtitle="مدیریت ورود و خروج بسته‌های بذر به انبارها"
-        icon={<DatabaseOutlined />}
-      />
       <SeedWarehousingTable
         data={data}
         seedPackages={seedPackages}

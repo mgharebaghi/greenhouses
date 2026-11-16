@@ -14,10 +14,9 @@ import type { WarehouseTransactionDetails } from "../types/details";
 import { deleteSeedWarehousing } from "@/features/seed-warehousing/actions";
 import DeleteModal from "@/shared/components/DeleteModal";
 import InsertionRow from "@/shared/components/InsertionRow";
-import Table from "@/shared/components/Table";
+import Table, { detailsColumn } from "@/shared/components/Table";
 import TableActions from "@/shared/components/TableActions";
-import { InfoCircleOutlined } from "@ant-design/icons";
-import { Button, Tag, Tooltip, message } from "antd";
+import { Tag, message } from "antd";
 import { download, generateCsv, mkConfig } from "export-to-csv";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -81,24 +80,9 @@ export default function SeedWarehousingTable({
   };
 
   const columns = [
-    {
-      title: "جزئیات",
-      key: "details",
-      width: 80,
-      render: (_: unknown, record: WarehouseTransactionDetails) => (
-        <Tooltip title="مشاهده جزئیات">
-          <Button
-            type="text"
-            icon={
-              <InfoCircleOutlined
-                style={{ color: "#3b82f6", fontSize: "18px" }}
-              />
-            }
-            onClick={() => setDetailModal({ open: true, data: record })}
-          />
-        </Tooltip>
-      ),
-    },
+    detailsColumn<WarehouseTransactionDetails>((record) =>
+      setDetailModal({ open: true, data: record }),
+    ),
     {
       title: "شماره تراکنش",
       dataIndex: "ID",
@@ -185,7 +169,6 @@ export default function SeedWarehousingTable({
         columns={columns}
         rowKey="ID"
         loading={loading}
-        pagination={{ pageSize: 10 }}
       />
 
       <SeedWarehousingFormModal

@@ -31,14 +31,11 @@ export default function NurseryRoomsDetailModal({
       onClose={onClose}
       title="جزئیات اتاق نشاء"
       icon={<ExperimentOutlined />}
-      gradientFrom="emerald"
-      gradientTo="teal"
     >
       {/* اطلاعات کلی */}
       <InfoCard
         title="اطلاعات کلی"
         icon={<DashboardOutlined />}
-        color="#10b981"
         items={[
           { label: "کد اتاق", value: data.NurseryRoomCode },
           { label: "نام اتاق", value: data.NurseryRoomName },
@@ -53,23 +50,24 @@ export default function NurseryRoomsDetailModal({
       <InfoCard
         title="شرایط محیطی"
         icon={<ThunderboltOutlined />}
-        color="#3b82f6"
         items={[
           {
             label: "حداقل دما",
-            value: data.TemperatureMin ? `${data.TemperatureMin} °C` : "—",
+            value:
+              data.TemperatureMin != null ? `${data.TemperatureMin} °C` : "—",
           },
           {
             label: "حداکثر دما",
-            value: data.TemperatureMax ? `${data.TemperatureMax} °C` : "—",
+            value:
+              data.TemperatureMax != null ? `${data.TemperatureMax} °C` : "—",
           },
           {
             label: "حداقل رطوبت",
-            value: data.HumidityMin ? `${data.HumidityMin} %` : "—",
+            value: data.HumidityMin != null ? `${data.HumidityMin} %` : "—",
           },
           {
             label: "حداکثر رطوبت",
-            value: data.HumidityMax ? `${data.HumidityMax} %` : "—",
+            value: data.HumidityMax != null ? `${data.HumidityMax} %` : "—",
           },
         ]}
       />
@@ -78,7 +76,6 @@ export default function NurseryRoomsDetailModal({
       <InfoCard
         title="روشنایی و بهداشت"
         icon={<SafetyCertificateOutlined />}
-        color="#f59e0b"
         items={[
           { label: "نوع نور", value: data.LightType },
           {

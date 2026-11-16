@@ -5,6 +5,7 @@ import { greenhouseInputSchema } from "../features/greenhouses/schema";
 import { growthStageInputSchema } from "../features/growth-stages/schema";
 import { nurseryRoomInputSchema } from "../features/nursery-rooms/schema";
 import { plantInputSchema } from "../features/plants/schema";
+import { peopleReadDTO, personInputSchema } from "../features/people/schema";
 import { seedPackageInputSchema } from "../features/seed-packages/schema";
 import { supplierInputSchema } from "../features/suppliers/schema";
 import { warehouseInputSchema } from "../features/warehouses/schema";
@@ -24,6 +25,71 @@ import {
   sqlDecimal,
   sqlInteger,
 } from "../shared/validation/input";
+import { normalizeNumericInput, toPersianDigits } from "../shared/utils/digits";
+import { normalizeIranianPhone } from "../shared/utils/phone";
+
+test("legacy local phone numbers recover the trunk zero as text", () => {
+  assert.equal(normalizeIranianPhone("۹۱۲ ۳۴۵ ۶۷۸۹"), "09123456789");
+  assert.equal(normalizeIranianPhone("(21) 1234-5678"), "02112345678");
+  assert.equal(normalizeIranianPhone("09123456789"), "09123456789");
+  assert.equal(normalizeIranianPhone("+۹۸ ۹۱۲ ۳۴۵ ۶۷۸۹"), "+98 912 345 6789");
+  assert.equal(normalizeIranianPhone("12345678"), "12345678");
+
+  const person = peopleReadDTO.parse({
+    ID: 1,
+    PhoneNumber: "9123456789",
+    Legal: false,
+    FirstName: null,
+    LastName: null,
+    PersonCode: null,
+    NationalCode: null,
+    EmailAddress: null,
+    Profession: null,
+    CompanyName: null,
+    CompanyEconomicCode: null,
+    CompanyRegistrationCode: null,
+    Tbl_PeoplePosts: null,
+  });
+  assert.equal(person.PhoneNumber, "09123456789");
+
+  const supplier = {
+    People_CompaniesID: 1,
+    ContactTel: "9123456789",
+  };
+  assert.equal(
+    parseInput(supplierInputSchema, { ...supplier, SupplierCountry: "ایران" })
+      .ContactTel,
+    "09123456789",
+  );
+  assert.equal(
+    parseInput(supplierInputSchema, { ...supplier, SupplierCountry: "فرانسه" })
+      .ContactTel,
+    "9123456789",
+  );
+});
+
+test("Persian number display and input preserve numeric types and leading zeros in IDs", () => {
+  assert.equal(toPersianDigits("ORD-0012"), "ORD-۰۰۱۲");
+  assert.equal(normalizeNumericInput("−۱٬۲۳۴٫۵۶"), "-1234.56");
+  assert.equal(normalizeNumericInput("٣٫١٤"), "3.14");
+  assert.equal(normalizeNumericInput("۰"), "0");
+  assert.equal(
+    parseInput(sqlDecimal(9, 2), Number(normalizeNumericInput("۱۲٫۵۱"))),
+    12.51,
+  );
+  assert.equal(parseInput(sqlInteger, Number(normalizeNumericInput("۲۴"))), 24);
+  assert.throws(() => parseInput(sqlInteger, "۲۴"), InputValidationError);
+  const person = parseInput(personInputSchema, {
+    Legal: false,
+    FirstName: "علی",
+    LastName: "رضایی",
+    NationalCode: "۰۰۱۲۳۴۵۶۷۸",
+    PhoneNumber: "۰۹۱۲۳۴۵۶۷۸۹",
+    PostID: 1,
+  });
+  assert.equal(person.NationalCode, "0012345678");
+  assert.equal(person.PhoneNumber, "09123456789");
+});
 
 const contracts: {
   schema: z.ZodType;

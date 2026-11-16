@@ -3,18 +3,17 @@ import type { SupplierResponse } from "@/features/suppliers/types";
 import DeleteModal, { DeleteModalProps } from "@/shared/components/DeleteModal";
 import DetailModal, { InfoCard } from "@/shared/components/DetailModal";
 import InsertionRow from "@/shared/components/InsertionRow";
-import Table from "@/shared/components/Table";
+import Table, { detailsColumn } from "@/shared/components/Table";
+import PhoneNumberText from "@/shared/components/PhoneNumberText";
 import TableActions from "@/shared/components/TableActions";
 import { csvRows } from "@/shared/exports/csv";
 import { ActionFailure, runDeletion } from "@/shared/forms/delete-record";
 import {
   CheckCircleOutlined,
   GlobalOutlined,
-  InfoCircleOutlined,
   ShopOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { Button } from "antd";
 import { download, generateCsv, mkConfig } from "export-to-csv";
 import { useState } from "react";
 import { supplierName } from "../domain/name";
@@ -52,22 +51,10 @@ export default function SuppliersTable({
   });
 
   const columns = [
-    {
-      title: "جزئیات",
-      key: "details",
-      width: 70,
-      align: "center" as const,
-      render: (_: unknown, record: SupplierDTO) => (
-        <Button
-          type="text"
-          icon={<InfoCircleOutlined className="text-blue-500 text-lg" />}
-          onClick={() => {
-            setViewRecord(record);
-            setViewModal(true);
-          }}
-        />
-      ),
-    },
+    detailsColumn<SupplierDTO>((record) => {
+      setViewRecord(record);
+      setViewModal(true);
+    }),
     {
       title: "نام شرکت / شخص",
       key: "Name",
@@ -87,7 +74,14 @@ export default function SuppliersTable({
     { title: "شماره مجوز", dataIndex: "LicenseNumber", key: "LicenseNumber" },
     { title: "کشور", dataIndex: "SupplierCountry", key: "SupplierCountry" },
     { title: "شهر", dataIndex: "SupplierCity", key: "SupplierCity" },
-    { title: "تلفن", dataIndex: "ContactTel", key: "ContactTel" },
+    {
+      title: "تلفن",
+      dataIndex: "ContactTel",
+      key: "ContactTel",
+      render: (_: unknown, supplier: SupplierDTO) => (
+        <PhoneNumberText value={supplier.ContactTel} />
+      ),
+    },
     {
       title: "عملیات",
       key: "actions",
@@ -155,7 +149,6 @@ export default function SuppliersTable({
         columns={columns}
         dataSource={data}
         rowKey="ID"
-        pagination={{ pageSize: 5 }}
         loading={loading}
       />
 
@@ -185,13 +178,10 @@ export default function SuppliersTable({
           onClose={() => setViewModal(false)}
           title={supplierName(viewRecord)}
           icon={<ShopOutlined />}
-          gradientFrom="emerald"
-          gradientTo="teal"
         >
           <InfoCard
             title="اطلاعات کلی"
             icon={<UserOutlined />}
-            color="#10b981"
             items={[
               {
                 label: "نوع شخص",
@@ -223,11 +213,13 @@ export default function SuppliersTable({
           <InfoCard
             title="اطلاعات تماس و آدرس"
             icon={<GlobalOutlined />}
-            color="#0ea5e9"
             items={[
               { label: "کشور", value: viewRecord.SupplierCountry },
               { label: "شهر", value: viewRecord.SupplierCity },
-              { label: "تلفن", value: viewRecord.ContactTel },
+              {
+                label: "تلفن",
+                value: <PhoneNumberText value={viewRecord.ContactTel} />,
+              },
               { label: "ایمیل", value: viewRecord.ContactEmail },
               { label: "آدرس", value: viewRecord.CompanyAddress, span: true },
             ]}

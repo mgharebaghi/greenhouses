@@ -11,10 +11,8 @@ import DeleteModal, {
   type DeleteModalProps,
 } from "@/shared/components/DeleteModal";
 import InsertionRow from "@/shared/components/InsertionRow";
-import Table from "@/shared/components/Table";
+import Table, { detailsColumn } from "@/shared/components/Table";
 import TableActions from "@/shared/components/TableActions";
-import { EyeOutlined } from "@ant-design/icons";
-import { Button, Tooltip } from "antd";
 import { download, generateCsv, mkConfig } from "export-to-csv";
 import { useState } from "react";
 import { headers, recoveryRoomCSVData } from "../exports/csv";
@@ -65,20 +63,9 @@ export default function RecoveryRoomTable({
   };
 
   const columns = [
-    {
-      title: "جزئیات",
-      key: "details",
-      width: 80,
-      align: "center" as const,
-      render: (_: unknown, record: RecoveryRoomListItem) => (
-        <Tooltip title="مشاهده جزئیات">
-          <Button
-            icon={<EyeOutlined />}
-            onClick={() => setDetailModal({ open: true, data: record })}
-          />
-        </Tooltip>
-      ),
-    },
+    detailsColumn<RecoveryRoomListItem>((record) =>
+      setDetailModal({ open: true, data: record }),
+    ),
     {
       title: "کد سفارش",
       key: "OrderCode",
@@ -156,7 +143,6 @@ export default function RecoveryRoomTable({
         dataSource={data}
         loading={loading}
         rowKey="ID"
-        pagination={{ pageSize: 5 }}
       />
 
       {formModal.open && (
