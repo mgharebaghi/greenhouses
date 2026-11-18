@@ -3,6 +3,7 @@ import { toPersianDigits } from "@/shared/utils/digits";
 import { useId, type ReactNode } from "react";
 import ResponsiveModal from "./ResponsiveModal";
 import GreenhouseButton from "./GreenhouseButton";
+import ModalIcon from "./ModalIcon";
 
 interface DetailModalProps {
   open: boolean;
@@ -30,10 +31,7 @@ export function InfoCard({ title, icon, items }: InfoCardProps) {
         id={heading}
         className="record-detail-section-title flex items-center gap-2.5 rounded-t-xl border-b px-3 py-2.5 text-sm font-bold sm:px-4"
       >
-        <span
-          aria-hidden
-          className="shrink-0 text-emerald-700 dark:text-emerald-300"
-        >
+        <span aria-hidden="true" className="shrink-0 text-(--button-accent)">
           {icon}
         </span>
         {title}
@@ -104,14 +102,7 @@ export default function DetailModal({
       className="record-detail-dialog"
       title={
         <div className="record-detail-heading flex min-w-0 items-center gap-3 px-3.5 py-3 sm:px-5">
-          {icon && (
-            <span
-              aria-hidden
-              className="grid size-9 shrink-0 place-items-center rounded-lg bg-emerald-100 text-lg text-emerald-800 dark:bg-emerald-900 dark:text-emerald-100"
-            >
-              {icon}
-            </span>
-          )}
+          {icon && <ModalIcon>{icon}</ModalIcon>}
           <h2 className="min-w-0 flex-1 text-base leading-6 font-bold sm:text-lg">
             {toPersianDigits(title)}
           </h2>

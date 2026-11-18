@@ -31,9 +31,8 @@ import {
 } from "@ant-design/icons";
 import { Drawer, message } from "antd";
 import Image from "next/image";
-import Link from "next/link";
+import NavigationLink from "./NavigationLink";
 import { unstable_rethrow, usePathname } from "next/navigation";
-import NProgress from "nprogress";
 import { useState } from "react";
 
 type MenuItem = {
@@ -163,8 +162,7 @@ export default function DashboardMenu({
   )?.title;
   const openGroup = expandedTitle === undefined ? activeGroup : expandedTitle;
 
-  const navigate = (page: string) => {
-    if (page !== pathname) NProgress.start();
+  const closeAfterNavigation = () => {
     setExpandedTitle(undefined);
     onClose();
   };
@@ -277,9 +275,9 @@ export default function DashboardMenu({
                   className={`rounded-[13px] border shadow-xs transition-colors ${isActive || isExpanded ? "border-emerald-300/75 bg-white dark:border-emerald-800 dark:bg-slate-900" : "border-slate-200/85 bg-white/90 hover:border-emerald-300 dark:border-slate-700/80 dark:bg-slate-900/80 dark:hover:border-emerald-700"}`}
                 >
                   {page ? (
-                    <Link
+                    <NavigationLink
                       href={page}
-                      onNavigate={() => navigate(page)}
+                      onNavigation={closeAfterNavigation}
                       aria-current={isActive ? "page" : undefined}
                       className={`${itemStyle} ${mainItemStyle}`}
                     >
@@ -292,7 +290,7 @@ export default function DashboardMenu({
                           className="rotate-180 text-[11px] text-emerald-700 opacity-45 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100 dark:text-emerald-300"
                         />
                       )}
-                    </Link>
+                    </NavigationLink>
                   ) : (
                     <>
                       <GreenhouseButton
@@ -323,9 +321,9 @@ export default function DashboardMenu({
                           const current = pathname === sub.page;
                           return (
                             <li key={sub.page}>
-                              <Link
+                              <NavigationLink
                                 href={sub.page}
-                                onNavigate={() => navigate(sub.page)}
+                                onNavigation={closeAfterNavigation}
                                 aria-current={current ? "page" : undefined}
                                 className={`group/submenu flex min-h-9 items-center gap-2 rounded-lg border px-2 py-1.5 text-[13px] transition-colors ${focusStyle} ${current ? `border-emerald-800 shadow-xs ${currentPageStyle}` : "border-transparent text-slate-700! hover:border-emerald-300 hover:bg-emerald-100! hover:text-emerald-950! focus-visible:bg-emerald-100! dark:text-slate-300! dark:hover:border-emerald-600 dark:hover:bg-emerald-900! dark:hover:text-white! dark:focus-visible:bg-emerald-900!"}`}
                               >
@@ -346,7 +344,7 @@ export default function DashboardMenu({
                                     className="rotate-180 text-[10px] text-emerald-700 opacity-0 transition-opacity group-hover/submenu:opacity-100 group-focus-visible/submenu:opacity-100 dark:text-emerald-200"
                                   />
                                 )}
-                              </Link>
+                              </NavigationLink>
                             </li>
                           );
                         })}

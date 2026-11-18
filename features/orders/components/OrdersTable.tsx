@@ -1,5 +1,7 @@
 "use client";
 
+import type { RefreshFormList } from "@/shared/forms/submit";
+
 import { formatPersianDate } from "@/shared/dates/calendar";
 
 import { ActionFailure, runDeletion } from "@/shared/forms/delete-record";
@@ -24,7 +26,7 @@ interface OrdersTableProps {
   loading: boolean;
   setLoading: (loading: boolean) => void;
   setData: (data: OrderDetails[]) => void;
-  refreshData: () => void | Promise<void>;
+  refreshData: RefreshFormList;
 }
 
 export default function OrdersTable({
@@ -162,7 +164,6 @@ export default function OrdersTable({
       <OrdersFormModal
         open={formModal.open}
         setOpen={(open: boolean) => setFormModal((prev) => ({ ...prev, open }))}
-        setLoading={setLoading}
         data={formModal.data}
         refreshData={refreshData}
       />

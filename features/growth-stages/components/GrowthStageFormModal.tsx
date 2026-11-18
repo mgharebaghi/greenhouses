@@ -18,8 +18,8 @@ import type { GrowthStageRecord } from "@/features/growth-stages/types/record";
 import { getPlantVarieties } from "@/features/plant-varieties/actions";
 import Modal from "@/shared/components/FormModal";
 import { applyFieldErrors } from "@/shared/forms/field-errors";
-import { refreshSavedForm, submitForm } from "@/shared/forms/submit";
-import { PlusOutlined } from "@ant-design/icons";
+import { submitForm } from "@/shared/forms/submit";
+import useSavedForm from "@/shared/forms/useSavedForm";
 
 import { useEffect, useState } from "react";
 
@@ -54,6 +54,7 @@ export default function GrowthStageFormModal({
   setMainData,
   record,
 }: GrowthStageFormModalProps) {
+  const savedForm = useSavedForm();
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
   const [submitMessage, setSubmitMessage] = useState<{
@@ -112,7 +113,6 @@ export default function GrowthStageFormModal({
       type: "select",
       required: true,
       options: varityOptions,
-      icon: "🌱",
     },
     {
       name: "StageOrder",
@@ -121,7 +121,6 @@ export default function GrowthStageFormModal({
       type: "select",
       required: true,
       options: stageOrderOptions,
-      icon: "🔢",
     },
     {
       name: "EntryCriteria",
@@ -129,7 +128,6 @@ export default function GrowthStageFormModal({
       placeholder: "علایم ورود را شرح دهید",
       type: "textArea",
       required: false,
-      icon: "🚪",
     },
     {
       name: "ExitCriteria",
@@ -137,7 +135,6 @@ export default function GrowthStageFormModal({
       placeholder: "علائم خروج را شرح دهید",
       type: "textArea",
       required: false,
-      icon: "🚶",
     },
     {
       name: "StartDay",
@@ -145,7 +142,6 @@ export default function GrowthStageFormModal({
       placeholder: "تعداد روز",
       type: "number",
       required: false,
-      icon: "📅",
     },
     {
       name: "EndDay",
@@ -153,7 +149,6 @@ export default function GrowthStageFormModal({
       placeholder: "تعداد روز",
       type: "number",
       required: false,
-      icon: "📅",
     },
     {
       name: "StageName",
@@ -162,11 +157,11 @@ export default function GrowthStageFormModal({
       type: "select",
       required: true,
       options: stageNameOptions,
-      icon: "📋",
     },
   ];
 
   const handleSubmit = async (values: GrowthStageRecord) => {
+    if (loading || savedForm.saved) return;
     setLoading(true);
     setSubmitMessage(null);
     await submitForm(
@@ -175,20 +170,20 @@ export default function GrowthStageFormModal({
           ? await updateGrowthStage(record.ID, values)
           : await createGrowthStage(values);
         applyFieldErrors(form, result);
-        setSubmitMessage(result);
-        if (result.status !== "ok") return;
-
-        setMainLoading?.(true);
-        await refreshSavedForm(async () =>
-          setMainData?.(await getGrowthStages()),
-        );
-        if (!isEdit) form.resetFields();
-        setTimeout(handleClose, 1500);
+        if (result.status === "ok") {
+          await savedForm.complete(
+            result.message,
+            async () => setMainData?.(await getGrowthStages()),
+            handleClose,
+            setMainLoading,
+          );
+        } else {
+          setSubmitMessage(result);
+        }
       },
       setSubmitMessage,
       () => {
         setLoading(false);
-        setMainLoading?.(false);
       },
     );
   };
@@ -204,7 +199,6 @@ export default function GrowthStageFormModal({
       key={field.name}
       label={
         <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
-          <span className="text-base">{field.icon}</span>
           {field.label}
           {field.required && <span className="text-rose-500 text-xs">*</span>}
         </span>
@@ -260,13 +254,14 @@ export default function GrowthStageFormModal({
     <Modal
       open={isOpen}
       onClose={handleClose}
+      busy={loading}
+      savedForm={savedForm}
       heading={isEdit ? "ویرایش مرحله رشد" : "افزودن مرحله رشد جدید"}
       description={
         isEdit
           ? "اطلاعات مرحله رشد را ویرایش کنید"
           : "اطلاعات مرحله رشد را با دقت وارد کنید"
       }
-      icon={<PlusOutlined />}
       editing={isEdit}
     >
       <Form
@@ -274,6 +269,14 @@ export default function GrowthStageFormModal({
         layout="vertical"
         onFinish={handleSubmit}
         requiredMark={false}
+        actions={
+          <FormActions
+            message={submitMessage}
+            onCancel={handleClose}
+            loading={loading}
+            editing={isEdit}
+          />
+        }
       >
         <FormGrid title="مشخصات مرحله" columns={3}>
           {fields
@@ -297,12 +300,7 @@ export default function GrowthStageFormModal({
             .map(renderField)}
           <FormItem
             className="record-form-wide"
-            label={
-              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
-                <span className="text-base">📝</span>
-                توضیحات (یادداشت)
-              </span>
-            }
+            label="توضیحات (یادداشت)"
             name="note"
           >
             <Input.TextArea
@@ -312,14 +310,6 @@ export default function GrowthStageFormModal({
             />
           </FormItem>
         </FormGrid>
-
-        {/* Actions */}
-        <FormActions
-          message={submitMessage}
-          onCancel={handleClose}
-          loading={loading}
-          editing={isEdit}
-        />
       </Form>
     </Modal>
   );

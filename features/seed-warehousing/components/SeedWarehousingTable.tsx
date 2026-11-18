@@ -11,14 +11,17 @@ import { csvRows } from "@/shared/exports/csv";
 
 import type { WarehouseTransactionDetails } from "../types/details";
 
-import { deleteSeedWarehousing } from "@/features/seed-warehousing/actions";
+import {
+  deleteSeedWarehousing,
+  getAllSeedWarehousing,
+} from "@/features/seed-warehousing/actions";
 import DeleteModal from "@/shared/components/DeleteModal";
 import InsertionRow from "@/shared/components/InsertionRow";
 import Table, { detailsColumn } from "@/shared/components/Table";
 import TableActions from "@/shared/components/TableActions";
 import { Tag, message } from "antd";
 import { download, generateCsv, mkConfig } from "export-to-csv";
-import { useRouter } from "next/navigation";
+import useRemoteList from "@/shared/hooks/useRemoteList";
 import { useState } from "react";
 import { headers, seedWarehousingCSVData } from "../exports/csv";
 import SeedWarehousingDetailModal from "./SeedWarehousingDetailModal";
@@ -31,12 +34,14 @@ interface Props {
 }
 
 export default function SeedWarehousingTable({
-  data,
+  data: initialData,
   seedPackages,
   warehouses,
 }: Props) {
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const { data, setData, loading, refresh, setLoading } = useRemoteList(
+    getAllSeedWarehousing,
+    initialData,
+  );
   const [formModal, setFormModal] = useState<{
     open: boolean;
     data: WarehouseTransactionDetails | null;
@@ -63,20 +68,14 @@ export default function SeedWarehousingTable({
         setLoading(true);
         const result = await deleteSeedWarehousing(id);
         if (result.status !== "ok") throw new ActionFailure(result.message);
-        {
-          message.success("تراکنش با موفقیت حذف شد");
-          setDeleteModal(null);
-          router.refresh();
-        }
+        message.success("تراکنش با موفقیت حذف شد");
+        setDeleteModal(null);
+        setData((rows) => rows.filter((row) => row.ID !== id));
       },
       () => {
         setLoading(false);
       },
     );
-  };
-
-  const refreshData = () => {
-    router.refresh();
   };
 
   const columns = [
@@ -177,7 +176,7 @@ export default function SeedWarehousingTable({
         data={formModal.data}
         seedPackages={seedPackages}
         warehouses={warehouses}
-        onSuccess={refreshData}
+        refreshData={refresh}
       />
 
       <SeedWarehousingDetailModal

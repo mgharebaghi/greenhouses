@@ -15,9 +15,9 @@ import {
 import Modal from "@/shared/components/FormModal";
 import { applyFieldErrors } from "@/shared/forms/field-errors";
 import { loadFormOptions } from "@/shared/forms/load-options";
-import { refreshSavedForm, submitForm } from "@/shared/forms/submit";
+import { submitForm } from "@/shared/forms/submit";
+import useSavedForm from "@/shared/forms/useSavedForm";
 import { validationOptions } from "@/shared/validation/input";
-import { UserAddOutlined } from "@ant-design/icons";
 
 import { useEffect, useState } from "react";
 import { supplierName } from "../domain/name";
@@ -39,6 +39,7 @@ export default function SupplierFormModal({
   setMainData,
   setMainLoading,
 }: SupplierFormModalProps) {
+  const savedForm = useSavedForm();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{
     status: "ok" | "error";
@@ -62,14 +63,12 @@ export default function SupplierFormModal({
       label: "نام شرکت",
       required: false,
       placeholder: "شرکت...",
-      icon: "🏢",
     },
     {
       name: "BrandName",
       label: "نام برند",
       required: false,
       placeholder: "برند...",
-      icon: "🏷️",
     },
     // Row 3: Phone + Email
     {
@@ -77,14 +76,12 @@ export default function SupplierFormModal({
       label: "تلفن",
       required: true,
       placeholder: "0912...",
-      icon: "📱",
     },
     {
       name: "ContactEmail",
       label: "ایمیل",
       required: false,
       placeholder: "email@...",
-      icon: "✉️",
     },
     // Row 4: Country + City + License
     {
@@ -92,28 +89,24 @@ export default function SupplierFormModal({
       label: "کشور",
       required: false,
       placeholder: "کشور...",
-      icon: "🌍",
     },
     {
       name: "SupplierCity",
       label: "شهر",
       required: false,
       placeholder: "شهر...",
-      icon: "🏙️",
     },
     {
       name: "LicenseNumber",
       label: "شماره مجوز",
       required: false,
       placeholder: "مجوز...",
-      icon: "📜",
     },
     {
       name: "CompanyAddress",
       label: "آدرس",
       required: false,
       placeholder: "آدرس کامل...",
-      icon: "📍",
       textArea: true,
     },
   ] satisfies Array<{
@@ -121,7 +114,6 @@ export default function SupplierFormModal({
     label: string;
     required: boolean;
     placeholder: string;
-    icon: string;
     textArea?: boolean;
   }>;
 
@@ -156,6 +148,7 @@ export default function SupplierFormModal({
   }, [isOpen, record, form]);
 
   const handleSubmit = async (values: SupplierInput) => {
+    if (loading || savedForm.saved) return;
     await submitForm(
       async () => {
         setMessage(null);
@@ -170,34 +163,22 @@ export default function SupplierFormModal({
 
         applyFieldErrors(form, result);
         if (result.status === "ok") {
-          setMessage({
-            status: "ok",
-            message: isEdit
-              ? "ویرایش با موفقیت انجام شد"
-              : "افزودن با موفقیت انجام شد",
-          });
-          setMainLoading(true);
-          await refreshSavedForm(async () => setMainData(await getSuppliers()));
-          setMainLoading(false);
-
-          if (!isEdit) form.resetFields();
-
-          setTimeout(() => {
-            setIsOpen(false);
-            setMessage(null);
-          }, 1500);
+          await savedForm.complete(
+            result.message,
+            async () => setMainData(await getSuppliers()),
+            handleClose,
+            setMainLoading,
+          );
         } else {
           setMessage({
             status: "error",
             message: result.message,
           });
         }
-        setLoading(false);
       },
       (feedback) => setMessage(feedback),
       () => {
         setLoading(false);
-        setMainLoading?.(false);
       },
     );
   };
@@ -215,9 +196,6 @@ export default function SupplierFormModal({
       key={field.name}
       label={
         <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5 mb-1">
-          {field.icon && (
-            <span className="text-sm opacity-80">{field.icon}</span>
-          )}
           {field.label}
           {field.required && (
             <span className="text-rose-500 text-[10px]">*</span>
@@ -261,13 +239,14 @@ export default function SupplierFormModal({
     <Modal
       open={isOpen}
       onClose={handleClose}
+      busy={loading}
+      savedForm={savedForm}
       heading={isEdit ? "ویرایش تامین‌کننده" : "افزودن تامین‌کننده جدید"}
       description={
         isEdit
           ? "اطلاعات تامین‌کننده را ویرایش کنید"
           : "اطلاعات تامین‌کننده را با دقت وارد کنید"
       }
-      icon={<UserAddOutlined />}
       editing={isEdit}
     >
       <Form
@@ -283,6 +262,15 @@ export default function SupplierFormModal({
             ]);
         }}
         requiredMark={false}
+        actions={
+          <FormActions
+            message={message}
+            onCancel={handleClose}
+            loading={loading}
+            editing={isEdit}
+            submitDisabled={peopleLoading}
+          />
+        }
       >
         <FormGrid title="شخص مرتبط">
           <FormItem
@@ -349,14 +337,6 @@ export default function SupplierFormModal({
             )
             .map(renderField)}
         </FormGrid>
-
-        <FormActions
-          message={message}
-          onCancel={handleClose}
-          loading={loading}
-          editing={isEdit}
-          submitDisabled={peopleLoading}
-        />
       </Form>
     </Modal>
   );

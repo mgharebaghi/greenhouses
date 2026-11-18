@@ -9,9 +9,9 @@ import { createPlant, getPlants, updatePlant } from "@/features/plants/actions";
 import type { PlantRecord } from "@/features/plants/types/record";
 import Modal from "@/shared/components/FormModal";
 import { applyFieldErrors } from "@/shared/forms/field-errors";
-import { refreshSavedForm, submitForm } from "@/shared/forms/submit";
+import { submitForm } from "@/shared/forms/submit";
+import useSavedForm from "@/shared/forms/useSavedForm";
 import type { FormValues } from "@/shared/forms/types";
-import { EditOutlined, PlusOutlined } from "@ant-design/icons";
 
 import { useEffect, useState } from "react";
 import { plantInputSchema } from "../schema";
@@ -31,6 +31,7 @@ export default function PlantFormModal({
   setMainLoading,
   record,
 }: PlantFormModalProps) {
+  const savedForm = useSavedForm();
   const [loading, setLoading] = useState(false);
   const [modalMsg, setModalMsg] = useState<{
     status: "ok" | "error";
@@ -44,11 +45,6 @@ export default function PlantFormModal({
   const modalSubTitle = isEdit
     ? "اطلاعات گیاه را ویرایش کنید"
     : "اطلاعات گیاه را وارد کنید";
-  const icon = isEdit ? (
-    <EditOutlined className="text-2xl" />
-  ) : (
-    <PlusOutlined className="text-2xl" />
-  );
 
   useEffect(() => {
     setMounted(true);
@@ -69,7 +65,6 @@ export default function PlantFormModal({
       placeholder: "نام رایج گیاه",
       type: "text",
       required: true,
-      icon: "🌱",
     },
     {
       name: "ScientificName",
@@ -77,7 +72,6 @@ export default function PlantFormModal({
       placeholder: "نام علمی گیاه (لاتین)",
       type: "text",
       required: true,
-      icon: "🔬",
     },
     {
       name: "PlantFamily",
@@ -85,60 +79,37 @@ export default function PlantFormModal({
       placeholder: "خانواده گیاه",
       type: "text",
       required: true,
-      icon: "🌿",
     },
-    // {name: "Notes", label: "توضیحات", placeholder: "توضیحات", type: "text", required: false, icon: "📝"}
   ];
 
   const handleSubmit = async (
     values: FormValues<import("zod").infer<typeof plantInputSchema>>,
   ) => {
+    if (loading || savedForm.saved) return;
     await submitForm(
       async () => {
         setLoading(true);
         setModalMsg(null);
 
-        try {
-          if (isEdit && record) {
-            const result = await updatePlant({ id: record.ID, data: values });
-            applyFieldErrors(form, result);
-            if (result.status === "error") {
-              setModalMsg(result);
-              return;
-            }
-            setModalMsg({
-              status: "ok",
-              message: "اطلاعات گیاه با موفقیت ویرایش شد",
-            });
-          } else {
-            const result = await createPlant(values);
-            applyFieldErrors(form, result);
-            if (result.status === "error") {
-              setModalMsg(result);
-              return;
-            }
-            setModalMsg({ status: "ok", message: "گیاه با موفقیت افزوده شد" });
-          }
-
-          setMainLoading(true);
-          await refreshSavedForm(async () => setMainData(await getPlants()));
-          setMainLoading(false);
-
-          setTimeout(() => {
-            handleClose();
-          }, 1500);
-        } catch {
-          setModalMsg({
-            status: "error",
-            message: "خطایی رخ داد، لطفا دوباره تلاش کنید.",
-          });
+        const result =
+          isEdit && record
+            ? await updatePlant({ id: record.ID, data: values })
+            : await createPlant(values);
+        applyFieldErrors(form, result);
+        if (result.status === "ok") {
+          await savedForm.complete(
+            result.message,
+            async () => setMainData(await getPlants()),
+            handleClose,
+            setMainLoading,
+          );
+        } else {
+          setModalMsg(result);
         }
-        setLoading(false);
       },
       (feedback) => setModalMsg(feedback),
       () => {
         setLoading(false);
-        setMainLoading?.(false);
       },
     );
   };
@@ -155,10 +126,11 @@ export default function PlantFormModal({
     <Modal
       open={modalOpen}
       onClose={handleClose}
+      busy={loading}
+      savedForm={savedForm}
       forceRender
       heading={modalTitle}
       description={modalSubTitle}
-      icon={icon}
       editing={isEdit}
     >
       <Form
@@ -166,6 +138,14 @@ export default function PlantFormModal({
         layout="vertical"
         onFinish={handleSubmit}
         requiredMark={false}
+        actions={
+          <FormActions
+            message={modalMsg}
+            onCancel={handleClose}
+            loading={loading}
+            editing={isEdit}
+          />
+        }
       >
         <FormGrid title="مشخصات گیاه" columns={3}>
           {fields.map((field) => (
@@ -173,7 +153,6 @@ export default function PlantFormModal({
               key={field.name}
               label={
                 <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
-                  <span className="text-base">{field.icon}</span>
                   {field.label}
                   {field.required && (
                     <span className="text-rose-500 text-xs">*</span>
@@ -195,15 +174,7 @@ export default function PlantFormModal({
               />
             </FormItem>
           ))}
-          <FormItem
-            className="record-form-wide"
-            label={
-              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
-                <span>📝</span>توضیحات
-              </span>
-            }
-            name="Notes"
-          >
+          <FormItem className="record-form-wide" label="توضیحات" name="Notes">
             <Input.TextArea
               placeholder="توضیحات گیاه"
               disabled={loading}
@@ -211,13 +182,6 @@ export default function PlantFormModal({
             />
           </FormItem>
         </FormGrid>
-
-        <FormActions
-          message={modalMsg}
-          onCancel={handleClose}
-          loading={loading}
-          editing={isEdit}
-        />
       </Form>
     </Modal>
   );

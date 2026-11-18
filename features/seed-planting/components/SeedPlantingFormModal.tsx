@@ -3,7 +3,6 @@
 import { loadFormOptions } from "@/shared/forms/load-options";
 
 import {
-  Checkbox,
   DatePicker,
   Form,
   FormActions,
@@ -13,6 +12,7 @@ import {
   Select,
 } from "@/shared/components/FormControls";
 import QrImage from "@/shared/components/QrImage";
+import { SeedTypePicker } from "@/shared/components/SeedType";
 
 import { seedPlantingInputSchema } from "../schema";
 
@@ -20,7 +20,8 @@ import { publicOrderUrl } from "@/shared/config/public-urls";
 
 import Modal from "@/shared/components/FormModal";
 import { applyFieldErrors } from "@/shared/forms/field-errors";
-import { refreshSavedForm, submitForm } from "@/shared/forms/submit";
+import { submitForm, type RefreshFormList } from "@/shared/forms/submit";
+import useSavedForm from "@/shared/forms/useSavedForm";
 
 import { getGreenhouses } from "@/features/greenhouses/actions";
 import {
@@ -30,8 +31,6 @@ import {
   updateSeedPlanting,
 } from "@/features/seed-planting/actions";
 import type { SeedPlantingRecord } from "@/features/seed-planting/types/record";
-
-import { ExperimentOutlined } from "@ant-design/icons";
 
 import { useEffect, useState } from "react";
 
@@ -47,38 +46,18 @@ type OrderData = Awaited<ReturnType<typeof getOrdersForDropdown>>[number] & {
   generatedQRCode?: string;
 };
 
-type SeedVariety = NonNullable<
-  OrderData["Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage"]
->["Tbl_plantVariety"];
-
-function VarietyLabel({ variety }: { variety: SeedVariety | undefined }) {
-  const plant = variety?.Tbl_Plants?.CommonName?.trim();
-  return (
-    <div className="flex min-w-0 flex-wrap items-baseline gap-x-1.5 text-sm text-slate-600 [overflow-wrap:anywhere] dark:text-slate-300">
-      <bdi>{variety?.VarietyName || "—"}</bdi>
-      {plant && (
-        <span className="text-xs text-slate-500 dark:text-slate-400">
-          ({plant})
-        </span>
-      )}
-    </div>
-  );
-}
-
 export default function SeedPlantingFormModal({
   modalOpen,
   setModalOpen,
-  setMainLoading,
   record,
   refreshData,
 }: {
   modalOpen: boolean;
   setModalOpen: (open: boolean) => void;
-  setMainData?: (data: SeedPlantingRecord[]) => void;
-  setMainLoading?: (loading: boolean) => void;
   record?: SeedPlantingRecord | null;
-  refreshData: () => Promise<void>;
+  refreshData: RefreshFormList;
 }) {
+  const savedForm = useSavedForm();
   const [loading, setLoading] = useState(false);
   const [modalMsg, setModalMsg] = useState<{
     status: "ok" | "error";
@@ -93,7 +72,6 @@ export default function SeedPlantingFormModal({
   // State for the custom logic
   const [selectedOrder, setSelectedOrder] = useState<OrderData | null>(null);
   const [seedType, setSeedType] = useState<boolean | null>(null); // true = Scion, false = Rootstock
-  const [, setShowVarietyInfo] = useState(false);
 
   const isEdit = !!record;
   const modalTitle = isEdit ? "ویرایش کشت بذر" : "کاشت بذور";
@@ -140,7 +118,6 @@ export default function SeedPlantingFormModal({
         const ord = ordersWithQR.find((o) => o.ID === record.OrderID);
         if (ord) {
           setSelectedOrder(ord);
-          setShowVarietyInfo(true);
         }
       }
     };
@@ -161,7 +138,6 @@ export default function SeedPlantingFormModal({
         form.resetFields();
         setSeedType(null);
         setSelectedOrder(null);
-        setShowVarietyInfo(false);
       }
     }
     return cancelOptions;
@@ -171,10 +147,8 @@ export default function SeedPlantingFormModal({
     const ord = orders.find((o) => o.ID === orderId);
     if (ord) {
       setSelectedOrder(ord);
-      setShowVarietyInfo(true);
     } else {
       setSelectedOrder(null);
-      setShowVarietyInfo(false);
     }
   };
 
@@ -191,12 +165,13 @@ export default function SeedPlantingFormModal({
   const handleSubmit = async (
     values: import("zod").input<typeof seedPlantingInputSchema>,
   ) => {
+    if (loading || savedForm.saved) return;
     await submitForm(
       async () => {
         if (seedType === null) {
           setModalMsg({
             status: "error",
-            message: "لطفاً نوع بذر (پایه یا پیوندی) را مشخص کنید",
+            message: "لطفاً نوع بذر (گیاه پایه یا پیوندک) را مشخص کنید",
           });
           return;
         }
@@ -216,25 +191,16 @@ export default function SeedPlantingFormModal({
           res = await createSeedPlanting(dataToSubmit);
         }
 
-        setModalMsg({
-          status: res.status as "ok" | "error",
-          message: res.message,
-        });
-
         applyFieldErrors(form, res);
         if (res.status === "ok") {
-          await refreshSavedForm(refreshData);
-          setTimeout(() => {
-            handleClose();
-            form.resetFields();
-          }, 1000);
+          await savedForm.complete(res.message, refreshData, handleClose);
+        } else {
+          setModalMsg({ status: "error", message: res.message });
         }
-        setLoading(false);
       },
       (feedback) => setModalMsg(feedback),
       () => {
         setLoading(false);
-        setMainLoading?.(false);
       },
     );
   };
@@ -245,16 +211,25 @@ export default function SeedPlantingFormModal({
     <Modal
       open={modalOpen}
       onClose={handleClose}
+      busy={loading}
+      savedForm={savedForm}
       heading={modalTitle}
       description={modalSubTitle}
-      icon={<ExperimentOutlined />}
       editing={isEdit}
     >
       <Form
         form={form}
         layout="vertical"
         onFinish={handleSubmit}
-        className="space-y-5"
+        fieldsClassName="space-y-5"
+        actions={
+          <FormActions
+            message={modalMsg}
+            onCancel={handleClose}
+            loading={loading}
+            editing={isEdit}
+          />
+        }
       >
         {/* Order & Seed Type Section - Card Style */}
         <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border-2 border-slate-100 dark:border-slate-700 shadow-sm transition-all duration-300">
@@ -264,7 +239,7 @@ export default function SeedPlantingFormModal({
               <FormItem
                 label={
                   <span className="font-semibold text-slate-700 dark:text-slate-300">
-                    📦 کد سفارش
+                    کد سفارش
                   </span>
                 }
                 name="OrderID"
@@ -286,63 +261,21 @@ export default function SeedPlantingFormModal({
                 />
               </FormItem>
 
-              {/* Variety & Seed Type Selection */}
               {selectedOrder && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                  {/* Rootstock Box */}
-                  <div
-                    className={`relative p-4 rounded-xl border-2 transition-all cursor-pointer group ${
-                      seedType === false
-                        ? "border-emerald-500 bg-emerald-50/50 dark:bg-emerald-900/20"
-                        : "border-slate-200 dark:border-slate-600 hover:border-emerald-300 dark:hover:border-emerald-700 bg-slate-50 dark:bg-slate-900"
-                    }`}
-                    onClick={() => handleSeedTypeChange(false)}
-                  >
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="flex flex-wrap items-baseline gap-x-1 font-semibold text-slate-700 dark:text-slate-200">
-                        گیاه پایه
-                        <bdi lang="en" className="text-xs font-normal">
-                          (ROOTSTOCK)
-                        </bdi>
-                      </span>
-                      <Checkbox checked={seedType === false} />
-                    </div>
-                    <VarietyLabel
-                      variety={
-                        selectedOrder
-                          .Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage
-                          ?.Tbl_plantVariety
-                      }
-                    />
-                  </div>
-
-                  {/* Scion Box */}
-                  <div
-                    className={`relative p-4 rounded-xl border-2 transition-all cursor-pointer group ${
-                      seedType === true
-                        ? "border-emerald-500 bg-emerald-50/50 dark:bg-emerald-900/20"
-                        : "border-slate-200 dark:border-slate-600 hover:border-emerald-300 dark:hover:border-emerald-700 bg-slate-50 dark:bg-slate-900"
-                    }`}
-                    onClick={() => handleSeedTypeChange(true)}
-                  >
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="flex flex-wrap items-baseline gap-x-1 font-semibold text-slate-700 dark:text-slate-200">
-                        پیوندک
-                        <bdi lang="en" className="text-xs font-normal">
-                          (SCION)
-                        </bdi>
-                      </span>
-                      <Checkbox checked={seedType === true} />
-                    </div>
-                    <VarietyLabel
-                      variety={
-                        selectedOrder
-                          .Tbl_SeedPackage_Tbl_Orders_ScionIDToTbl_SeedPackage
-                          ?.Tbl_plantVariety
-                      }
-                    />
-                  </div>
-                </div>
+                <SeedTypePicker
+                  value={seedType}
+                  onChange={handleSeedTypeChange}
+                  rootstock={
+                    selectedOrder
+                      .Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage
+                      ?.Tbl_plantVariety
+                  }
+                  scion={
+                    selectedOrder
+                      .Tbl_SeedPackage_Tbl_Orders_ScionIDToTbl_SeedPackage
+                      ?.Tbl_plantVariety
+                  }
+                />
               )}
             </div>
 
@@ -369,7 +302,7 @@ export default function SeedPlantingFormModal({
             <FormItem
               label={
                 <span className="font-semibold text-slate-700 dark:text-slate-300">
-                  📅 تاریخ کاشت
+                  تاریخ کاشت
                 </span>
               }
               name="PlantingDate"
@@ -380,7 +313,7 @@ export default function SeedPlantingFormModal({
             <FormItem
               label={
                 <span className="font-semibold text-slate-700 dark:text-slate-300">
-                  🔢 تعداد بذر کاشته شده
+                  تعداد بذر کاشته شده
                 </span>
               }
               name="SeedPlantingNumber"
@@ -393,7 +326,7 @@ export default function SeedPlantingFormModal({
 
         {/* Section 2: Tray Info & Location */}
         <FormGrid title="اطلاعات سینی و گلخانه" columns={3}>
-          <FormItem label="🏠 نام گلخانه" name="GreenhouseID">
+          <FormItem label="نام گلخانه" name="GreenhouseID">
             <Select
               options={greenhouses}
 
@@ -402,7 +335,7 @@ export default function SeedPlantingFormModal({
           </FormItem>
 
           <FormItem
-            label="👨‍🔧 تکنسین مسئول"
+            label="تکنسین مسئول"
             name="TechnicianID"
             rules={[{ required: true }]}
           >
@@ -414,7 +347,7 @@ export default function SeedPlantingFormModal({
           </FormItem>
 
           <FormItem
-            label="📥 تعداد سینی"
+            label="تعداد سینی"
             name="TrayNumber"
             rules={[{ required: true }]}
           >
@@ -484,14 +417,6 @@ export default function SeedPlantingFormModal({
             <DatePicker />
           </FormItem>
         </FormGrid>
-
-        {/* Actions */}
-        <FormActions
-          message={modalMsg}
-          onCancel={handleClose}
-          loading={loading}
-          editing={isEdit}
-        />
       </Form>
     </Modal>
   );

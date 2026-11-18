@@ -25,8 +25,8 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export default function Login() {
-  const [error, setError] = useState<string | null>(null);
+export default function Login({ sessionError }: { sessionError?: string }) {
+  const [error, setError] = useState<string | null>(sessionError ?? null);
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
   const [form] = Form.useForm();

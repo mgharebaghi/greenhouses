@@ -15,7 +15,7 @@ export async function updatePlantVariety(params: {
     const id = parseInput(recordIdSchema, params?.id);
     const data = parseInput(varietyInputSchema, params.data);
     await prisma.tbl_PlantVariety.update({ where: { ID: id }, data });
-    revalidatePath("/dashboard/varities");
+    revalidatePath("/dashboard/plantvarities");
     return { status: "ok" as const, message: "اطلاعات با موفقیت ویرایش شد." };
   } catch (error) {
     return actionError(error);

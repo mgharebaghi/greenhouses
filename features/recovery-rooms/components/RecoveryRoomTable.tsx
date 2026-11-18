@@ -1,5 +1,7 @@
 "use client";
 
+import type { RefreshFormList } from "@/shared/forms/submit";
+
 import { formatPersianDate } from "@/shared/dates/calendar";
 
 import { ActionFailure, runDeletion } from "@/shared/forms/delete-record";
@@ -25,7 +27,7 @@ interface RecoveryRoomTableProps {
   loading: boolean;
   setLoading: (loading: boolean) => void;
   setData: (data: RecoveryRoomListItem[]) => void;
-  refreshData: () => void;
+  refreshData: RefreshFormList;
 }
 
 export default function RecoveryRoomTable({
@@ -151,7 +153,6 @@ export default function RecoveryRoomTable({
           setOpen={(open: boolean) =>
             setFormModal((prev) => ({ ...prev, open }))
           }
-          setLoading={setLoading}
           data={formModal.data}
           refreshData={refreshData}
         />

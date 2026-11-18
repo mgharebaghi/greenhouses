@@ -11,9 +11,9 @@ import InsertionRow from "@/shared/components/InsertionRow";
 import Table, { detailsColumn } from "@/shared/components/Table";
 import TableActions from "@/shared/components/TableActions";
 import { download, generateCsv, mkConfig } from "export-to-csv";
-import { useRouter } from "next/navigation";
+import useRemoteList from "@/shared/hooks/useRemoteList";
 import { useState } from "react";
-import { deleteGraftingOperation } from "../actions";
+import { deleteGraftingOperation, getAllGraftingOperations } from "../actions";
 import { graftingCSVData, headers } from "../exports/csv";
 import { GraftingFormData, GraftingOperationWithDetails } from "../types";
 import GraftingDetailModal from "./GraftingDetailModal";
@@ -24,8 +24,17 @@ interface Props {
   formData: GraftingFormData;
 }
 
+async function loadGraftingOperations() {
+  const result = await getAllGraftingOperations();
+  if (result.status === "error") throw new ActionFailure(result.message);
+  return result.data ?? [];
+}
+
 export default function GraftingTable({ initialData, formData }: Props) {
-  const router = useRouter();
+  const { data, setData, loading, refresh } = useRemoteList(
+    loadGraftingOperations,
+    initialData,
+  );
 
   // Modal & Record State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -50,11 +59,9 @@ export default function GraftingTable({ initialData, formData }: Props) {
         setDeleteModalMsg("");
         const res = await deleteGraftingOperation(id);
         if (res.status !== "ok") throw new ActionFailure(res.message);
-        {
-          setDeleteModalLoading(false);
-          setDeleteModalOpen(null);
-          router.refresh();
-        }
+        setDeleteModalLoading(false);
+        setDeleteModalOpen(null);
+        setData((rows) => rows.filter((row) => row.ID !== id));
       },
       () => {
         setDeleteModalLoading(false);
@@ -167,7 +174,7 @@ export default function GraftingTable({ initialData, formData }: Props) {
           setIsModalOpen(true);
         }}
         csvOnclick={async () => {
-          const csvData = await graftingCSVData(initialData);
+          const csvData = await graftingCSVData(data);
           const options = mkConfig({
             useKeysAsHeaders: false,
             columnHeaders: headers,
@@ -176,25 +183,22 @@ export default function GraftingTable({ initialData, formData }: Props) {
           const csv = generateCsv(options)(csvRows(csvData, headers));
           download(options)(csv);
         }}
-        data={initialData}
+        data={data}
       />
 
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
         <Table
           columns={columns}
-          dataSource={initialData}
+          dataSource={data}
           rowKey="ID"
-          loading={false}
+          loading={loading}
         />
       </div>
 
       <GraftingFormModal
         open={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
-        onSuccess={() => {
-          setIsModalOpen(false);
-          router.refresh();
-        }}
+        refreshData={refresh}
         formData={formData}
         initialData={editingRecord} // Pass editing record if any
       />

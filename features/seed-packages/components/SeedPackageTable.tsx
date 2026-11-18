@@ -169,7 +169,6 @@ export default function SeedPackageTable({
       <SeedPackageInsUpModal
         open={insUpModal.open}
         setOpen={(open) => setInsUpModal((prev) => ({ ...prev, open }))}
-        setLoading={setLoading}
         data={insUpModal.data}
         refreshData={refreshData}
       />

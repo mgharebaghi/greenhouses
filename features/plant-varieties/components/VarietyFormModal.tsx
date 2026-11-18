@@ -14,7 +14,8 @@ import {
 
 import Modal from "@/shared/components/FormModal";
 import { applyFieldErrors } from "@/shared/forms/field-errors";
-import { refreshSavedForm, submitForm } from "@/shared/forms/submit";
+import { submitForm } from "@/shared/forms/submit";
+import useSavedForm from "@/shared/forms/useSavedForm";
 
 import {
   createPlantVariety,
@@ -24,7 +25,6 @@ import {
 import type { PlantVarietyRecord } from "@/features/plant-varieties/types/record";
 import { getPlants } from "@/features/plants/actions";
 import type { PlantRecord } from "@/features/plants/types/record";
-import { PlusOutlined } from "@ant-design/icons";
 
 import { useEffect, useState } from "react";
 import type { PlantVarietyDTO } from "../types";
@@ -47,6 +47,7 @@ export default function VarietyFormModal({
   record,
 }: VarietyFormModalProps) {
   const [form] = Form.useForm();
+  const savedForm = useSavedForm();
   const [loading, setLoading] = useState(false);
   const [selectLoading, setSelectLoading] = useState(false);
   const [plantOptions, setPlantOptions] = useState<SelectOption[]>([]);
@@ -93,7 +94,6 @@ export default function VarietyFormModal({
       placeholder: "واریته را وارد کنید",
       type: "text",
       required: true,
-      icon: "🌾",
     },
     {
       name: "PlantID",
@@ -102,7 +102,6 @@ export default function VarietyFormModal({
       type: "select",
       required: true,
       options: plantOptions,
-      icon: "🌱",
     },
     {
       name: "DaysToGermination",
@@ -110,7 +109,6 @@ export default function VarietyFormModal({
       placeholder: "روز",
       type: "number",
       required: false,
-      icon: "🌱",
     },
     {
       name: "DaysToSprout",
@@ -118,7 +116,6 @@ export default function VarietyFormModal({
       placeholder: "روز",
       type: "number",
       required: false,
-      icon: "🌿",
     },
     {
       name: "DaysToSeedling",
@@ -126,7 +123,6 @@ export default function VarietyFormModal({
       placeholder: "روز",
       type: "number",
       required: false,
-      icon: "🪴",
     },
     {
       name: "DaysToMaturity",
@@ -134,7 +130,6 @@ export default function VarietyFormModal({
       placeholder: "روز",
       type: "number",
       required: false,
-      icon: "🌳",
     },
     {
       name: "IdealTempMin",
@@ -142,7 +137,6 @@ export default function VarietyFormModal({
       placeholder: "دما",
       type: "number",
       required: false,
-      icon: "🌡️",
     },
     {
       name: "IdealTempMax",
@@ -150,7 +144,6 @@ export default function VarietyFormModal({
       placeholder: "دما",
       type: "number",
       required: false,
-      icon: "🌡️",
     },
     {
       name: "IdealHumidityMin",
@@ -158,7 +151,6 @@ export default function VarietyFormModal({
       placeholder: "رطوبت",
       type: "number",
       required: false,
-      icon: "💧",
     },
     {
       name: "IdealHumidityMax",
@@ -166,7 +158,6 @@ export default function VarietyFormModal({
       placeholder: "رطوبت",
       type: "number",
       required: false,
-      icon: "💧",
     },
     {
       name: "LightRequirement",
@@ -174,11 +165,11 @@ export default function VarietyFormModal({
       placeholder: "نیاز نوری",
       type: "text",
       required: false,
-      icon: "☀️",
     },
   ];
 
   const handleSubmit = async (values: PlantVarietyRecord) => {
+    if (loading || savedForm.saved) return;
     await submitForm(
       async () => {
         setLoading(true);
@@ -189,34 +180,20 @@ export default function VarietyFormModal({
 
         applyFieldErrors(form, ok);
         if (ok.status === "ok") {
-          setMessage({
-            status: "ok",
-            message: isEdit
-              ? "اطلاعات واریته با موفقیت ویرایش شد"
-              : "واریته جدید با موفقیت افزوده شد",
-          });
-          setMainLoading?.(true);
-          await refreshSavedForm(async () =>
-            setMainData?.(await getPlantVarieties()),
+          await savedForm.complete(
+            ok.message,
+            async () => setMainData?.(await getPlantVarieties()),
+            handleClose,
+            setMainLoading,
           );
-          setMainLoading?.(false);
-
-          if (!isEdit) form.resetFields();
-
-          setTimeout(() => {
-            onClose?.();
-            setMessage(null);
-          }, 1500);
         } else {
           setMessage(ok);
         }
-        setLoading(false);
       },
       (feedback) =>
         setMessage({ status: feedback.status, message: feedback.message }),
       () => {
         setLoading(false);
-        setMainLoading?.(false);
       },
     );
   };
@@ -234,7 +211,6 @@ export default function VarietyFormModal({
       key={field.name}
       label={
         <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
-          <span className="text-base">{field.icon}</span>
           {field.label}
           {field.required && <span className="text-rose-500 text-xs">*</span>}
         </span>
@@ -283,13 +259,14 @@ export default function VarietyFormModal({
     <Modal
       open={isOpen}
       onClose={handleClose}
+      busy={loading}
+      savedForm={savedForm}
       heading={isEdit ? "ویرایش واریته" : "افزودن واریته"}
       description={
         isEdit
           ? "اطلاعات واریته را ویرایش کنید"
           : "اطلاعات واریته جدید را وارد کنید"
       }
-      icon={<PlusOutlined />}
       editing={isEdit}
     >
       <Form
@@ -297,6 +274,14 @@ export default function VarietyFormModal({
         layout="vertical"
         onFinish={handleSubmit}
         requiredMark={false}
+        actions={
+          <FormActions
+            message={message}
+            onCancel={handleClose}
+            loading={loading}
+            editing={isEdit}
+          />
+        }
       >
         <FormGrid title="مشخصات رقم">
           {fields
@@ -329,16 +314,7 @@ export default function VarietyFormModal({
               ].includes(field.name),
             )
             .map(renderField)}
-          <FormItem
-            className="record-form-wide"
-            label={
-              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
-                <span className="text-base">📝</span>
-                یادداشت
-              </span>
-            }
-            name="Notes"
-          >
+          <FormItem className="record-form-wide" label="یادداشت" name="Notes">
             <Input.TextArea
               placeholder="یادداشت‌های اضافی"
               disabled={loading}
@@ -346,13 +322,6 @@ export default function VarietyFormModal({
             />
           </FormItem>
         </FormGrid>
-
-        <FormActions
-          message={message}
-          onCancel={handleClose}
-          loading={loading}
-          editing={isEdit}
-        />
       </Form>
     </Modal>
   );

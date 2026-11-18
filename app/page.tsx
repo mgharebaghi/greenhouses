@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
-  await requireAuth("/");
+  const sessionError = await requireAuth("/");
 
-  return <Login />;
+  return <Login sessionError={sessionError} />;
 }

@@ -3,6 +3,7 @@
 import { removeAuth } from "@/server/auth/actions";
 import DashboardMenu from "@/shared/components/Menu";
 import GreenhouseButton from "@/shared/components/GreenhouseButton";
+import NavigationLink from "@/shared/components/NavigationLink";
 import ThemeToggle from "@/shared/components/ThemeToggle";
 import { formatPersianDate, formatTehranTime } from "@/shared/dates/calendar";
 import { useServerDay, useServerTime } from "@/shared/dates/ServerClock";
@@ -56,6 +57,15 @@ export default function DashboardShell({
   const [title, description] = pages[pathname] ?? ["سامانه گلخانه"];
   const time = useServerTime();
   const today = useServerDay();
+  const logo = (
+    <Image
+      src="/fakoor-logo.png"
+      alt="فکور پیوند آریا"
+      width={42}
+      height={42}
+      className="size-8 shrink-0 rounded-lg border border-slate-200 bg-white object-contain p-0.5 sm:size-10 dark:border-slate-600"
+    />
+  );
 
   return (
     <div
@@ -73,13 +83,18 @@ export default function DashboardShell({
               aria-label="باز کردن منو"
               aria-expanded={openDrawer}
             />
-            <Image
-              src="/fakoor-logo.png"
-              alt="فکور پیوند آریا"
-              width={42}
-              height={42}
-              className="size-8 shrink-0 rounded-lg border border-slate-200 bg-white object-contain p-0.5 sm:size-10 dark:border-slate-600"
-            />
+            {pathname === "/dashboard" ? (
+              logo
+            ) : (
+              <NavigationLink
+                href="/dashboard"
+                aria-label="فکور پیوند آریا، رفتن به داشبورد"
+                title="رفتن به داشبورد"
+                className="inline-flex shrink-0 rounded-lg outline-offset-2 motion-safe:transition-opacity hover:opacity-80 focus-visible:outline-2 focus-visible:outline-emerald-600"
+              >
+                {logo}
+              </NavigationLink>
+            )}
             <div className="min-w-0 border-s border-slate-200 ps-2.5 sm:ps-4 dark:border-slate-700">
               <h1 className="text-sm leading-5 font-bold text-slate-900 sm:text-lg sm:leading-6 dark:text-slate-50">
                 {title}

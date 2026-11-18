@@ -1,5 +1,7 @@
 "use client";
 
+import type { RefreshFormList } from "@/shared/forms/submit";
+
 import { ActionFailure, runDeletion } from "@/shared/forms/delete-record";
 
 import { csvRows } from "@/shared/exports/csv";
@@ -22,7 +24,7 @@ interface NurseryRoomsTableProps {
   loading: boolean;
   setLoading: (loading: boolean) => void;
   setData: (data: NurseryRoomRecord[]) => void;
-  refreshData: () => void;
+  refreshData: RefreshFormList;
 }
 
 export default function NurseryRoomsTable({
@@ -130,7 +132,6 @@ export default function NurseryRoomsTable({
       <NurseryRoomsInsUpModal
         open={insUpModal.open}
         setOpen={(open) => setInsUpModal((prev) => ({ ...prev, open }))}
-        setLoading={setLoading}
         data={insUpModal.data}
         refreshData={refreshData}
       />

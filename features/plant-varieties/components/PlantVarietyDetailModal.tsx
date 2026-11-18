@@ -1,6 +1,15 @@
 "use client";
 
 import DetailModal, { InfoCard } from "@/shared/components/DetailModal";
+import {
+  AppstoreOutlined,
+  BulbOutlined,
+  ClockCircleOutlined,
+  CloudOutlined,
+  DashboardOutlined,
+  ExperimentOutlined,
+  FileTextOutlined,
+} from "@ant-design/icons";
 import { PlantVarietyDTO } from "../types";
 
 interface PlantVarietyDetailModalProps {
@@ -21,12 +30,12 @@ export default function PlantVarietyDetailModal({
       open={open}
       onClose={onClose}
       title="جزئیات واریته"
-      icon={<span className="text-2xl">🌿</span>}
+      icon={<AppstoreOutlined />}
     >
       {/* اطلاعات اولیه */}
       <InfoCard
         title="اطلاعات اولیه"
-        icon={<span className="text-xl">🌱</span>}
+        icon={<ExperimentOutlined />}
         items={[
           { label: "واریته", value: data.VarietyName },
           { label: "نام رایج", value: data.Tbl_Plants?.CommonName },
@@ -38,7 +47,7 @@ export default function PlantVarietyDetailModal({
       {/* زمان‌بندی رشد */}
       <InfoCard
         title="زمان‌بندی رشد"
-        icon={<span className="text-xl">⏱️</span>}
+        icon={<ClockCircleOutlined />}
         items={[
           {
             label: "تعداد روز تا جوانه زنی",
@@ -66,7 +75,7 @@ export default function PlantVarietyDetailModal({
       {/* شرایط دمایی */}
       <InfoCard
         title="شرایط دمایی"
-        icon={<span className="text-xl">🌡️</span>}
+        icon={<DashboardOutlined />}
         items={[
           {
             label: "حداقل دمای ایده‌آل",
@@ -82,7 +91,7 @@ export default function PlantVarietyDetailModal({
       {/* شرایط رطوبتی */}
       <InfoCard
         title="شرایط رطوبتی"
-        icon={<span className="text-xl">💧</span>}
+        icon={<CloudOutlined />}
         items={[
           {
             label: "حداقل رطوبت ایده‌آل",
@@ -100,7 +109,7 @@ export default function PlantVarietyDetailModal({
       {/* نور و عملکرد */}
       <InfoCard
         title="نور و عملکرد"
-        icon={<span className="text-xl">☀️</span>}
+        icon={<BulbOutlined />}
         items={[{ label: "نیاز نوری", value: data.LightRequirement }]}
       />
 
@@ -109,7 +118,7 @@ export default function PlantVarietyDetailModal({
         <div className="md:col-span-2">
           <InfoCard
             title="یادداشت‌ها"
-            icon={<span className="text-xl">📝</span>}
+            icon={<FileTextOutlined />}
             items={[{ label: "توضیحات", value: data.Notes, span: true }]}
           />
         </div>

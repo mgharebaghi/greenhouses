@@ -1,5 +1,7 @@
 "use client";
 
+import type { RefreshFormList } from "@/shared/forms/submit";
+
 import { formatPersianDate } from "@/shared/dates/calendar";
 
 import { ActionFailure, runDeletion } from "@/shared/forms/delete-record";
@@ -24,7 +26,7 @@ interface WarehousesTableProps {
   loading: boolean;
   setLoading: (loading: boolean) => void;
   setData: (data: WarehouseRecord[]) => void;
-  refreshData: () => void;
+  refreshData: RefreshFormList;
 }
 
 export default function WarehousesTable({
@@ -136,7 +138,6 @@ export default function WarehousesTable({
       <WarehousesInsUpModal
         open={insUpModal.open}
         setOpen={(open) => setInsUpModal((prev) => ({ ...prev, open }))}
-        setLoading={setLoading}
         data={insUpModal.data}
         refreshData={refreshData}
       />

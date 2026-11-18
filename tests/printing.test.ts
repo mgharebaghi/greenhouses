@@ -11,6 +11,27 @@ import {
 import type { OrderDetails } from "../features/orders/types/details";
 import PrintQrLabel from "../shared/components/PrintQrLabel";
 import FormFeedback from "../shared/components/FormFeedback";
+import { renderSeedInfo, SeedTypePicker } from "../shared/components/SeedType";
+
+test("seed type labels match between the picker and table, including legacy nulls", () => {
+  const rootstock = {
+    VarietyName: "Variety A",
+    Tbl_Plants: { CommonName: "گوجه‌فرنگی" },
+  };
+  const picker = renderToStaticMarkup(
+    createElement(SeedTypePicker, { value: false, onChange() {}, rootstock }),
+  );
+  const rootstockCell = renderToStaticMarkup(renderSeedInfo(false, rootstock));
+  const scionCell = renderToStaticMarkup(renderSeedInfo(true, undefined));
+  for (const html of [picker, rootstockCell]) {
+    assert.match(html, /گیاه پایه.*\(Rootstock\)/);
+    assert.match(html, /Variety A.*گوجه‌فرنگی/);
+  }
+  for (const html of [picker, scionCell])
+    assert.match(html, /پیوندک.*\(Scion\)/);
+  assert.match(picker, /type="radio"[^>]*aria-label="گیاه پایه"[^>]*checked/);
+  assert.equal(renderSeedInfo(null, rootstock), "—");
+});
 
 test("form feedback stays absent until there is a message", () => {
   assert.equal(

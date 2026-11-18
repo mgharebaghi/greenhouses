@@ -4,6 +4,22 @@ import { requireSession } from "@/server/auth/require-session";
 
 import { prisma } from "@/server/db/prisma";
 
+const seedPackageSelection = {
+  select: {
+    Tbl_plantVariety: {
+      select: {
+        VarietyName: true,
+        Tbl_Plants: { select: { CommonName: true } },
+      },
+    },
+  },
+} as const;
+
+const orderSeedPackages = {
+  Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage: seedPackageSelection,
+  Tbl_SeedPackage_Tbl_Orders_ScionIDToTbl_SeedPackage: seedPackageSelection,
+};
+
 export async function getStartSeedlingCycles() {
   try {
     await requireSession();
@@ -12,16 +28,7 @@ export async function getStartSeedlingCycles() {
         Tbl_Orders: {
           select: {
             OrderCode: true,
-            Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage: {
-              select: {
-                Tbl_plantVariety: { select: { VarietyName: true } },
-              },
-            },
-            Tbl_SeedPackage_Tbl_Orders_ScionIDToTbl_SeedPackage: {
-              select: {
-                Tbl_plantVariety: { select: { VarietyName: true } },
-              },
-            },
+            ...orderSeedPackages,
           },
         },
         Tbl_Greenhouses: {
@@ -46,16 +53,7 @@ export async function getOrdersForSelect() {
       select: {
         ID: true,
         OrderCode: true,
-        Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage: {
-          select: {
-            Tbl_plantVariety: { select: { VarietyName: true } },
-          },
-        },
-        Tbl_SeedPackage_Tbl_Orders_ScionIDToTbl_SeedPackage: {
-          select: {
-            Tbl_plantVariety: { select: { VarietyName: true } },
-          },
-        },
+        ...orderSeedPackages,
       },
       orderBy: { ID: "desc" },
     });
@@ -65,10 +63,10 @@ export async function getOrdersForSelect() {
       label: order.OrderCode,
       rootstockVariety:
         order.Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage
-          ?.Tbl_plantVariety?.VarietyName,
+          ?.Tbl_plantVariety,
       scionVariety:
         order.Tbl_SeedPackage_Tbl_Orders_ScionIDToTbl_SeedPackage
-          ?.Tbl_plantVariety?.VarietyName,
+          ?.Tbl_plantVariety,
     }));
   } catch (error) {
     throw readError(error);

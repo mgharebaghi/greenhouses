@@ -1,5 +1,7 @@
 "use client";
 
+import { renderSeedType } from "@/shared/components/SeedType";
+
 import { formatPersianDate } from "@/shared/dates/calendar";
 import QrImage from "@/shared/components/QrImage";
 
@@ -68,17 +70,12 @@ export default function StartSeedlingCycleDetailModal({
             { label: "کد سفارش", value: record.Tbl_Orders?.OrderCode || "---" },
             {
               label: "نوع بذر",
-              value:
-                record.SeedType === null
-                  ? "---"
-                  : record.SeedType
-                    ? "پیوندک"
-                    : "پایه",
+              value: renderSeedType(record.SeedType),
             },
             {
               label: "نام واریته",
               value:
-                record.SeedType === null
+                record.SeedType == null
                   ? "---"
                   : (record.SeedType
                       ? record.Tbl_Orders

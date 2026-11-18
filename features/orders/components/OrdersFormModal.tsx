@@ -21,7 +21,8 @@ import type { OrderDetails } from "../types/details";
 
 import Modal from "@/shared/components/FormModal";
 import { applyFieldErrors } from "@/shared/forms/field-errors";
-import { refreshSavedForm, submitForm } from "@/shared/forms/submit";
+import { submitForm, type RefreshFormList } from "@/shared/forms/submit";
+import useSavedForm from "@/shared/forms/useSavedForm";
 
 import { createOrder, updateOrder } from "@/features/orders/actions";
 import { getLegacyPersonOptions } from "@/features/people/actions";
@@ -29,7 +30,7 @@ import { getAllSeedPackages } from "@/features/seed-packages/actions";
 import { getSuppliers } from "@/features/suppliers/actions";
 import { supplierName } from "@/features/suppliers/domain/name";
 
-import { CheckCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined } from "@ant-design/icons";
 
 import { useEffect, useState } from "react";
 
@@ -45,19 +46,18 @@ function seedProducer(
 interface OrdersFormModalProps {
   open: boolean;
   setOpen: (open: boolean) => void;
-  setLoading: (loading: boolean) => void;
   data?: OrderDetails | null;
-  refreshData: () => void | Promise<void>;
+  refreshData: RefreshFormList;
 }
 
 export default function OrdersFormModal({
   open,
   setOpen,
-  setLoading,
   data,
   refreshData,
 }: OrdersFormModalProps) {
   const [form] = Form.useForm();
+  const savedForm = useSavedForm();
   const [internalLoading, setInternalLoading] = useState(false);
   const [message, setMessage] = useState<{
     status: "ok" | "error";
@@ -230,10 +230,10 @@ export default function OrdersFormModal({
   };
 
   const handleFinish = async (values: z.input<typeof orderInputSchema>) => {
+    if (internalLoading || savedForm.saved) return;
     await submitForm(
       async () => {
         setInternalLoading(true);
-        setLoading(true);
         setMessage(null);
 
         const result =
@@ -243,8 +243,7 @@ export default function OrdersFormModal({
 
         applyFieldErrors(form, result);
         if (result.status === "ok") {
-          handleClose();
-          await refreshSavedForm(refreshData);
+          await savedForm.complete(result.message, refreshData, handleClose);
         } else {
           setMessage({ status: "error", message: result.message });
         }
@@ -252,7 +251,6 @@ export default function OrdersFormModal({
       (feedback) => setMessage(feedback),
       () => {
         setInternalLoading(false);
-        setLoading(false);
       },
     );
   };
@@ -336,10 +334,11 @@ export default function OrdersFormModal({
     <Modal
       open={open}
       onClose={handleClose}
+      busy={internalLoading}
+      savedForm={savedForm}
       destroyOnHidden
       heading={isEditMode ? "ویرایش سفارش" : "ثبت سفارش جدید"}
       description={"اطلاعات سفارش را با دقت وارد کنید"}
-      icon={<PlusOutlined />}
       editing={isEditMode}
     >
       <Form
@@ -347,6 +346,14 @@ export default function OrdersFormModal({
         layout="vertical"
         onFinish={handleFinish}
         requiredMark={false}
+        actions={
+          <FormActions
+            message={message}
+            onCancel={handleClose}
+            loading={internalLoading}
+            editing={isEditMode}
+          />
+        }
       >
         {/* General Info */}
         <FormGrid title="مشخصات سفارش" columns={3}>
@@ -442,13 +449,6 @@ export default function OrdersFormModal({
           scionDetails,
           handleScionChange,
         )}
-
-        <FormActions
-          message={message}
-          onCancel={handleClose}
-          loading={internalLoading}
-          editing={isEditMode}
-        />
       </Form>
     </Modal>
   );

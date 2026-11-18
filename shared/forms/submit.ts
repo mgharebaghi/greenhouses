@@ -1,13 +1,22 @@
 import type { ActionMessage } from "@/shared/contracts/action-result";
-import { message } from "antd";
+export type RefreshFormList = () => Promise<void | boolean>;
 
-export async function refreshSavedForm(refresh: () => void | Promise<void>) {
+export async function refreshSavedForm(
+  refresh: RefreshFormList,
+  setTableLoading?: (loading: boolean) => void,
+  feedbackDuration = 800,
+) {
+  setTableLoading?.(true);
   try {
-    await refresh();
+    const [updated] = await Promise.all([
+      refresh(),
+      new Promise<void>((resolve) => setTimeout(resolve, feedbackDuration)),
+    ]);
+    return updated !== false;
   } catch {
-    void message.warning(
-      "تغییرات ذخیره شد. برای دیدن فهرست به‌روز، صفحه را تازه کنید.",
-    );
+    return false;
+  } finally {
+    setTableLoading?.(false);
   }
 }
 

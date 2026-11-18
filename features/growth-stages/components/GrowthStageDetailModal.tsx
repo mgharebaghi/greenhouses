@@ -3,6 +3,13 @@
 import type { GrowthStageDetails } from "../types";
 
 import DetailModal, { InfoCard } from "@/shared/components/DetailModal";
+import {
+  ClockCircleOutlined,
+  FileTextOutlined,
+  ProfileOutlined,
+  RiseOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
 
 interface GrowthStageDetailModalProps {
   open: boolean;
@@ -22,11 +29,11 @@ export default function GrowthStageDetailModal({
       open={open}
       onClose={onClose}
       title="جزئیات مرحله رشد"
-      icon={<span className="text-2xl">🌱</span>}
+      icon={<RiseOutlined />}
     >
       <InfoCard
         title="اطلاعات کلی"
-        icon={<span className="text-xl">📋</span>}
+        icon={<ProfileOutlined />}
         items={[
           {
             label: "واریته - رقم",
@@ -42,7 +49,7 @@ export default function GrowthStageDetailModal({
 
       <InfoCard
         title="زمان‌بندی"
-        icon={<span className="text-xl">⏱️</span>}
+        icon={<ClockCircleOutlined />}
         items={[
           {
             label: "تعداد روز شروع",
@@ -58,7 +65,7 @@ export default function GrowthStageDetailModal({
       <div className="md:col-span-2">
         <InfoCard
           title="علائم و معیارها"
-          icon={<span className="text-xl">🔍</span>}
+          icon={<SearchOutlined />}
           items={[
             { label: "علائم ورود", value: data.EntryCriteria, span: true },
             { label: "علائم خروج", value: data.ExitCriteria, span: true },
@@ -70,7 +77,7 @@ export default function GrowthStageDetailModal({
         <div className="md:col-span-2">
           <InfoCard
             title="یادداشت‌ها"
-            icon={<span className="text-xl">📝</span>}
+            icon={<FileTextOutlined />}
             items={[{ label: "توضیحات", value: data.note, span: true }]}
           />
         </div>

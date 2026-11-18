@@ -16,8 +16,8 @@ import {
 import Modal from "@/shared/components/FormModal";
 import { applyFieldErrors } from "@/shared/forms/field-errors";
 import { loadFormOptions } from "@/shared/forms/load-options";
-import { refreshSavedForm, submitForm } from "@/shared/forms/submit";
-import { ShopOutlined } from "@ant-design/icons";
+import { submitForm, type RefreshFormList } from "@/shared/forms/submit";
+import useSavedForm from "@/shared/forms/useSavedForm";
 
 import { useEffect, useState } from "react";
 import type { z } from "zod";
@@ -27,19 +27,18 @@ import type { WarehouseRecord } from "../types/record";
 interface WarehousesInsUpModalProps {
   open: boolean;
   setOpen: (open: boolean) => void;
-  setLoading: (loading: boolean) => void;
   data?: WarehouseRecord | null; // If data is provided, it's edit mode
-  refreshData: () => void;
+  refreshData: RefreshFormList;
 }
 
 export default function WarehousesInsUpModal({
   open,
   setOpen,
-  setLoading,
   data,
   refreshData,
 }: WarehousesInsUpModalProps) {
   const [form] = Form.useForm();
+  const savedForm = useSavedForm();
   const [internalLoading, setInternalLoading] = useState(false);
   const [managers, setManagers] = useState<
     Awaited<ReturnType<typeof getWarehouseManagerOptions>>
@@ -87,10 +86,10 @@ export default function WarehousesInsUpModal({
   }, [open, data, isEditMode, form]);
 
   const handleFinish = async (values: z.input<typeof warehouseInputSchema>) => {
+    if (internalLoading || savedForm.saved) return;
     await submitForm(
       async () => {
         setInternalLoading(true);
-        setLoading(true);
         setMessage(null);
 
         let res;
@@ -100,19 +99,9 @@ export default function WarehousesInsUpModal({
           res = await createWarehouse(values);
         }
 
-        setLoading(false);
-        setInternalLoading(false);
-
         applyFieldErrors(form, res);
         if (res.status === "ok") {
-          setMessage({ status: "ok", message: res.message });
-          setTimeout(() => {
-            setOpen(false);
-            void refreshSavedForm(refreshData);
-            if (!isEditMode) {
-              form.resetFields();
-            }
-          }, 1000);
+          await savedForm.complete(res.message, refreshData, handleClose);
         } else {
           setMessage({ status: "error", message: res.message });
         }
@@ -120,7 +109,6 @@ export default function WarehousesInsUpModal({
       (feedback) => setMessage(feedback),
       () => {
         setInternalLoading(false);
-        setLoading(false);
       },
     );
   };
@@ -141,6 +129,8 @@ export default function WarehousesInsUpModal({
     <Modal
       open={open}
       onClose={handleClose}
+      busy={internalLoading}
+      savedForm={savedForm}
       destroyOnHidden
       heading={isEditMode ? "ویرایش انبار" : "افزودن انبار جدید"}
       description={
@@ -148,7 +138,6 @@ export default function WarehousesInsUpModal({
           ? `ویرایش اطلاعات انبار: ${data?.WarehouseName}`
           : "اطلاعات انبار را با دقت وارد کنید"
       }
-      icon={<ShopOutlined />}
       editing={isEditMode}
     >
       <Form
@@ -156,6 +145,14 @@ export default function WarehousesInsUpModal({
         layout="vertical"
         onFinish={handleFinish}
         requiredMark={false}
+        actions={
+          <FormActions
+            message={message}
+            onCancel={handleClose}
+            loading={internalLoading}
+            editing={isEditMode}
+          />
+        }
       >
         <FormGrid title="مشخصات انبار">
           <FormItem
@@ -271,13 +268,6 @@ export default function WarehousesInsUpModal({
             />
           </FormItem>
         </FormGrid>
-
-        <FormActions
-          message={message}
-          onCancel={handleClose}
-          loading={internalLoading}
-          editing={isEditMode}
-        />
       </Form>
     </Modal>
   );

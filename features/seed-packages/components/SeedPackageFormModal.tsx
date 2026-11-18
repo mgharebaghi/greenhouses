@@ -21,8 +21,8 @@ import { getSuppliers } from "@/features/suppliers/actions";
 import { supplierName } from "@/features/suppliers/domain/name";
 import Modal from "@/shared/components/FormModal";
 import { applyFieldErrors } from "@/shared/forms/field-errors";
-import { refreshSavedForm, submitForm } from "@/shared/forms/submit";
-import { PlusOutlined } from "@ant-design/icons";
+import { submitForm, type RefreshFormList } from "@/shared/forms/submit";
+import useSavedForm from "@/shared/forms/useSavedForm";
 import {
   pickerDateToISO,
   toCalendarDate,
@@ -37,19 +37,18 @@ import type { SeedPackageDetails } from "../types/details";
 interface SeedPackageInsUpModalProps {
   open: boolean;
   setOpen: (open: boolean) => void;
-  setLoading: (loading: boolean) => void;
   data?: SeedPackageDetails | null; // If data is provided, it's edit mode
-  refreshData: () => void;
+  refreshData: RefreshFormList;
 }
 
 export default function SeedPackageInsUpModal({
   open,
   setOpen,
-  setLoading,
   data,
   refreshData,
 }: SeedPackageInsUpModalProps) {
   const [form] = Form.useForm();
+  const savedForm = useSavedForm();
   const [internalLoading, setInternalLoading] = useState(false);
   const [calendarSystem, setCalendarSystem] = useState<DateCalendar>("persian");
   const [productionCalendar, setProductionCalendar] =
@@ -179,10 +178,10 @@ export default function SeedPackageInsUpModal({
   const handleFinish = async (
     values: z.input<typeof seedPackageInputSchema>,
   ) => {
+    if (internalLoading || savedForm.saved) return;
     await submitForm(
       async () => {
         setInternalLoading(true);
-        setLoading(true);
         setMessage(null);
 
         const input = { ...values, ProductionCalendar: productionCalendar };
@@ -193,19 +192,9 @@ export default function SeedPackageInsUpModal({
           res = await createSeedPackage(input);
         }
 
-        setLoading(false);
-        setInternalLoading(false);
-
         applyFieldErrors(form, res);
         if (res.status === "ok") {
-          setMessage({ status: "ok", message: res.message });
-          setTimeout(() => {
-            setOpen(false);
-            void refreshSavedForm(refreshData);
-            if (!isEditMode) {
-              form.resetFields();
-            }
-          }, 1000);
+          await savedForm.complete(res.message, refreshData, handleClose);
         } else {
           setMessage({ status: "error", message: res.message });
         }
@@ -213,7 +202,6 @@ export default function SeedPackageInsUpModal({
       (feedback) => setMessage(feedback),
       () => {
         setInternalLoading(false);
-        setLoading(false);
       },
     );
   };
@@ -232,6 +220,8 @@ export default function SeedPackageInsUpModal({
     <Modal
       open={open}
       onClose={handleClose}
+      busy={internalLoading}
+      savedForm={savedForm}
       destroyOnHidden
       heading={isEditMode ? "ویرایش بسته بذر" : "افزودن بسته بذر جدید"}
       description={
@@ -239,7 +229,6 @@ export default function SeedPackageInsUpModal({
           ? `ویرایش اطلاعات بسته: ${data?.SerialNumber}`
           : "اطلاعات بسته را با دقت وارد کنید"
       }
-      icon={<PlusOutlined />}
       editing={isEditMode}
     >
       <Form
@@ -247,6 +236,14 @@ export default function SeedPackageInsUpModal({
         layout="vertical"
         onFinish={handleFinish}
         requiredMark={false}
+        actions={
+          <FormActions
+            message={message}
+            onCancel={handleClose}
+            loading={internalLoading}
+            editing={isEditMode}
+          />
+        }
       >
         <FormGrid title="هویت بسته و تأمین‌کننده" columns={3}>
           <FormItem
@@ -483,13 +480,6 @@ export default function SeedPackageInsUpModal({
             />
           </FormItem>
         </FormGrid>
-
-        <FormActions
-          message={message}
-          onCancel={handleClose}
-          loading={internalLoading}
-          editing={isEditMode}
-        />
       </Form>
     </Modal>
   );

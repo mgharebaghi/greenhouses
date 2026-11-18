@@ -1,10 +1,11 @@
 import type { ActionResult } from "@/shared/contracts/action-result";
+import type { SeedVariety } from "@/shared/contracts/seed-variety";
 
 export type CycleOrderOption = {
   value: number;
   label: string | null;
-  rootstockVariety?: string | null;
-  scionVariety?: string | null;
+  rootstockVariety?: SeedVariety | null;
+  scionVariety?: SeedVariety | null;
 };
 export type CycleGreenhouseOption = { value: number; label: string | null };
 export interface StartSeedlingCycle {
@@ -23,10 +24,10 @@ export interface StartSeedlingCycle {
   Tbl_Orders?: {
     OrderCode?: string | null;
     Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage?: {
-      Tbl_plantVariety?: { VarietyName?: string | null } | null;
+      Tbl_plantVariety?: SeedVariety | null;
     } | null;
     Tbl_SeedPackage_Tbl_Orders_ScionIDToTbl_SeedPackage?: {
-      Tbl_plantVariety?: { VarietyName?: string | null } | null;
+      Tbl_plantVariety?: SeedVariety | null;
     } | null;
   } | null;
   Tbl_Greenhouses?: {

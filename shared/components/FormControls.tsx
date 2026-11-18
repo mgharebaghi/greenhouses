@@ -31,6 +31,11 @@ import { normalizeNumericInput } from "@/shared/utils/digits";
 export { Checkbox, Input, Radio, Select, Switch } from "antd";
 export const FormItem = AntForm.Item;
 const FormIsOpen = createContext(true);
+export const FormSubmission = createContext<{
+  busy: boolean;
+  saved: { message: string; status: "refreshing" | "failed" } | null;
+  retry: () => void;
+} | null>(null);
 
 export function InputNumber<T extends string | number = number>({
   decimalSeparator = "٫",
@@ -50,12 +55,19 @@ export function InputNumber<T extends string | number = number>({
 }
 
 function SharedForm<T>({
+  children,
+  actions,
+  fieldsClassName,
   onFinish,
   onFinishFailed,
   onFieldsChange,
   scrollToFirstError = { block: "center", focus: true },
   ...props
-}: Omit<FormProps<T>, "children"> & { children?: ReactNode }) {
+}: Omit<FormProps<T>, "children"> & {
+  children?: ReactNode;
+  actions?: ReactNode;
+  fieldsClassName?: string;
+}) {
   const open = useContext(FormIsOpen);
   const [failed, setFailed] = useState(false);
 
@@ -87,7 +99,16 @@ function SharedForm<T>({
             setFailed(false);
           onFieldsChange?.(changed, fields);
         }}
-      />
+      >
+        {actions ? (
+          <>
+            <FormFields className={fieldsClassName}>{children}</FormFields>
+            {actions}
+          </>
+        ) : (
+          children
+        )}
+      </AntForm>
     </FormValidationFeedback.Provider>
   );
 }
@@ -99,9 +120,12 @@ export const Form = Object.assign(SharedForm, {
 });
 
 export function DatePicker(props: ComponentProps<typeof PersianDatePicker>) {
+  const submission = useContext(FormSubmission);
+
   return (
     <PersianDatePicker
       {...props}
+      disabled={props.disabled || submission?.busy || !!submission?.saved}
       containerClassName="w-full"
       className="greenhouse-calendar"
       inputClass="record-date-input"
@@ -135,6 +159,29 @@ export function FormAppearance({
 
 export function FormLabel({ className, ...props }: ComponentProps<"label">) {
   return <label {...props} className={clsx(className, "record-form-label")} />;
+}
+
+export function FormFields({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  const submission = useContext(FormSubmission);
+  const locked = submission?.busy || !!submission?.saved;
+
+  return (
+    <ConfigProvider componentDisabled={locked || undefined}>
+      <fieldset
+        disabled={locked}
+        inert={locked}
+        className={clsx("record-form-fields min-w-0", className)}
+      >
+        {children}
+      </fieldset>
+    </ConfigProvider>
+  );
 }
 
 export function FormGrid({
@@ -195,16 +242,36 @@ export function FormActions({
   nextStep?: boolean;
   onBack?: () => void;
 }) {
+  const submission = useContext(FormSubmission);
+  const saved = submission?.saved;
+  const busy = loading || submission?.busy;
+  const retryRefresh = saved?.status === "failed";
   const submitLabel = editing ? "ذخیره تغییرات" : "ثبت";
   return (
     <div className="record-form-actions">
-      <FormFeedback message={message} />
+      <FormFeedback
+        message={saved ? { status: "ok", message: saved.message } : message}
+        detail={
+          saved &&
+          (retryRefresh ? (
+            "به‌روزرسانی جدول انجام نشد."
+          ) : (
+            <span className="inline-flex items-center gap-1.5">
+              <span
+                aria-hidden="true"
+                className="size-3 shrink-0 rounded-full border-2 border-current/30 border-e-current motion-safe:animate-spin"
+              />
+              در حال به‌روزرسانی جدول…
+            </span>
+          ))
+        }
+      />
       <div className="record-form-buttons">
         <GreenhouseButton
-          text="انصراف"
+          text={retryRefresh ? "بستن" : "انصراف"}
           variant="secondary"
           onClick={onCancel}
-          disabled={loading}
+          disabled={busy}
         />
         {onBack && (
           <GreenhouseButton
@@ -212,18 +279,28 @@ export function FormActions({
             variant="outline"
             icon={<ArrowRightOutlined />}
             onClick={onBack}
-            disabled={loading}
+            disabled={busy || !!saved}
           />
         )}
-        <GreenhouseButton
-          text={
-            nextStep ? "مرحله بعد" : loading ? "در حال ذخیره…" : submitLabel
-          }
-          type="submit"
-          icon={nextStep ? <ArrowLeftOutlined /> : undefined}
-          loading={loading}
-          disabled={submitDisabled}
-        />
+        {retryRefresh ? (
+          <GreenhouseButton text="تلاش دوباره" onClick={submission?.retry} />
+        ) : (
+          <GreenhouseButton
+            text={
+              saved
+                ? "ذخیره شد"
+                : nextStep
+                  ? "مرحله بعد"
+                  : loading
+                    ? "در حال ذخیره…"
+                    : submitLabel
+            }
+            type="submit"
+            icon={!saved && nextStep ? <ArrowLeftOutlined /> : undefined}
+            loading={loading && !saved}
+            disabled={busy || submitDisabled || !!saved}
+          />
+        )}
       </div>
     </div>
   );

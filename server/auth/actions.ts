@@ -19,6 +19,26 @@ type User = {
   username: string;
 };
 
+const databaseUnavailableMessage =
+  "ارتباط با پایگاه داده برقرار نشد. لطفاً کمی بعد دوباره تلاش کنید.";
+
+function isDatabaseUnavailable(error: unknown) {
+  if (!(error instanceof Error)) return false;
+  const code =
+    "errorCode" in error && error.errorCode != null
+      ? error.errorCode
+      : "code" in error
+        ? error.code
+        : undefined;
+  return (
+    code === "P1001" ||
+    code === "P1002" ||
+    (error.name === "PrismaClientInitializationError" &&
+      code == null &&
+      error.message.includes("Can't reach database server"))
+  );
+}
+
 export async function signIn(input: unknown): Promise<SignInResult> {
   try {
     const data = parseInput(signInInputSchema, input);
@@ -61,14 +81,23 @@ export async function signIn(input: unknown): Promise<SignInResult> {
 
     return { status: "ok", user: { username: user.Username } };
   } catch (error) {
+    if (isDatabaseUnavailable(error)) {
+      return { status: "error", message: databaseUnavailableMessage };
+    }
     return actionError(error);
   }
 }
 
 export async function requireAuth(route: string) {
-  const session = await ReadSession().catch((error: unknown) => {
+  let session: Awaited<ReturnType<typeof ReadSession>>;
+  try {
+    session = await ReadSession();
+  } catch (error) {
+    if (route === "/" && isDatabaseUnavailable(error)) {
+      return databaseUnavailableMessage;
+    }
     throw readError(error);
-  });
+  }
 
   if (session?.status === "ok" && (route === "/" || route === "/login"))
     redirect("/dashboard");

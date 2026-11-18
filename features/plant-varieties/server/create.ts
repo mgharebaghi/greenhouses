@@ -11,7 +11,7 @@ export async function createPlantVariety(input: unknown) {
     await requireSession();
     const data = parseInput(varietyInputSchema, input);
     await prisma.tbl_PlantVariety.create({ data });
-    revalidatePath("/dashboard/varities");
+    revalidatePath("/dashboard/plantvarities");
     return { status: "ok" as const, message: "اطلاعات با موفقیت ثبت شد." };
   } catch (error) {
     return actionError(error);

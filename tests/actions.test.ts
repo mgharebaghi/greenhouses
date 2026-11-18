@@ -12,6 +12,65 @@ type Result = {
 };
 type Action = (...args: unknown[]) => Promise<Result>;
 
+test("an unreachable session database keeps the login page available and blocks protected access", async () => {
+  const sessionError = new Error(
+    "Can't reach database server at test endpoint",
+  );
+  sessionError.name = "PrismaClientInitializationError";
+  const loginError = Object.assign(new Error("Database connection failed"), {
+    errorCode: "P1001",
+  });
+  const loader = createServerLoader(
+    {
+      users: {
+        findUnique: async () => {
+          throw loginError;
+        },
+      },
+    },
+    sessionError,
+  );
+  const auth = loader.load("@/server/auth/actions");
+  const requireAuth = auth.requireAuth as (
+    route: string,
+  ) => Promise<string | undefined>;
+
+  const notice = await requireAuth("/");
+  assert.match(notice ?? "", /ارتباط با پایگاه داده برقرار نشد/);
+  await assert.rejects(requireAuth("/dashboard"), {
+    message: "دریافت اطلاعات انجام نشد. لطفاً دوباره تلاش کنید.",
+  });
+  const login = auth.signIn as Action;
+  const result = await login({ username: "admin", password: "password" });
+  assert.equal(result.status, "error");
+  assert.equal(result.message, notice);
+});
+
+test("plant variety mutations revalidate the dashboard page after saving", async () => {
+  const loader = createServerLoader({
+    tbl_PlantVariety: {
+      create: async () => undefined,
+      update: async () => undefined,
+      delete: async () => undefined,
+    },
+  });
+  const { createPlantVariety, updatePlantVariety, deletePlantVariety } =
+    loader.load("@/features/plant-varieties/actions") as Record<string, Action>;
+  const variety = { VarietyName: "واریته نمونه" };
+
+  assert.equal((await createPlantVariety(variety)).status, "ok");
+  assert.equal(
+    (await updatePlantVariety({ id: 1, data: variety })).status,
+    "ok",
+  );
+  assert.equal((await deletePlantVariety(1)).status, "ok");
+  assert.deepEqual(loader.invalidations, [
+    "/dashboard/plantvarities",
+    "/dashboard/plantvarities",
+    "/dashboard/plantvarities",
+  ]);
+});
+
 test("warehouse managers are selected by numeric ID and validated as natural people", async () => {
   const writes: Record<string, unknown>[] = [];
   const lookups: unknown[] = [];

@@ -1,28 +1,24 @@
-import { CloseOutlined } from "@ant-design/icons";
+import { CloseOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import type { ReactNode } from "react";
 import GreenhouseButton from "./GreenhouseButton";
+import ModalIcon from "./ModalIcon";
 
 export default function FormModalHeader({
   heading,
   description,
-  icon,
   editing,
+  busy,
   onClose,
 }: {
   heading: ReactNode;
   description?: ReactNode;
-  icon: ReactNode;
   editing?: boolean;
+  busy?: boolean;
   onClose: () => void;
 }) {
   return (
     <header className="flex shrink-0 items-center gap-3 border-b border-slate-200 bg-slate-50/90 px-4 py-3 sm:px-5 dark:border-slate-700 dark:bg-slate-900">
-      <div
-        aria-hidden="true"
-        className={`flex size-10 shrink-0 items-center justify-center rounded-xl text-lg ${editing ? "bg-amber-100 text-amber-900 dark:bg-amber-900/50 dark:text-amber-200" : "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-200"}`}
-      >
-        {icon}
-      </div>
+      <ModalIcon>{editing ? <EditOutlined /> : <PlusOutlined />}</ModalIcon>
       <div className="min-w-0 flex-1">
         <h2 className="text-base font-bold [overflow-wrap:anywhere] sm:text-lg text-slate-900 dark:text-slate-100">
           {heading}
@@ -37,6 +33,7 @@ export default function FormModalHeader({
         onClick={onClose}
         aria-label="بستن"
         variant="secondary"
+        disabled={busy}
         icon={<CloseOutlined />}
       />
     </header>

@@ -10,12 +10,13 @@ import { csvRows } from "@/shared/exports/csv";
 
 import DeleteModal, { DeleteModalProps } from "@/shared/components/DeleteModal";
 import InsertionRow from "@/shared/components/InsertionRow";
+import { renderSeedInfo } from "@/shared/components/SeedType";
 import Table, { detailsColumn } from "@/shared/components/Table";
 import TableActions from "@/shared/components/TableActions";
 import { download, generateCsv, mkConfig } from "export-to-csv";
-import { useRouter } from "next/navigation";
+import useRemoteList from "@/shared/hooks/useRemoteList";
 import { useState } from "react";
-import { deleteStartSeedlingCycle } from "../actions";
+import { deleteStartSeedlingCycle, getStartSeedlingCycles } from "../actions";
 import { headers, startSeedlingCycleCSVData } from "../exports/csv";
 import { StartSeedlingCycle } from "../types";
 import StartSeedlingCycleDetailModal from "./StartSeedlingCycleDetailModal";
@@ -28,11 +29,14 @@ interface Props {
 }
 
 export default function StartSeedlingCycleTable({
-  data,
+  data: initialData,
   orders,
   greenhouses,
 }: Props) {
-  const router = useRouter();
+  const { data, setData, loading, refresh } = useRemoteList(
+    getStartSeedlingCycles,
+    initialData,
+  );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState<StartSeedlingCycle | null>(
     null,
@@ -51,11 +55,9 @@ export default function StartSeedlingCycleTable({
         setDeleteModalMsg("");
         const res = await deleteStartSeedlingCycle(id);
         if (res.status !== "ok") throw new ActionFailure(res.message);
-        {
-          setDeleteModalLoading(false);
-          setDeleteModalOpen(null);
-          router.refresh(); // Refresh server data
-        }
+        setDeleteModalLoading(false);
+        setDeleteModalOpen(null);
+        setData((rows) => rows.filter((row) => row.ID !== id));
       },
       () => {
         setDeleteModalLoading(false);
@@ -95,13 +97,16 @@ export default function StartSeedlingCycleTable({
       title: "نوع بذر",
       dataIndex: "SeedType",
       key: "SeedType",
-      render: (val: boolean | null) => (
-        <span
-          className={`px-2 py-0.5 rounded text-xs font-medium ${val === true ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" : val === false ? "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400" : "bg-slate-100 text-slate-600"}`}
-        >
-          {val === true ? "پیوندک" : val === false ? "پایه" : "---"}
-        </span>
-      ),
+      render: (_: unknown, record: StartSeedlingCycle) =>
+        renderSeedInfo(
+          record.SeedType,
+          (record.SeedType
+            ? record.Tbl_Orders
+                ?.Tbl_SeedPackage_Tbl_Orders_ScionIDToTbl_SeedPackage
+            : record.Tbl_Orders
+                ?.Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage
+          )?.Tbl_plantVariety,
+        ),
     },
     {
       title: "نام گلخانه",
@@ -176,15 +181,17 @@ export default function StartSeedlingCycleTable({
         data={data}
       />
 
-      <Table columns={columns} dataSource={data} rowKey="ID" />
+      <Table
+        columns={columns}
+        dataSource={data}
+        rowKey="ID"
+        loading={loading}
+      />
 
       <StartSeedlingCycleFormModal
         open={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
-        onSuccess={() => {
-          setIsModalOpen(false);
-          router.refresh(); // Refresh server data
-        }}
+        refreshData={refresh}
         orders={orders}
         greenhouses={greenhouses}
         record={editingRecord}

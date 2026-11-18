@@ -21,7 +21,8 @@ import { publicOrderUrl } from "@/shared/config/public-urls";
 
 import Modal from "@/shared/components/FormModal";
 import { applyFieldErrors } from "@/shared/forms/field-errors";
-import { refreshSavedForm, submitForm } from "@/shared/forms/submit";
+import { submitForm, type RefreshFormList } from "@/shared/forms/submit";
+import useSavedForm from "@/shared/forms/useSavedForm";
 
 import {
   createRecoveryRoom,
@@ -30,7 +31,7 @@ import {
 } from "@/features/recovery-rooms/actions";
 
 import QRCodeCanvas from "@/shared/components/QRCodeCanvas";
-import { EditOutlined, UserOutlined } from "@ant-design/icons";
+import { UserOutlined } from "@ant-design/icons";
 
 import { useEffect, useMemo, useState } from "react";
 import { RecoveryGraftingOpDTO, RecoveryRoomListItem } from "../types";
@@ -38,19 +39,18 @@ import { RecoveryGraftingOpDTO, RecoveryRoomListItem } from "../types";
 interface RecoveryRoomFormModalProps {
   open: boolean;
   setOpen: (open: boolean) => void;
-  setLoading: (loading: boolean) => void;
   data?: RecoveryRoomListItem | null;
-  refreshData: () => void;
+  refreshData: RefreshFormList;
 }
 
 export default function RecoveryRoomFormModal({
   open,
   setOpen,
-  setLoading,
   data,
   refreshData,
 }: RecoveryRoomFormModalProps) {
   const [form] = Form.useForm();
+  const savedForm = useSavedForm();
   const [internalLoading, setInternalLoading] = useState(false);
   const [message, setMessage] = useState<{
     status: "ok" | "error";
@@ -172,10 +172,10 @@ export default function RecoveryRoomFormModal({
   const handleFinish = async (
     values: import("zod").input<typeof recoveryRoomSchema>,
   ) => {
+    if (internalLoading || savedForm.saved) return;
     await submitForm(
       async () => {
         setInternalLoading(true);
-        setLoading(true);
         setMessage(null);
 
         // Calculate total loss
@@ -193,43 +193,20 @@ export default function RecoveryRoomFormModal({
           GraftedLossCount: graftedLossCount,
         };
 
-        if (isEditMode && data?.ID) {
-          const res = await updateRecoveryRoom(data.ID, dataToSubmit);
-          setLoading(false);
-          setInternalLoading(false);
-
-          applyFieldErrors(form, res);
-          if (res.status === "ok") {
-            setMessage({ status: "ok", message: res.message });
-            setTimeout(() => {
-              setOpen(false);
-              void refreshSavedForm(refreshData);
-            }, 1000);
-          } else {
-            setMessage({ status: "error", message: res.message });
-          }
+        const result =
+          isEditMode && data?.ID
+            ? await updateRecoveryRoom(data.ID, dataToSubmit)
+            : await createRecoveryRoom(dataToSubmit);
+        applyFieldErrors(form, result);
+        if (result.status === "ok") {
+          await savedForm.complete(result.message, refreshData, handleClose);
         } else {
-          const res = await createRecoveryRoom(dataToSubmit);
-          setLoading(false);
-          setInternalLoading(false);
-
-          applyFieldErrors(form, res);
-          if (res.status === "ok") {
-            setMessage({ status: "ok", message: res.message });
-            setTimeout(() => {
-              setOpen(false);
-              void refreshSavedForm(refreshData);
-              form.resetFields();
-            }, 1000);
-          } else {
-            setMessage({ status: "error", message: res.message });
-          }
+          setMessage(result);
         }
       },
       (feedback) => setMessage(feedback),
       () => {
         setInternalLoading(false);
-        setLoading(false);
       },
     );
   };
@@ -252,6 +229,8 @@ export default function RecoveryRoomFormModal({
     <Modal
       open={open}
       onClose={handleClose}
+      busy={internalLoading}
+      savedForm={savedForm}
       destroyOnHidden
       heading={"اتاق ریکاوری"}
       description={
@@ -259,7 +238,6 @@ export default function RecoveryRoomFormModal({
           ? "ویرایش گیاه پیوند زده شده"
           : "ثبت وضعیت گیاه پیوند زده شده"
       }
-      icon={<EditOutlined />}
       editing={isEditMode}
     >
       <Form
@@ -267,6 +245,14 @@ export default function RecoveryRoomFormModal({
         layout="vertical"
         onFinish={handleFinish}
         requiredMark={false}
+        actions={
+          <FormActions
+            message={message}
+            onCancel={handleClose}
+            loading={internalLoading}
+            editing={isEditMode}
+          />
+        }
       >
         {/* Row 1 */}
         <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border-2 border-slate-100 dark:border-slate-700 shadow-sm mb-6">
@@ -452,13 +438,6 @@ export default function RecoveryRoomFormModal({
             }}
           </Form.List>
         </div>
-
-        <FormActions
-          message={message}
-          onCancel={handleClose}
-          loading={internalLoading}
-          editing={isEditMode}
-        />
       </Form>
     </Modal>
   );

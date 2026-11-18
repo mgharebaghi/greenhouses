@@ -27,13 +27,17 @@ export async function getSeedPlantings() {
           include: {
             Tbl_SeedPackage_Tbl_Orders_ScionIDToTbl_SeedPackage: {
               include: {
-                Tbl_plantVariety: true,
+                Tbl_plantVariety: {
+                  include: { Tbl_Plants: { select: { CommonName: true } } },
+                },
                 Tbl_suppliers: true,
               },
             },
             Tbl_SeedPackage_Tbl_Orders_RootstockIDToTbl_SeedPackage: {
               include: {
-                Tbl_plantVariety: true,
+                Tbl_plantVariety: {
+                  include: { Tbl_Plants: { select: { CommonName: true } } },
+                },
                 Tbl_suppliers: true,
               },
             },

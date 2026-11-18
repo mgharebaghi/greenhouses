@@ -10,7 +10,7 @@ export async function deletePlantVariety(id: number) {
     await requireSession();
     const recordId = parseInput(recordIdSchema, id);
     await prisma.tbl_PlantVariety.delete({ where: { ID: recordId } });
-    revalidatePath("/dashboard/varities");
+    revalidatePath("/dashboard/plantvarities");
     return { status: "ok" as const, message: "اطلاعات با موفقیت حذف شد." };
   } catch (error) {
     return actionError(error);

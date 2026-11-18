@@ -18,6 +18,7 @@ import type { SeedPlantingRecord } from "@/features/seed-planting/types/record";
 import DeleteModal, { DeleteModalProps } from "@/shared/components/DeleteModal";
 import DetailModal, { InfoCard } from "@/shared/components/DetailModal";
 import InsertionRow from "@/shared/components/InsertionRow";
+import { renderSeedInfo, renderSeedType } from "@/shared/components/SeedType";
 import Table, { detailsColumn } from "@/shared/components/Table";
 import TableActions from "@/shared/components/TableActions";
 import { AppstoreOutlined, ExperimentOutlined } from "@ant-design/icons";
@@ -113,23 +114,14 @@ export default function SeedPlantingTable({
       ),
     },
     {
-      title: "بذر",
-      key: "SeedInfo",
-      render: (_: unknown, record: SeedPlantingDetails) => {
-        const variety = getVarietyName(record);
-        const type =
-          record.SeedType === true
-            ? "پیوندی"
-            : record.SeedType === false
-              ? "پایه"
-              : "-";
-        return (
-          <div className="flex flex-col">
-            <span className="text-xs font-bold text-slate-700">{variety}</span>
-            <span className="text-[10px] text-slate-500">{type}</span>
-          </div>
-        );
-      },
+      title: "نوع بذر",
+      dataIndex: "SeedType",
+      key: "SeedType",
+      render: (_: unknown, record: SeedPlantingDetails) =>
+        renderSeedInfo(
+          record.SeedType,
+          getSeedPackageInfo(record)?.Tbl_plantVariety,
+        ),
     },
     {
       title: "تاریخ کاشت",
@@ -267,12 +259,7 @@ export default function SeedPlantingTable({
                 },
                 {
                   label: "نوع بذر",
-                  value:
-                    viewRecord.SeedType !== null
-                      ? viewRecord.SeedType
-                        ? "پیوندی"
-                        : "پایه"
-                      : "—",
+                  value: renderSeedType(viewRecord.SeedType),
                 },
                 { label: "نام واریته", value: getVarietyName(viewRecord) },
                 {
@@ -373,7 +360,6 @@ export default function SeedPlantingTable({
         setModalOpen={(open) => setFormModal((prev) => ({ ...prev, open }))}
         record={formModal.record}
         refreshData={refreshData}
-        setMainLoading={setMainLoading}
       />
     </>
   );

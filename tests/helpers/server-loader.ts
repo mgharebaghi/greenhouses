@@ -10,7 +10,10 @@ const externalRequire = createRequire(path.join(root, "package.json"));
 /** Isolated module graph: database/network modules are never loaded by these tests. */
 export function createServerLoader(
   db: Record<string, unknown>,
-  session: { status: string; id?: number } | null = { status: "ok", id: 1 },
+  session: { status: string; id?: number } | Error | null = {
+    status: "ok",
+    id: 1,
+  },
 ) {
   const modules = new Map<string, { exports: Record<string, unknown> }>();
   const invalidations: string[] = [];
@@ -22,7 +25,10 @@ export function createServerLoader(
     react: { cache: (operation: unknown) => operation },
     [path.join(root, "server/db/prisma.ts")]: { prisma: db },
     [path.join(root, "server/auth/session.ts")]: {
-      ReadSession: async () => session,
+      ReadSession: async () => {
+        if (session instanceof Error) throw session;
+        return session;
+      },
     },
   };
   function load(request: string, from = root): Record<string, unknown> {

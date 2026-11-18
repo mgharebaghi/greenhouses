@@ -601,6 +601,18 @@ body {
   @apply mt-0.5 text-xs leading-relaxed text-rose-700 dark:text-rose-300;
 }
 
+.record-form
+  .record-form-fields:disabled
+  :is(
+    .ant-input,
+    .ant-input-number-input,
+    .ant-select-selection-item,
+    .record-date-input
+  ) {
+  color: var(--ui-muted-text);
+  opacity: 1;
+}
+
 .record-form-actions {
   display: flex;
   flex-wrap: wrap;

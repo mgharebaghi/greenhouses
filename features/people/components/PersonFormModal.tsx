@@ -18,7 +18,7 @@ import {
 import Modal from "@/shared/components/FormModal";
 import { applyFieldErrors } from "@/shared/forms/field-errors";
 import { submitForm } from "@/shared/forms/submit";
-import { UserAddOutlined } from "@ant-design/icons";
+import useSavedForm from "@/shared/forms/useSavedForm";
 
 import { useEffect, useState } from "react";
 import type { ZodType } from "zod";
@@ -47,6 +47,7 @@ export default function PersonFormModal({
   setMainData,
   setMainLoading,
 }: PersonFormModalProps) {
+  const savedForm = useSavedForm();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{
     status: "ok" | "error";
@@ -239,6 +240,7 @@ export default function PersonFormModal({
   }, [isOpen, record, form]);
 
   const handleSubmit = async (values: PersonInput) => {
+    if (loading || savedForm.saved) return;
     await submitForm(
       async () => {
         setMessage(null);
@@ -264,28 +266,16 @@ export default function PersonFormModal({
             return;
           }
 
-          setMessage({ status: "ok", message: result.message });
-          setMainLoading(true);
-          try {
-            const mainData = await getPeople();
-            if (mainData.status !== "ok") throw new Error("Refresh failed");
-            setMainData(mainData.dta || []);
-          } catch {
-            setMessage({
-              status: "ok",
-              message:
-                "اطلاعات ذخیره شد؛ برای دیدن فهرست به‌روز، صفحه را تازه کنید.",
-            });
-          } finally {
-            setMainLoading(false);
-          }
-
-          if (!isEdit) form.resetFields();
-
-          setTimeout(() => {
-            setIsOpen(false);
-            setMessage(null);
-          }, 1500);
+          await savedForm.complete(
+            result.message,
+            async () => {
+              const mainData = await getPeople();
+              if (mainData.status !== "ok") return false;
+              setMainData(mainData.dta || []);
+            },
+            handleClose,
+            setMainLoading,
+          );
         } catch {
           setMessage({
             status: "error",
@@ -298,7 +288,6 @@ export default function PersonFormModal({
       (feedback) => setMessage(feedback),
       () => {
         setLoading(false);
-        setMainLoading?.(false);
       },
     );
   };
@@ -369,11 +358,12 @@ export default function PersonFormModal({
     <Modal
       open={isOpen}
       onClose={handleClose}
+      busy={loading}
+      savedForm={savedForm}
       heading={isEdit ? "ویرایش اطلاعات شخص" : "افزودن شخص جدید"}
       description={
         isEdit ? "اطلاعات شخص را ویرایش کنید" : "اطلاعات شخص را وارد کنید"
       }
-      icon={<UserAddOutlined />}
       editing={isEdit}
     >
       <Form
@@ -397,6 +387,15 @@ export default function PersonFormModal({
           );
         }}
         requiredMark={false}
+        actions={
+          <FormActions
+            message={message}
+            onCancel={handleClose}
+            loading={loading}
+            editing={isEdit}
+            submitDisabled={codeLoading || postsLoading}
+          />
+        }
       >
         <FormGrid title="اطلاعات هویتی">
           <FormItem label="نوع شخص" name="Legal">
@@ -421,14 +420,6 @@ export default function PersonFormModal({
             .filter((field) => field.section === "contact")
             .map(renderField)}
         </FormGrid>
-
-        <FormActions
-          message={message}
-          onCancel={handleClose}
-          loading={loading}
-          editing={isEdit}
-          submitDisabled={codeLoading || postsLoading}
-        />
       </Form>
     </Modal>
   );

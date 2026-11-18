@@ -14,8 +14,8 @@ import {
 } from "@/features/nursery-rooms/actions";
 import Modal from "@/shared/components/FormModal";
 import { applyFieldErrors } from "@/shared/forms/field-errors";
-import { refreshSavedForm, submitForm } from "@/shared/forms/submit";
-import { PlusOutlined } from "@ant-design/icons";
+import { submitForm, type RefreshFormList } from "@/shared/forms/submit";
+import useSavedForm from "@/shared/forms/useSavedForm";
 
 import { useEffect, useState } from "react";
 import type { z } from "zod";
@@ -25,19 +25,18 @@ import type { NurseryRoomRecord } from "../types/record";
 interface NurseryRoomsInsUpModalProps {
   open: boolean;
   setOpen: (open: boolean) => void;
-  setLoading: (loading: boolean) => void;
   data?: NurseryRoomRecord | null; // If data is provided, it's edit mode
-  refreshData: () => void;
+  refreshData: RefreshFormList;
 }
 
 export default function NurseryRoomsInsUpModal({
   open,
   setOpen,
-  setLoading,
   data,
   refreshData,
 }: NurseryRoomsInsUpModalProps) {
   const [form] = Form.useForm();
+  const savedForm = useSavedForm();
   const [internalLoading, setInternalLoading] = useState(false);
   const [message, setMessage] = useState<{
     status: "ok" | "error";
@@ -72,10 +71,10 @@ export default function NurseryRoomsInsUpModal({
   const handleFinish = async (
     values: z.input<typeof nurseryRoomInputSchema>,
   ) => {
+    if (internalLoading || savedForm.saved) return;
     await submitForm(
       async () => {
         setInternalLoading(true);
-        setLoading(true);
         setMessage(null);
 
         let res;
@@ -85,19 +84,9 @@ export default function NurseryRoomsInsUpModal({
           res = await createNurseryRoom(values);
         }
 
-        setLoading(false);
-        setInternalLoading(false);
-
         applyFieldErrors(form, res);
         if (res.status === "ok") {
-          setMessage({ status: "ok", message: res.message });
-          setTimeout(() => {
-            setOpen(false);
-            void refreshSavedForm(refreshData);
-            if (!isEditMode) {
-              form.resetFields();
-            }
-          }, 1000);
+          await savedForm.complete(res.message, refreshData, handleClose);
         } else {
           setMessage({ status: "error", message: res.message });
         }
@@ -105,7 +94,6 @@ export default function NurseryRoomsInsUpModal({
       (feedback) => setMessage(feedback),
       () => {
         setInternalLoading(false);
-        setLoading(false);
       },
     );
   };
@@ -124,6 +112,8 @@ export default function NurseryRoomsInsUpModal({
     <Modal
       open={open}
       onClose={handleClose}
+      busy={internalLoading}
+      savedForm={savedForm}
       destroyOnHidden
       heading={isEditMode ? "ویرایش اتاق ریکاوری" : "افزودن اتاق ریکاوری جدید"}
       description={
@@ -131,7 +121,6 @@ export default function NurseryRoomsInsUpModal({
           ? `ویرایش اطلاعات اتاق: ${data?.NurseryRoomName}`
           : "اطلاعات اتاق را با دقت وارد کنید"
       }
-      icon={<PlusOutlined />}
       editing={isEditMode}
     >
       <Form
@@ -139,6 +128,14 @@ export default function NurseryRoomsInsUpModal({
         layout="vertical"
         onFinish={handleFinish}
         requiredMark={false}
+        actions={
+          <FormActions
+            message={message}
+            onCancel={handleClose}
+            loading={internalLoading}
+            editing={isEditMode}
+          />
+        }
       >
         <FormGrid title="مشخصات اتاق">
           <FormItem
@@ -287,13 +284,6 @@ export default function NurseryRoomsInsUpModal({
             <Input placeholder="مثال: 400-800" />
           </FormItem>
         </FormGrid>
-
-        <FormActions
-          message={message}
-          onCancel={handleClose}
-          loading={internalLoading}
-          editing={isEditMode}
-        />
       </Form>
     </Modal>
   );

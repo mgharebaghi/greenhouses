@@ -22,14 +22,13 @@ import type { WarehouseTransactionDetails } from "../types/details";
 
 import Modal from "@/shared/components/FormModal";
 import { applyFieldErrors } from "@/shared/forms/field-errors";
-import { submitForm } from "@/shared/forms/submit";
+import { submitForm, type RefreshFormList } from "@/shared/forms/submit";
+import useSavedForm from "@/shared/forms/useSavedForm";
 
 import {
   createSeedWarehousing,
   updateSeedWarehousing,
 } from "@/features/seed-warehousing/actions";
-
-import { ExperimentOutlined } from "@ant-design/icons";
 
 import { useEffect, useState } from "react";
 
@@ -39,7 +38,7 @@ interface SeedWarehousingFormModalProps {
   data?: WarehouseTransactionDetails | null;
   seedPackages: SeedPackageDetails[];
   warehouses: WarehouseRecord[];
-  onSuccess: () => void;
+  refreshData: RefreshFormList;
 }
 
 export default function SeedWarehousingFormModal({
@@ -48,9 +47,10 @@ export default function SeedWarehousingFormModal({
   data,
   seedPackages,
   warehouses,
-  onSuccess,
+  refreshData,
 }: SeedWarehousingFormModalProps) {
   const [form] = Form.useForm();
+  const savedForm = useSavedForm();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{
     status: "ok" | "error";
@@ -81,6 +81,7 @@ export default function SeedWarehousingFormModal({
   const handleFinish = async (
     values: z.input<typeof seedWarehousingInputSchema>,
   ) => {
+    if (loading || savedForm.saved) return;
     await submitForm(
       async () => {
         setLoading(true);
@@ -95,16 +96,7 @@ export default function SeedWarehousingFormModal({
 
         applyFieldErrors(form, result);
         if (result.status === "ok") {
-          setMessage({
-            status: "ok",
-            message: isEdit
-              ? "تراکنش با موفقیت ویرایش شد"
-              : "تراکنش با موفقیت ثبت شد",
-          });
-          setTimeout(() => {
-            onSuccess();
-            onCancel();
-          }, 1000);
+          await savedForm.complete(result.message, refreshData, handleClose);
         } else {
           setMessage({
             status: "error",
@@ -128,6 +120,8 @@ export default function SeedWarehousingFormModal({
     <Modal
       open={open}
       onClose={handleClose}
+      busy={loading}
+      savedForm={savedForm}
       destroyOnHidden
       heading={isEdit ? "ویرایش تراکنش" : "ثبت تراکنش جدید"}
       description={
@@ -135,7 +129,6 @@ export default function SeedWarehousingFormModal({
           ? "ویرایش اطلاعات تراکنش انبار"
           : "اطلاعات ورود و خروج بذر را وارد کنید"
       }
-      icon={<ExperimentOutlined />}
       editing={isEdit}
     >
       <Form
@@ -143,6 +136,14 @@ export default function SeedWarehousingFormModal({
         layout="vertical"
         onFinish={handleFinish}
         initialValues={{ TransactionType: true }}
+        actions={
+          <FormActions
+            message={message}
+            onCancel={handleClose}
+            loading={loading}
+            editing={isEdit}
+          />
+        }
       >
         <FormGrid title="بسته و انبار">
           <FormItem
@@ -258,13 +259,6 @@ export default function SeedWarehousingFormModal({
             <Input placeholder="نام شخص ثبت کننده" />
           </FormItem>
         </FormGrid>
-
-        <FormActions
-          message={message}
-          onCancel={handleClose}
-          loading={loading}
-          editing={isEdit}
-        />
       </Form>
     </Modal>
   );

@@ -21,8 +21,8 @@ import Modal from "@/shared/components/FormModal";
 
 import type { ActionMessage as ModalMsg } from "@/shared/contracts/action-result";
 import { applyFieldErrors } from "@/shared/forms/field-errors";
-import { refreshSavedForm, submitForm } from "@/shared/forms/submit";
-import { EditOutlined, HomeOutlined } from "@ant-design/icons";
+import { submitForm } from "@/shared/forms/submit";
+import useSavedForm from "@/shared/forms/useSavedForm";
 
 import { useEffect, useState } from "react";
 
@@ -44,6 +44,7 @@ export default function GreenhouseFormModal({
   setMainLoading: (loading: boolean) => void;
   record?: GreenhouseRecord | null;
 }) {
+  const savedForm = useSavedForm();
   const [loading, setLoading] = useState(false);
   const [modalMsg, setModalMsg] = useState<ModalMsg | null>(null);
   const [owners, setOwners] = useState<SelectOptions[]>([]);
@@ -56,11 +57,6 @@ export default function GreenhouseFormModal({
   const modalSubTitle = isEdit
     ? "اطلاعات گلخانه را ویرایش کنید"
     : "اطلاعات گلخانه را وارد کنید";
-  const icon = isEdit ? (
-    <EditOutlined className="text-2xl" />
-  ) : (
-    <HomeOutlined className="text-2xl" />
-  );
 
   useEffect(() => {
     let cancelOptions: (() => void) | undefined;
@@ -101,14 +97,12 @@ export default function GreenhouseFormModal({
       label: "نام گلخانه",
       placeholder: "نام گلخانه را وارد کنید",
       required: true,
-      icon: "🏡",
     },
     {
       name: "GreenhouseType",
       label: "نوع سازه",
       placeholder: "نوع سازه (مثلاً اسپانیایی)",
       required: false,
-      icon: "🏗️",
     },
     {
       name: "AreaSqM",
@@ -116,14 +110,12 @@ export default function GreenhouseFormModal({
       placeholder: "متراژ کل",
       required: false,
       type: "number",
-      icon: "📐",
     },
     {
       name: "ConstructionDate",
       label: "تاریخ احداث",
       placeholder: "تاریخ احداث",
       required: false,
-      icon: "📅",
       type: "date",
     },
     {
@@ -132,7 +124,6 @@ export default function GreenhouseFormModal({
       placeholder: "انتخاب مالک",
       required: true,
       type: "select",
-      icon: "👤",
     },
     {
       name: "IsActive",
@@ -144,20 +135,19 @@ export default function GreenhouseFormModal({
         { label: "فعال", value: true },
         { label: "غیرفعال", value: false },
       ],
-      icon: "⚡",
     },
     {
       name: "GreenhouseAddress",
       label: "آدرس",
       placeholder: "آدرس گلخانه را وارد کنید",
       required: true,
-      icon: "📍",
     },
   ];
 
   const handleSubmit = async (
     values: import("zod").input<typeof greenhouseInputSchema>,
   ) => {
+    if (loading || savedForm.saved) return;
     await submitForm(
       async () => {
         setLoading(true);
@@ -166,21 +156,21 @@ export default function GreenhouseFormModal({
         const res = record
           ? await updateGreenhouse({ id: record.ID, data: values })
           : await createGreenhouse(values);
-        setModalMsg(res);
         applyFieldErrors(form, res);
         if (res.status === "ok") {
-          setMainLoading(true);
-          await refreshSavedForm(async () =>
-            setMainData(await getGreenhouses()),
+          await savedForm.complete(
+            res.message,
+            async () => setMainData(await getGreenhouses()),
+            handleClose,
+            setMainLoading,
           );
-          setTimeout(handleClose, 1500);
+        } else {
+          setModalMsg(res);
         }
-        setLoading(false);
       },
       (feedback) => setModalMsg(feedback),
       () => {
         setLoading(false);
-        setMainLoading?.(false);
       },
     );
   };
@@ -198,7 +188,6 @@ export default function GreenhouseFormModal({
       key={field.name}
       label={
         <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
-          <span className="text-base">{field.icon}</span>
           {field.label}
           {field.required && <span className="text-rose-500 text-xs">*</span>}
         </span>
@@ -249,10 +238,11 @@ export default function GreenhouseFormModal({
     <Modal
       open={modalOpen}
       onClose={handleClose}
+      busy={loading}
+      savedForm={savedForm}
       forceRender
       heading={modalTitle}
       description={modalSubTitle}
-      icon={icon}
       editing={isEdit}
     >
       <Form
@@ -260,6 +250,14 @@ export default function GreenhouseFormModal({
         layout="vertical"
         onFinish={handleSubmit}
         requiredMark={false}
+        actions={
+          <FormActions
+            message={modalMsg}
+            onCancel={handleClose}
+            loading={loading}
+            editing={isEdit}
+          />
+        }
       >
         <FormGrid title="مشخصات گلخانه">
           {greenHousefields
@@ -280,15 +278,7 @@ export default function GreenhouseFormModal({
           {greenHousefields
             .filter((field) => field.name === "GreenhouseAddress")
             .map(renderField)}
-          <FormItem
-            className="record-form-wide"
-            label={
-              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
-                <span>📝</span>توضیحات
-              </span>
-            }
-            name="Notes"
-          >
+          <FormItem className="record-form-wide" label="توضیحات" name="Notes">
             <Input.TextArea
               placeholder="توضیحات گلخانه"
               disabled={loading}
@@ -296,13 +286,6 @@ export default function GreenhouseFormModal({
             />
           </FormItem>
         </FormGrid>
-
-        <FormActions
-          message={modalMsg}
-          onCancel={handleClose}
-          loading={loading}
-          editing={isEdit}
-        />
       </Form>
     </Modal>
   );

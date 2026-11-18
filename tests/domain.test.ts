@@ -7,7 +7,7 @@ import {
   prepareRecoveryInput,
 } from "../features/recovery-rooms/domain/input";
 import { seedWarehousingInputSchema } from "../features/seed-warehousing/schema";
-import { submitForm } from "../shared/forms/submit";
+import { refreshSavedForm, submitForm } from "../shared/forms/submit";
 import { InputValidationError, parseInput } from "../shared/validation/input";
 
 export const personInput = {
@@ -165,4 +165,32 @@ test("submission releases loading after rejection and reports a usable error", a
     () => events.push("settled"),
   );
   assert.deepEqual(events.slice(-2), ["saved", "settled"]);
+});
+
+test("a saved form waits for the list and handles a failed refresh separately", async () => {
+  const loading: boolean[] = [];
+  const complete = Promise.withResolvers<boolean>();
+  const refresh = refreshSavedForm(
+    () => complete.promise,
+    (busy) => loading.push(busy),
+    0,
+  );
+
+  assert.deepEqual(loading, [true]);
+  complete.resolve(true);
+  assert.equal(await refresh, true);
+  assert.deepEqual(loading, [true, false]);
+
+  assert.equal(await refreshSavedForm(async () => false, undefined, 0), false);
+  assert.equal(
+    await refreshSavedForm(
+      async () => {
+        throw new Error("List request failed");
+      },
+      (busy) => loading.push(busy),
+      0,
+    ),
+    false,
+  );
+  assert.deepEqual(loading, [true, false, true, false]);
 });
