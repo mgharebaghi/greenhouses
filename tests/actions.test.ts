@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import bcrypt from "bcryptjs";
 import fs from "node:fs";
 import ts from "typescript";
 import { createServerLoader } from "./helpers/server-loader";
@@ -11,6 +12,66 @@ type Result = {
   dta?: { PersonCode: string }[];
 };
 type Action = (...args: unknown[]) => Promise<Result>;
+
+test("disabling an account blocks new logins and rejects its existing session", async () => {
+  const credentials = { username: "admin", password: "test-password" };
+  const user = {
+    ID: 1,
+    Username: credentials.username,
+    PasswordHash: bcrypt.hashSync(credentials.password, 4),
+    IsActive: true as boolean | null,
+  };
+  type StoredSession = {
+    PublicID: string;
+    SecretHash: string;
+    ExpiresAt: Date;
+    UserId: number;
+  };
+  let session: StoredSession | undefined;
+  let token: string | undefined;
+  let sessionWrites = 0;
+  const { load } = createServerLoader(
+    {
+      users: { findUnique: async () => user },
+      session: {
+        create: async ({ data }: { data: StoredSession }) => {
+          session = data;
+          sessionWrites++;
+        },
+        findFirst: async () => session,
+      },
+    },
+    undefined,
+    {
+      cookies: () => ({
+        get: () => ({ value: token }),
+        set: ({ value }: { value: string }) => {
+          token = value;
+        },
+      }),
+    },
+  );
+  const { signIn } = load("@/server/auth/actions") as { signIn: Action };
+  const { ReadSession } = load("@/server/auth/session") as {
+    ReadSession: () => Promise<unknown>;
+  };
+
+  assert.equal((await signIn(credentials)).status, "ok");
+  assert.ok(token);
+  assert.deepEqual(await ReadSession(), {
+    status: "ok",
+    code: 200,
+    id: user.ID,
+    username: user.Username,
+  });
+
+  for (const inactive of [false, null]) {
+    user.IsActive = inactive;
+    assert.equal((await signIn(credentials)).status, "error");
+    assert.deepEqual(await ReadSession(), { status: "error", code: 403 });
+  }
+  assert.equal(sessionWrites, 1);
+});
 
 test("an unreachable session database keeps the login page available and blocks protected access", async () => {
   const sessionError = new Error(

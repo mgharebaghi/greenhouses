@@ -14,6 +14,7 @@ export function createServerLoader(
     status: "ok",
     id: 1,
   },
+  options?: { cookies: () => unknown },
 ) {
   const modules = new Map<string, { exports: Record<string, unknown> }>();
   const invalidations: string[] = [];
@@ -24,12 +25,16 @@ export function createServerLoader(
     },
     react: { cache: (operation: unknown) => operation },
     [path.join(root, "server/db/prisma.ts")]: { prisma: db },
-    [path.join(root, "server/auth/session.ts")]: {
-      ReadSession: async () => {
-        if (session instanceof Error) throw session;
-        return session;
-      },
-    },
+    ...(options
+      ? { "next/headers": { cookies: options.cookies } }
+      : {
+          [path.join(root, "server/auth/session.ts")]: {
+            ReadSession: async () => {
+              if (session instanceof Error) throw session;
+              return session;
+            },
+          },
+        }),
   };
   function load(request: string, from = root): Record<string, unknown> {
     if (Object.hasOwn(stubs, request))

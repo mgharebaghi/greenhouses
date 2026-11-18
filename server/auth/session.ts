@@ -70,10 +70,11 @@ export async function ReadSession(): Promise<Session | null> {
 
   const user = await prisma.users.findUnique({
     where: { ID: session.UserId || 0 },
-    select: { ID: true, Username: true },
+    select: { ID: true, Username: true, IsActive: true },
   });
 
   if (!user) return { status: "error", code: 404 };
+  if (user.IsActive !== true) return { status: "error", code: 403 };
 
   return { status: "ok", code: 200, id: user.ID, username: user.Username };
 }

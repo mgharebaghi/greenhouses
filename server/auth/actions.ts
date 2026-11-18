@@ -50,7 +50,7 @@ export async function signIn(input: unknown): Promise<SignInResult> {
       where: { Username: data.username },
     });
 
-    if (!user) {
+    if (user?.IsActive !== true) {
       return { status: "error", message: "کاربری با این مشخصات یافت نشد!" };
     }
 
